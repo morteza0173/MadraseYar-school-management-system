@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 // import localFont from "next/font/local";
 import { Vazirmatn } from "next/font/google";
 import "./globals.css";
+import { Toaster } from "@/components/ui/sonner";
 
 const vazirmatn = Vazirmatn({ style: "normal", subsets: ["latin"] });
 
@@ -28,7 +29,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" dir="rtl">
-      <body className={`${vazirmatn.className} antialiased`}>{children}</body>
+      <body className={`${vazirmatn.className} antialiased`}>
+        {children} <Toaster />
+      </body>
     </html>
   );
 }
