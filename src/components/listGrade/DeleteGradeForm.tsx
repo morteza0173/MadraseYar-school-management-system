@@ -16,23 +16,29 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useFormState } from "react-dom";
-import { AddGrade } from "@/actions/gradeActions";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Loader2Icon } from "lucide-react";
+import { deleteGrade } from "@/actions/gradeActions";
 
-const formSchema = z.object({
-  grade: z
-    .string()
-    .nonempty("سال تحصیلی نمی‌تواند خالی باشد.")
-    .refine((val) => {
-      const num = Number(val);
-      return num > 0;
-    }, "سال تحصیلی باید بزرگ‌تر از صفر باشد."),
-});
+interface RowData {
+  id: number;
+  level: number;
+  students: number;
+  classes: number;
+}
 
-const AddGradeForm = ({ onCancel }: { onCancel: () => void }) => {
-  const [state, formAction] = useFormState(AddGrade, { message: "" });
+type Row<T> = {
+  original: T;
+};
+
+interface DataTableRowActionsProps {
+  row: Row<RowData>;
+  onCancel: () => void;
+}
+
+const DeleteGradeForm = ({ onCancel, row }: DataTableRowActionsProps) => {
+  const [state, formAction] = useFormState(deleteGrade, { message: "" });
   const [pending, setPending] = useState(false);
 
   useEffect(() => {
@@ -43,21 +49,35 @@ const AddGradeForm = ({ onCancel }: { onCancel: () => void }) => {
     }
   }, [state]);
 
+  const expectedText = `remove ${row.original.level} and all ${row.original.classes} classes and all ${row.original.students} students`;
+
+  const formSchema = z.object({
+    confirm: z
+      .string()
+      .nonempty("تاییدیه باید نوشته شود")
+      .refine((val) => val === expectedText, {
+        message:
+          "متن وارد شده مطابقت ندارد. لطفاً جمله موردنظر را دقیقاً تایپ کنید.",
+      }),
+  });
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      grade: "",
+      confirm: "",
     },
   });
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
+    if (data.confirm !== expectedText) {
+      return;
+    }
     setPending(true);
-    console.log(pending);
-
     const formData = new FormData();
-    formData.set("grade", data.grade);
-    formAction(formData);
+    const gradeId = row.original.id.toString();
+    formData.set("gradeId", gradeId);
 
+    formAction(formData);
   };
   return (
     <div className="p-4">
@@ -65,19 +85,24 @@ const AddGradeForm = ({ onCancel }: { onCancel: () => void }) => {
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <FormField
             control={form.control}
-            name="grade"
+            name="confirm"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>سال تحصیلی</FormLabel>
+                <FormLabel>تایید حذف</FormLabel>
                 <FormControl>
                   <Input
                     className="focus-visible:ring-orange-300"
-                    type="number"
-                    placeholder="12"
+                    placeholder="متن تایید را بنویسید"
                     {...field}
                   />
                 </FormControl>
-                <FormDescription>به صورت عدد وارد کنید </FormDescription>
+                <FormDescription>
+                  {`برای حذف جمله زیر به رو را به صورت کامل در کادر بنویسید`}
+                  <br />
+                  <span className="font-semibold">
+                    {`remove ${row.original.level} and all ${row.original.classes} classes and all ${row.original.students} students`}
+                  </span>
+                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -111,4 +136,4 @@ const AddGradeForm = ({ onCancel }: { onCancel: () => void }) => {
     </div>
   );
 };
-export default AddGradeForm;
+export default DeleteGradeForm;

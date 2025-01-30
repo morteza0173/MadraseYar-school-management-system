@@ -16,7 +16,7 @@ import { DatePicker } from "./ClanderDatePicker";
 
 export const AdminContent = async () => {
   const userinfo = await getUserInfo();
-  if (!userinfo) {
+  if (userinfo?.role !== "admin") {
     redirect("/login");
   }
 

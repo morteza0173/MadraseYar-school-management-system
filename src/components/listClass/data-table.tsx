@@ -24,8 +24,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { DataTablePagination } from "../tableComponent/data-table-pagination";
-import { DataTableViewOptions } from "./data-table-view-options";
 import { useLayoutEffect, useState } from "react";
+import { DataTableViewOptions } from "./data-table-view-options";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -41,7 +41,6 @@ export function DataTable<TData, TValue>({
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [sorting, setSorting] = useState<SortingState>([]);
 
-
   const [isMobile, setIsMobile] = useState(false);
 
   useLayoutEffect(() => {
@@ -52,15 +51,19 @@ export function DataTable<TData, TValue>({
         // در حالت موبایل ستون‌های خاصی مخفی شوند
         setColumnVisibility((prevState) => ({
           ...prevState,
-          students: false,
-          classes: false,
+          grade: false,
+          capacity: false,
+          studentCount: false,
+          supervisor: false,
         }));
       } else if (!mobileView && isMobile) {
         // در حالت دسکتاپ ستون‌ها نمایش داده شوند
         setColumnVisibility({
           name: true,
-          students: true,
-          classes: true,
+          grade: true,
+          capacity: true,
+          studentCount: true,
+          supervisor: true,
         });
       }
 

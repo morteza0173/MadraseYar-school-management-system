@@ -4,7 +4,7 @@ import { prisma } from "@/lib/db";
 import { createClient } from "@/lib/supabaseClient";
 import { cache } from "react";
 
-export interface getUserInfo {
+export interface getUserInfoProps {
   id: string;
   role: string;
   name: string;
@@ -16,7 +16,7 @@ export interface getUserInfo {
   img: string | null;
 }
 
-export  const getUserInfo = cache(async (): Promise<getUserInfo | undefined> => {
+export const getUserInfo = cache(async (): Promise<getUserInfoProps | undefined> => {
   const supabase = await createClient();
   const { data } = await supabase.auth.getUser();
   if (!data.user?.id) return;
@@ -46,11 +46,10 @@ export  const getUserInfo = cache(async (): Promise<getUserInfo | undefined> => 
   return;
 });
 
-
 export async function getStudents() {
-    const data = await prisma.student.findMany()
+  const data = await prisma.student.findMany();
 
-    return data
+  return data;
 }
 
 export async function getTeacher() {

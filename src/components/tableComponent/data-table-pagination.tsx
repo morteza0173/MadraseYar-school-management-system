@@ -1,4 +1,3 @@
-
 import { Table } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import {
@@ -8,7 +7,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+} from "lucide-react";
 
 interface DataTablePaginationProps<TData> {
   table: Table<TData>;
@@ -21,8 +25,12 @@ export function DataTablePagination<TData>({
     <div className="flex flex-col items-center justify-between space-y-4 px-2 lg:flex-row lg:space-y-0">
       <div className="flex flex-col items-center gap-0 md:gap-10 space-y-2 sm:flex-row sm:space-x-6 sm:space-y-0">
         <div className="text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} از{" "}
-          {table.getFilteredRowModel().rows.length} ردیف انتخاب شده است.
+          {table.getFilteredSelectedRowModel().rows.length > 0 && (
+            <>
+              {table.getFilteredSelectedRowModel().rows.length} از{" "}
+              {table.getFilteredRowModel().rows.length} ردیف انتخاب شده است.
+            </>
+          )}
         </div>
         <div className="flex items-center px-2 space-x-2">
           <p className="text-sm font-medium pl-2">ردیف در هر صفحه</p>

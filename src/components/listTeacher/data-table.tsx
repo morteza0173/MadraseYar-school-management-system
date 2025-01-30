@@ -25,8 +25,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import { DataTablePagination } from "./data-table-pagination";
 import { DataTableToolbar } from "./data-table-toolbar";
+import { DataTablePagination } from "../tableComponent/data-table-pagination";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -54,7 +54,7 @@ export function DataTable<TData, TValue>({
           category: false,
           type: false,
           amount: false,
-          date:false,
+          date: false,
         });
       } else {
         // در حالت دسکتاپ ستون‌ها نمایش داده شوند
@@ -63,7 +63,7 @@ export function DataTable<TData, TValue>({
           category: true,
           type: true,
           amount: true,
-          date:true,
+          date: true,
         });
       }
     };

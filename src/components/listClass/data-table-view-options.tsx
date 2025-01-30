@@ -11,10 +11,10 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { CirclePlus, SlidersHorizontal } from "lucide-react";
+import { CirclePlus, SlidersHorizontal} from "lucide-react";
 import { useState } from "react";
-import AddGradeForm from "./AddGradeForm";
-import ResponsiveModalForm from "../ResponsiveModalForm";
+// import AddGradeForm from "./AddGradeForm";
+// import ResponsiveModalForm from "./ResponsiveModalForm";
 
 interface DataTableViewOptionsProps<TData> {
   table: Table<TData>;
@@ -30,7 +30,7 @@ export function DataTableViewOptions<TData>({
 
   return (
     <div className="flex gap-2 w-full md:w-auto">
-      <ResponsiveModalForm
+      {/* <ResponsiveModalForm
         isOpen={isOpen}
         setIsOpen={setIsOpen}
         close={close}
@@ -38,7 +38,7 @@ export function DataTableViewOptions<TData>({
         discription="در این بخش میتوانید سال تحصیلی جدیدی بسازید"
       >
         <AddGradeForm onCancel={close} />
-      </ResponsiveModalForm>
+      </ResponsiveModalForm> */}
       <Button
         variant="outline"
         size="sm"

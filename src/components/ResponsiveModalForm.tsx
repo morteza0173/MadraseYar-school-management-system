@@ -1,18 +1,18 @@
-import { ResponsiveModal } from "../Responsive-modal";
-import AddGradeForm from "./AddGradeForm";
+import { ResponsiveModal } from "./Responsive-modal";
 
-const AddGrade = ({
+const ResponsiveModalForm = ({
+  children,
   isOpen,
   setIsOpen,
-  close,
   title,
   discription,
 }: {
+  children: React.ReactNode;
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
   close: () => void;
   title: string;
-  discription:string;
+  discription: string;
 }) => {
   return (
     <ResponsiveModal
@@ -21,8 +21,8 @@ const AddGrade = ({
       title={title}
       discription={discription}
     >
-      <AddGradeForm onCancel={close} />
+      {children}
     </ResponsiveModal>
   );
 };
-export default AddGrade
+export default ResponsiveModalForm;

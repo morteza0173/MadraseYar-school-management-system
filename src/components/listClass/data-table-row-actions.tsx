@@ -10,9 +10,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Ellipsis } from "lucide-react";
 import { useState } from "react";
+// import DeleteGradeForm from "./DeleteGradeForm";
+// import EditGradeForm from "./EditGradeForm";
 import ResponsiveModalForm from "../ResponsiveModalForm";
-import DeleteGradeForm from "./DeleteGradeForm";
-import EditGradeForm from "./EditGradeForm";
 
 interface RowData {
   id: number;
@@ -40,7 +40,7 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
 
   return (
     <>
-      <ResponsiveModalForm
+      {/* <ResponsiveModalForm
         isOpen={isOpenDelete}
         setIsOpen={setIsOpenDelete}
         close={closeDelete}
@@ -57,7 +57,7 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
         discription="دقت کنید که سال تحصیلی نمیتواند تکراری باشد"
       >
         <EditGradeForm onCancel={closeEdit} row={row} />
-      </ResponsiveModalForm>
+      </ResponsiveModalForm> */}
       <DropdownMenu dir="rtl" modal={false}>
         <DropdownMenuTrigger asChild>
           <Button

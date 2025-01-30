@@ -4,7 +4,7 @@ import { Vazirmatn } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 
-const vazirmatn = Vazirmatn({ style: "normal", subsets: ["latin"] });
+const vazirmatn = Vazirmatn({ style: "normal", subsets: ["arabic"] });
 
 // const geistSans = localFont({
 //   src: "./fonts/GeistVF.woff",
@@ -30,7 +30,8 @@ export default function RootLayout({
   return (
     <html lang="en" dir="rtl">
       <body className={`${vazirmatn.className} antialiased`}>
-        {children} <Toaster />
+        {children}{" "}
+        <Toaster closeButton richColors dir="rtl" position="bottom-left" />
       </body>
     </html>
   );

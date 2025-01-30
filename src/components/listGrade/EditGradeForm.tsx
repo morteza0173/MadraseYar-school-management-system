@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useFormState } from "react-dom";
-import { AddGrade } from "@/actions/gradeActions";
+import { EditGrade } from "@/actions/gradeActions";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Loader2Icon } from "lucide-react";
@@ -31,8 +31,24 @@ const formSchema = z.object({
     }, "سال تحصیلی باید بزرگ‌تر از صفر باشد."),
 });
 
-const AddGradeForm = ({ onCancel }: { onCancel: () => void }) => {
-  const [state, formAction] = useFormState(AddGrade, { message: "" });
+interface RowData {
+  id: number;
+  level: number;
+  students: number;
+  classes: number;
+}
+
+type Row<T> = {
+  original: T;
+};
+
+interface DataTableRowActionsProps {
+  row: Row<RowData>;
+  onCancel: () => void;
+}
+
+const EditGradeForm = ({ onCancel, row }: DataTableRowActionsProps) => {
+  const [state, formAction] = useFormState(EditGrade, { message: "" });
   const [pending, setPending] = useState(false);
 
   useEffect(() => {
@@ -46,7 +62,7 @@ const AddGradeForm = ({ onCancel }: { onCancel: () => void }) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      grade: "",
+      grade: row.original.level.toString(),
     },
   });
 
@@ -56,8 +72,8 @@ const AddGradeForm = ({ onCancel }: { onCancel: () => void }) => {
 
     const formData = new FormData();
     formData.set("grade", data.grade);
+    formData.set("gradeId", row.original.id.toString());
     formAction(formData);
-
   };
   return (
     <div className="p-4">
@@ -94,7 +110,7 @@ const AddGradeForm = ({ onCancel }: { onCancel: () => void }) => {
                   لطفا صبر کنید ...
                 </>
               ) : (
-                "ثبت"
+                "ویرایش"
               )}
             </Button>
             <Button
@@ -111,4 +127,4 @@ const AddGradeForm = ({ onCancel }: { onCancel: () => void }) => {
     </div>
   );
 };
-export default AddGradeForm;
+export default EditGradeForm;
