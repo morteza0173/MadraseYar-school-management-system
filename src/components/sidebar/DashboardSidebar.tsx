@@ -22,7 +22,7 @@ import { DashboardSidebarMain } from "./DashboardSidebarMain";
 import { DashboardSidebarOther } from "./DashboardSidebarOther";
 import { DashboardSidebarSwitcher } from "./DashboardSidebarSwitcher";
 import { DashboardSidebarUser } from "./DashboardSidebarUser";
-import { getUserInfo } from "@/actions/dashboardAction";
+import { getUserInfoProps } from "@/actions/dashboardAction";
 
 // This is sample data.
 const data = {
@@ -170,7 +170,7 @@ export function DashboardSidebar({
   userInfo,
   ...props
 }: React.ComponentProps<typeof Sidebar> & {
-  userInfo: getUserInfo | undefined;
+  userInfo: getUserInfoProps | undefined;
 }) {
   return (
     <Sidebar collapsible="icon" {...props} side="right">

@@ -1,10 +1,11 @@
 import ClassListContent from "@/components/listClass/ClassListContent";
+import DataTableSkeleton from "@/components/skeleton/DataTableSkeleton";
 import { Suspense } from "react";
 
-const page = async () => {
+const page = () => {
   return (
     <div>
-      <Suspense fallback={<div>Loading class data...</div>}>
+      <Suspense fallback={<DataTableSkeleton />}>
         <ClassListContent />
       </Suspense>
     </div>

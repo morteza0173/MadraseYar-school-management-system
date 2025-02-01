@@ -1,3 +1,4 @@
+"use client";
 import { useFormStatus } from "react-dom";
 import { Button } from "./ui/button";
 import { Loader2Icon } from "lucide-react";

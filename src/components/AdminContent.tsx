@@ -60,7 +60,7 @@ export const AdminContent = async () => {
         <div className="w-full flex flex-col md:flex-row lg:flex-col gap-4">
           {/* datepicker */}
           <div className="md:h-[380px] lg:h-auto  mt-10 lg:mt-0">
-            <DatePicker />
+              <DatePicker />
           </div>
           <div className="w-full h-auto md:mt-10 lg:mt-0">
             <EventCard />

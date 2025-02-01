@@ -3,7 +3,7 @@ import { Button } from "./ui/button";
 
 const UserCard = ({ type, Number }: { type: string; Number?: number }) => {
   return (
-    <div className="rounded-2xl odd:bg-Purple even:bg-Yellow p-4 flex-1 min-w-[170px] shadow-sm w-full h-full p-4">
+    <div className="rounded-2xl odd:bg-Purple even:bg-Yellow p-4 flex-1 min-w-[170px] shadow-sm w-full h-full">
       <div>
         <div className="flex items-center justify-between">
           <div className="flex items-center justify-center bg-white p-1 px-2 rounded-full">

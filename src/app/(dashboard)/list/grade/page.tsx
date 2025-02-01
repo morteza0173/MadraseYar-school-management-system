@@ -1,9 +1,10 @@
 import GradeListContent from "@/components/listGrade/GradeListContent";
+import DataTableSkeleton from "@/components/skeleton/DataTableSkeleton";
 import { Suspense } from "react";
-const page = async () => {
+const page = () => {
   return (
     <div>
-      <Suspense fallback={<div>Loading grade data...</div>}>
+      <Suspense fallback={<DataTableSkeleton />}>
         <GradeListContent />
       </Suspense>
     </div>

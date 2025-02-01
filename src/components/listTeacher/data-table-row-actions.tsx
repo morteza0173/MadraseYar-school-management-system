@@ -7,13 +7,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Ellipsis } from "lucide-react";
@@ -26,6 +20,7 @@ export function DataTableRowActions<TData>({
   row,
 }: DataTableRowActionsProps<TData>) {
   // const task = taskSchema.parse(row.original);
+  console.log(row);
 
   return (
     <DropdownMenu dir="rtl">
@@ -41,9 +36,7 @@ export function DataTableRowActions<TData>({
       <DropdownMenuContent align="end" className="w-[160px]">
         <DropdownMenuItem>ویرایش</DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
-          حذف
-        </DropdownMenuItem>
+        <DropdownMenuItem>حذف</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

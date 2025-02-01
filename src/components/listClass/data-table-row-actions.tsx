@@ -9,16 +9,17 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Ellipsis } from "lucide-react";
-import { useState } from "react";
+// import { useState } from "react";
 // import DeleteGradeForm from "./DeleteGradeForm";
 // import EditGradeForm from "./EditGradeForm";
-import ResponsiveModalForm from "../ResponsiveModalForm";
+// import ResponsiveModalForm from "../ResponsiveModalForm";
 
 interface RowData {
-  id: number;
-  level: number;
-  students: number;
-  classes: number;
+  name: string;
+  grade: number;
+  capacity: number;
+  studentCount: number;
+  supervisor?: string;
 }
 
 type Row<T> = {
@@ -30,13 +31,14 @@ interface DataTableRowActionsProps {
 }
 
 export function DataTableRowActions({ row }: DataTableRowActionsProps) {
-  const [isOpenDelete, setIsOpenDelete] = useState(false);
-  const [isOpenEdit, setIsOpenEdit] = useState(false);
+  // const [isOpenDelete, setIsOpenDelete] = useState(false);
+  // const [isOpenEdit, setIsOpenEdit] = useState(false);
 
-  const closeDelete = () => setIsOpenDelete(false);
-  const openDelete = () => setIsOpenDelete(true);
-  const closeEdit = () => setIsOpenEdit(false);
-  const openEdit = () => setIsOpenEdit(true);
+  // const closeDelete = () => setIsOpenDelete(false);
+  // const openDelete = () => setIsOpenDelete(true);
+  // const closeEdit = () => setIsOpenEdit(false);
+  // const openEdit = () => setIsOpenEdit(true);
+  console.log(row);
 
   return (
     <>
@@ -69,9 +71,9 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-[160px]">
-          <DropdownMenuItem onClick={openEdit}>ویرایش</DropdownMenuItem>
+          <DropdownMenuItem>ویرایش</DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={openDelete}>حذف</DropdownMenuItem>
+          <DropdownMenuItem>حذف</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </>

@@ -18,12 +18,12 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { getUserInfo } from "@/actions/dashboardAction";
+import { getUserInfoProps } from "@/actions/dashboardAction";
 
 export function DashboardSidebarUser({
   user,
 }: {
-  user: getUserInfo | undefined;
+  user: getUserInfoProps | undefined;
 }) {
   const { isMobile } = useSidebar();
   if (!user) {

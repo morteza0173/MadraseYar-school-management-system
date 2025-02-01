@@ -1,12 +1,18 @@
 import { Adminlogin } from "@/actions/loginAction";
-import { Button } from "@/components/ui/button";
-import { Card, CardDescription, CardFooter, CardHeader, CardTitle,CardContent } from "@/components/ui/card";
+import SubmitButton from "@/components/SubmitButton";
+import {
+  Card,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+  CardContent,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { GraduationCap } from "lucide-react";
 import Image from "next/image";
-
 
 function CardContentUsers({
   value,
@@ -29,7 +35,9 @@ function CardContentUsers({
         <form action={loginAction}>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="user">نام کاربری یا شماره موبایل و یا کدملی</Label>
+              <Label htmlFor="user">
+                نام کاربری یا شماره موبایل و یا کدملی
+              </Label>
               <Input
                 id="user"
                 name="user"
@@ -48,9 +56,7 @@ function CardContentUsers({
             </div>
           </CardContent>
           <CardFooter>
-            <Button variant="default" className="w-full bg-orange-400 hover:bg-orange-300">
-              ورود
-            </Button>
+            <SubmitButton text="ورود" />
           </CardFooter>
         </form>
       </Card>

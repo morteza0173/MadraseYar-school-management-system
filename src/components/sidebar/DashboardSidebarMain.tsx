@@ -17,7 +17,7 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
-import { getUserInfo } from "@/actions/dashboardAction";
+import { getUserInfoProps } from "@/actions/dashboardAction";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -36,7 +36,7 @@ export function DashboardSidebarMain({
       url: string;
     }[];
   }[];
-  userInfo: getUserInfo | undefined;
+  userInfo: getUserInfoProps | undefined;
 }) {
   const pathname = usePathname();
   return (
