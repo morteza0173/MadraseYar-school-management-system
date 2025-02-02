@@ -1,15 +1,22 @@
 import { getClassDetails } from "@/actions/classAction";
 import { DataTable } from "./data-table";
 import { columns } from "./columns";
-import { getUserInfo } from "@/actions/dashboardAction";
+import { getTeacher, getUserInfo } from "@/actions/dashboardAction";
 import { redirect } from "next/navigation";
+import { GetGradeData } from "@/actions/gradeActions";
+
+
 
 const ClassListContent = async () => {
   const user = await getUserInfo();
   if (!user) {
     redirect("/login");
   }
-  const classDetails = await getClassDetails(user);
+
+  const [classDetails, teacherList, gradeList] =
+    user.role === "admin"
+      ? await Promise.all([getClassDetails(user), getTeacher(), GetGradeData()])
+      : [await getClassDetails(user), null, null];
 
   return (
     <div className="h-auto pb-10 flex-1 flex-col px-8 md:flex">
@@ -18,7 +25,12 @@ const ClassListContent = async () => {
           لیست تمام کلاس ها در جدول زیر نمایش داده میشود
         </p>
       </div>
-      <DataTable data={classDetails} columns={columns} />
+      <DataTable
+        data={classDetails}
+        teacherList={teacherList}
+        gradeList={gradeList}
+        columns={columns}
+      />
     </div>
   );
 };

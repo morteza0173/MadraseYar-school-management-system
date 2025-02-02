@@ -3,6 +3,13 @@
 import { prisma } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 
+export interface gradeListProps {
+  id: number;
+  level: number;
+  students: number;
+  classes: number;
+}
+
 export async function GetGradeData() {
   const grades = await prisma.grade.findMany({
     select: {

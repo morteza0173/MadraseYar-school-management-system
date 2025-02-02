@@ -26,14 +26,20 @@ import {
 import { DataTablePagination } from "../tableComponent/data-table-pagination";
 import { useLayoutEffect, useState } from "react";
 import { DataTableViewOptions } from "./data-table-view-options";
+import { teacherListProps } from "@/actions/dashboardAction";
+import { gradeListProps } from "@/actions/gradeActions";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
+  teacherList: teacherListProps[] | null;
+  gradeList: gradeListProps[] | null;
   data: TData[];
 }
 
 export function DataTable<TData, TValue>({
   columns,
+  teacherList,
+  gradeList,
   data,
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = useState({});
@@ -101,7 +107,11 @@ export function DataTable<TData, TValue>({
 
   return (
     <div className="space-y-2 ">
-      <DataTableViewOptions table={table} />
+      <DataTableViewOptions
+        table={table}
+        teacherList={teacherList}
+        gradeList={gradeList}
+      />
       <div className="overflow-y-auto rounded-md border">
         <Table>
           <TableHeader>

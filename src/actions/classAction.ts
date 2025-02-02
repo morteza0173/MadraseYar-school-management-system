@@ -1,5 +1,8 @@
+"use server";
+
 import { prisma } from "@/lib/db";
 import { getUserInfoProps } from "./dashboardAction";
+import { revalidatePath } from "next/cache";
 
 export async function getClassDetails(user: getUserInfoProps) {
   if (!user) {
@@ -46,8 +49,6 @@ export async function getClassDetails(user: getUserInfoProps) {
     classFilter = { id: student.classId };
   }
 
-
-
   const classDetails = await prisma.class.findMany({
     where: classFilter,
     select: {
@@ -79,4 +80,35 @@ export async function getClassDetails(user: getUserInfoProps) {
     studentCount: cls.student.length, // تعداد دانش‌آموزان
     supervisor: `${cls.supervisor.name} ${cls.supervisor.surname}`, // نام کامل مشاور
   }));
+}
+
+export type FormState = {
+  message: string;
+};
+
+export async function AddClass(
+  _PrevState: FormState,
+  formData: FormData
+): Promise<FormState> {
+  const className = formData.get("className") as string;
+  const capacity = Number(formData.get("capacity"));
+  const supervisor = formData.get("supervisor") as string;
+  const grade = Number(formData.get("grade"));
+
+  try {
+    await prisma.class.create({
+      data: {
+        name: className,
+        capacity: capacity,
+        supervisorId: supervisor,
+        gradeId: grade,
+      },
+    });
+
+    revalidatePath("/list/class");
+    return { message: "کلاس جدید با موفقیت ساخته شد" };
+  } catch (error) {
+    console.error("Error creating class:", error);
+    return { message: "مشکلی در ثبت کلاس جدید به وجود آمد" };
+  }
 }

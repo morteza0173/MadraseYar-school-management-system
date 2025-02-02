@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/db";
 import { createClient } from "@/lib/supabaseClient";
+import { $Enums } from "@prisma/client";
 import { cache } from "react";
 
 export interface getUserInfoProps {
@@ -16,35 +17,50 @@ export interface getUserInfoProps {
   img: string | null;
 }
 
-export const getUserInfo = cache(async (): Promise<getUserInfoProps | undefined> => {
-  const supabase = await createClient();
-  const { data } = await supabase.auth.getUser();
-  if (!data.user?.id) return;
-  const userRole = await prisma.users.findFirst({
-    where: {
-      id: data.user.id,
-    },
-  });
+export interface teacherListProps {
+  name: string;
+  address: string;
+  img: string | null;
+  id: string;
+  email: string | null;
+  username: string;
+  phone: string | null;
+  surname: string;
+  sex: $Enums.UserSex;
+  createdAt: Date;
+}
 
-  if (!userRole?.role) {
-    return;
-  }
-
-  if (userRole.role === "admin") {
-    const adminInfo = await prisma.admin.findFirst({
+export const getUserInfo = cache(
+  async (): Promise<getUserInfoProps | undefined> => {
+    const supabase = await createClient();
+    const { data } = await supabase.auth.getUser();
+    if (!data.user?.id) return;
+    const userRole = await prisma.users.findFirst({
       where: {
         id: data.user.id,
       },
     });
 
-    if (!adminInfo) return;
+    if (!userRole?.role) {
+      return;
+    }
 
-    const userInfo = { ...adminInfo, ...userRole };
-    return userInfo;
+    if (userRole.role === "admin") {
+      const adminInfo = await prisma.admin.findFirst({
+        where: {
+          id: data.user.id,
+        },
+      });
+
+      if (!adminInfo) return;
+
+      const userInfo = { ...adminInfo, ...userRole };
+      return userInfo;
+    }
+
+    return;
   }
-
-  return;
-});
+);
 
 export async function getStudents() {
   const data = await prisma.student.findMany();
