@@ -2,7 +2,7 @@ import { GetGradeData } from "@/actions/gradeActions";
 import { GradeListDataTable } from "./GradeListDataTable";
 import { getUserInfo } from "@/actions/dashboardAction";
 import { redirect } from "next/navigation";
-import { gradeListColumns } from "./GradeListColumns";
+import { gradeListColumns } from "./gradeListColumns";
 
 const GradeListContent = async () => {
   const user = await getUserInfo();
