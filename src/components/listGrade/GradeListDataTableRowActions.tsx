@@ -9,17 +9,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Ellipsis } from "lucide-react";
-// import { useState } from "react";
-// import DeleteGradeForm from "./DeleteGradeForm";
-// import EditGradeForm from "./EditGradeForm";
-// import ResponsiveModalForm from "../ResponsiveModalForm";
+import { useState } from "react";
+import ResponsiveModalForm from "../ResponsiveModalForm";
+import DeleteGradeForm from "./DeleteGradeForm";
+import EditGradeForm from "./EditGradeForm";
 
 interface RowData {
-  name: string;
-  grade: number;
-  capacity: number;
-  studentCount: number;
-  supervisor?: string;
+  id: number;
+  level: number;
+  students: number;
+  classes: number;
 }
 
 type Row<T> = {
@@ -30,19 +29,18 @@ interface DataTableRowActionsProps {
   row: Row<RowData>;
 }
 
-export function DataTableRowActions({ row }: DataTableRowActionsProps) {
-  // const [isOpenDelete, setIsOpenDelete] = useState(false);
-  // const [isOpenEdit, setIsOpenEdit] = useState(false);
+export function GradeListDataTableRowActions({ row }: DataTableRowActionsProps) {
+  const [isOpenDelete, setIsOpenDelete] = useState(false);
+  const [isOpenEdit, setIsOpenEdit] = useState(false);
 
-  // const closeDelete = () => setIsOpenDelete(false);
-  // const openDelete = () => setIsOpenDelete(true);
-  // const closeEdit = () => setIsOpenEdit(false);
-  // const openEdit = () => setIsOpenEdit(true);
-  console.log(row);
+  const closeDelete = () => setIsOpenDelete(false);
+  const openDelete = () => setIsOpenDelete(true);
+  const closeEdit = () => setIsOpenEdit(false);
+  const openEdit = () => setIsOpenEdit(true);
 
   return (
     <>
-      {/* <ResponsiveModalForm
+      <ResponsiveModalForm
         isOpen={isOpenDelete}
         setIsOpen={setIsOpenDelete}
         close={closeDelete}
@@ -59,7 +57,7 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
         discription="دقت کنید که سال تحصیلی نمیتواند تکراری باشد"
       >
         <EditGradeForm onCancel={closeEdit} row={row} />
-      </ResponsiveModalForm> */}
+      </ResponsiveModalForm>
       <DropdownMenu dir="rtl" modal={false}>
         <DropdownMenuTrigger asChild>
           <Button
@@ -71,9 +69,9 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-[160px]">
-          <DropdownMenuItem>ویرایش</DropdownMenuItem>
+          <DropdownMenuItem onClick={openEdit}>ویرایش</DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>حذف</DropdownMenuItem>
+          <DropdownMenuItem onClick={openDelete}>حذف</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </>

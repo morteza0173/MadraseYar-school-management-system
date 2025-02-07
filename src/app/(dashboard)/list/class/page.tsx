@@ -1,4 +1,4 @@
-import ClassListContent from "@/components/listClass/ClassListContent";
+import ClassListContent from "@/components/ClassList/ClassListContent";
 import DataTableSkeleton from "@/components/skeleton/DataTableSkeleton";
 import { Suspense } from "react";
 

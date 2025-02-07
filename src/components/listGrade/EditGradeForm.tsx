@@ -20,16 +20,8 @@ import { EditGrade } from "@/actions/gradeActions";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Loader2Icon } from "lucide-react";
+import { GradeFormSchema } from "@/lib/schemas";
 
-const formSchema = z.object({
-  grade: z
-    .string()
-    .nonempty("سال تحصیلی نمی‌تواند خالی باشد.")
-    .refine((val) => {
-      const num = Number(val);
-      return num > 0;
-    }, "سال تحصیلی باید بزرگ‌تر از صفر باشد."),
-});
 
 interface RowData {
   id: number;
@@ -51,22 +43,24 @@ const EditGradeForm = ({ onCancel, row }: DataTableRowActionsProps) => {
   const [state, formAction] = useFormState(EditGrade, { message: "" });
   const [pending, setPending] = useState(false);
 
-  useEffect(() => {
-    if (state.message !== "") {
-      toast(state.message);
-      setPending(false);
-      onCancel();
-    }
-  }, [state]);
+   useEffect(() => {
+     if (pending) {
+       if (state.message !== "") {
+         toast(state.message);
+         setPending(false);
+         onCancel();
+       }
+     }
+   }, [state, onCancel, pending]);
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof GradeFormSchema>>({
+    resolver: zodResolver(GradeFormSchema),
     defaultValues: {
       grade: row.original.level.toString(),
     },
   });
 
-  const onSubmit = async (data: z.infer<typeof formSchema>) => {
+  const onSubmit = async (data: z.infer<typeof GradeFormSchema>) => {
     setPending(true);
     console.log(pending);
 

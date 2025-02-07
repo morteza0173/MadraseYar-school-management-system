@@ -1,3 +1,4 @@
+import { useIsMobile } from "@/hooks/use-mobile";
 import {
   Dialog,
   DialogContent,
@@ -12,7 +13,6 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from "./ui/drawer";
-import { useLayoutEffect, useState } from "react";
 
 interface ResponsiveModalProps {
   children: React.ReactNode;
@@ -29,25 +29,10 @@ export const ResponsiveModal = ({
   title,
   discription,
 }: ResponsiveModalProps) => {
-  const [isDesktop, setIsDesktop] = useState(false);
+  const isMobile = useIsMobile();
+  
 
-  useLayoutEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth < 768) {
-        setIsDesktop(false);
-      } else {
-        setIsDesktop(true);
-      }
-    };
-
-    window.addEventListener("resize", handleResize);
-    handleResize();
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
-
-  if (isDesktop) {
+  if (!isMobile) {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent
@@ -70,9 +55,7 @@ export const ResponsiveModal = ({
           <DrawerTitle>{title}</DrawerTitle>
           <DrawerDescription>{discription}</DrawerDescription>
         </DrawerHeader>
-        <div className="overflow-y-auto hide-scrollbar max-h-[85vh]">
-          {children}
-        </div>
+        <div className="overflow-y-auto hide-scrollbar">{children}</div>
       </DrawerContent>
     </Drawer>
   );

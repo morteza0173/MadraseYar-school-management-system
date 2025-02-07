@@ -9,16 +9,17 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Ellipsis } from "lucide-react";
-import { useState } from "react";
 import ResponsiveModalForm from "../ResponsiveModalForm";
-import DeleteGradeForm from "./DeleteGradeForm";
-import EditGradeForm from "./EditGradeForm";
+import EditClassForm from "./EditClassForm";
+import { useState } from "react";
+import DeleteClassForm from "./DeleteClassForm";
 
 interface RowData {
-  id: number;
-  level: number;
-  students: number;
-  classes: number;
+  name: string;
+  grade: number;
+  capacity: number;
+  studentCount: number;
+  supervisor?: string;
 }
 
 type Row<T> = {
@@ -29,7 +30,9 @@ interface DataTableRowActionsProps {
   row: Row<RowData>;
 }
 
-export function DataTableRowActions({ row }: DataTableRowActionsProps) {
+export function ClassListDataTableRowActions({
+  row,
+}: DataTableRowActionsProps) {
   const [isOpenDelete, setIsOpenDelete] = useState(false);
   const [isOpenEdit, setIsOpenEdit] = useState(false);
 
@@ -44,10 +47,10 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
         isOpen={isOpenDelete}
         setIsOpen={setIsOpenDelete}
         close={closeDelete}
-        title="حذف سال تحصیلی"
-        discription="سال تحصیلی به همراه کلاس ها و دانش آموزان و خانواده هایی که دانش آموز دیگر در مدرسه ندارند به طور کامل حذف خواهد شد "
+        title="حذف کلاس"
+        discription="کلاس به همراه تمام دانش آموزان و خانواده هایی که دانش آموز دیگری در مدرسه ندارند حذف خواهد شد"
       >
-        <DeleteGradeForm onCancel={closeDelete} row={row} />
+        <DeleteClassForm onCancel={closeDelete} row={row} />
       </ResponsiveModalForm>
       <ResponsiveModalForm
         isOpen={isOpenEdit}
@@ -56,7 +59,7 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
         title="ویرایش سال تحصیلی"
         discription="دقت کنید که سال تحصیلی نمیتواند تکراری باشد"
       >
-        <EditGradeForm onCancel={closeEdit} row={row} />
+        <EditClassForm onCancel={closeEdit} row={row} />
       </ResponsiveModalForm>
       <DropdownMenu dir="rtl" modal={false}>
         <DropdownMenuTrigger asChild>

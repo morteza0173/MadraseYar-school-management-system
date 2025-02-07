@@ -1,6 +1,6 @@
 import { getClassDetails } from "@/actions/classAction";
-import { DataTable } from "./data-table";
-import { columns } from "./columns";
+import { ClassListDataTable } from "./ClassListDataTable";
+import { classListColumns } from "./classListColumns";
 import { getTeacher, getUserInfo } from "@/actions/dashboardAction";
 import { redirect } from "next/navigation";
 import { GetGradeData } from "@/actions/gradeActions";
@@ -25,11 +25,11 @@ const ClassListContent = async () => {
           لیست تمام کلاس ها در جدول زیر نمایش داده میشود
         </p>
       </div>
-      <DataTable
+      <ClassListDataTable
         data={classDetails}
         teacherList={teacherList}
         gradeList={gradeList}
-        columns={columns}
+        columns={classListColumns}
       />
     </div>
   );

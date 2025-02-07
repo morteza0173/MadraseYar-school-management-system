@@ -20,7 +20,7 @@ interface DataTableViewOptionsProps<TData> {
   table: Table<TData>;
 }
 
-export function DataTableViewOptions<TData>({
+export function GradeListDataTableViewOptions<TData>({
   table,
 }: DataTableViewOptionsProps<TData>) {
   const [isOpen, setIsOpen] = useState(false);

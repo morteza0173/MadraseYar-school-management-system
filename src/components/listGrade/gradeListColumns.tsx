@@ -2,10 +2,10 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { DataTableColumnHeader } from "../tableComponent/data-table-column-header";
-import { Expense } from "./schema";
-import { DataTableRowActions } from "./data-table-row-actions";
+import { GradeListDataTableRowActions } from "./GradeListDataTableRowActions";
+import { GradeListSchema } from "@/lib/schemas";
 
-export const columns: ColumnDef<Expense>[] = [
+export const gradeListColumns: ColumnDef<GradeListSchema>[] = [
   {
     accessorKey: "level",
     header: ({ column }) => (
@@ -58,6 +58,6 @@ export const columns: ColumnDef<Expense>[] = [
   },
   {
     id: "actions",
-    cell: ({ row }) => <DataTableRowActions row={row} />,
+    cell: ({ row }) => <GradeListDataTableRowActions row={row} />,
   },
 ];

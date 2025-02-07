@@ -42,12 +42,14 @@ const DeleteGradeForm = ({ onCancel, row }: DataTableRowActionsProps) => {
   const [pending, setPending] = useState(false);
 
   useEffect(() => {
-    if (state.message !== "") {
-      toast(state.message);
-      setPending(false);
-      onCancel();
+    if (pending) {
+      if (state.message !== "") {
+        toast(state.message);
+        setPending(false);
+        onCancel();
+      }
     }
-  }, [state]);
+  }, [state, onCancel, pending]);
 
   const expectedText = `remove ${row.original.level} and all ${row.original.classes} classes and all ${row.original.students} students`;
 

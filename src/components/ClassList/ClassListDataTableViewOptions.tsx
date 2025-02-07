@@ -24,7 +24,7 @@ interface DataTableViewOptionsProps<TData> {
   gradeList: gradeListProps[] | null;
 }
 
-export function DataTableViewOptions<TData>({
+export function ClassListDataTableViewOptions<TData>({
   table,
   teacherList,
   gradeList,
@@ -35,13 +35,13 @@ export function DataTableViewOptions<TData>({
   const open = () => setIsOpen(true);
 
   return (
-    <div className="flex gap-2 w-full md:w-auto">
+    <div className="flex gap-2 w-full md:w-auto relative">
       <ResponsiveModalForm
         isOpen={isOpen}
         setIsOpen={setIsOpen}
         close={close}
-        title="افزودن سال تحصیلی"
-        discription="در این بخش میتوانید سال تحصیلی جدیدی بسازید"
+        title="افزودن کلاس جدید"
+        discription="در این بخش میتوانید کلاس جدیدی بسازید"
       >
         <AddClassForm
           onCancel={close}

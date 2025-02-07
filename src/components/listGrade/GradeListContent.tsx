@@ -1,8 +1,8 @@
 import { GetGradeData } from "@/actions/gradeActions";
-import { DataTable } from "./data-table";
-import { columns } from "./columns";
+import { GradeListDataTable } from "./GradeListDataTable";
 import { getUserInfo } from "@/actions/dashboardAction";
 import { redirect } from "next/navigation";
+import { gradeListColumns } from "./GradeListColumns";
 
 const GradeListContent = async () => {
   const user = await getUserInfo();
@@ -19,7 +19,7 @@ const GradeListContent = async () => {
           لیست سال تحصیلی در جدول زیر نمایش داده میشود
         </p>
       </div>
-      <DataTable data={gradeData} columns={columns} />
+      <GradeListDataTable data={gradeData} columns={gradeListColumns} />
     </div>
   );
 };

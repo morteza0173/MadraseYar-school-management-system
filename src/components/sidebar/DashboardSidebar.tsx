@@ -2,13 +2,18 @@
 
 import * as React from "react";
 import {
+  AlertTriangle,
   BookOpen,
-  Bot,
-  Frame,
+  BriefcaseBusiness,
+  ClipboardCheck,
+  ClipboardList,
   GraduationCap,
-  Map,
-  PieChart,
-  Settings2,
+  Medal,
+  Megaphone,
+  School,
+  TrendingDown,
+  TrendingUp,
+  UsersRound,
 } from "lucide-react";
 
 import {
@@ -39,13 +44,13 @@ const data = {
 
   navMain: [
     {
-      title: "لیست ها",
+      title: "پایه ها و کلاس ها",
       visible: ["admin", "teacher", "student", "parent"],
-      url: "#",
-      icon: Bot,
+      url: "/list/class",
+      icon: School,
       items: [
         {
-          title: "دوره تحصیلی",
+          title: "پایه ها",
           visible: ["admin", "teacher"],
           url: "/list/grade",
         },
@@ -54,53 +59,88 @@ const data = {
           visible: ["admin", "teacher", "parent"],
           url: "/list/class",
         },
+      ],
+    },
+    {
+      title: "آموزش و تدریس",
+      visible: ["admin", "teacher", "student", "parent"],
+      url: "#",
+      icon: BookOpen,
+      items: [
         {
-          title: "درس ها",
+          title: "حوزه تدریس",
           visible: ["admin", "teacher", "student", "parent"],
-          url: "/list/lesson",
+          url: "/list/subject",
         },
         {
-          title: "دانش آموزان",
+          title: "دروس",
           visible: ["admin", "teacher", "student", "parent"],
-          url: "/list/student",
+          url: "/list/lesson",
         },
         {
           title: "معلم ها",
           visible: ["admin", "teacher", "student", "parent"],
           url: "/list/teacher",
         },
+      ],
+    },
+
+    {
+      title: "امور دانش آموزی",
+      visible: ["admin", "teacher", "student", "parent"],
+      url: "#",
+      icon: UsersRound,
+      items: [
+        {
+          title: "دانش آموزان",
+          visible: ["admin", "teacher", "student", "parent"],
+          url: "/list/student",
+        },
         {
           title: "خانواده ها",
-          visible: ["admin", "teacher"],
+          visible: ["admin", "teacher", "student", "parent"],
           url: "/list/parent",
         },
       ],
     },
     {
-      title: "فعالیت ها",
+      title: "اطلاع رسانی و رویداد ها",
       visible: ["admin", "teacher", "student", "parent"],
       url: "#",
-      icon: BookOpen,
+      icon: Megaphone,
       items: [
         {
-          title: "تکالیف",
+          title: "اعلامیه ها",
           visible: ["admin", "teacher", "student", "parent"],
           url: "/list/Assignment",
         },
         {
+          title: "رویداد ها",
+          visible: ["admin", "teacher", "student", "parent"],
+          url: "/list/exam",
+        },
+      ],
+    },
+    {
+      title: "ارزیابی آموزشی",
+      visible: ["admin", "teacher", "student", "parent"],
+      url: "#",
+      icon: ClipboardCheck,
+      items: [
+        {
           title: "امتحانات",
+          visible: ["admin", "teacher", "student", "parent"],
+          url: "/list/Assignment",
+        },
+        {
+          title: "تکالیف",
           visible: ["admin", "teacher", "student", "parent"],
           url: "/list/exam",
         },
         {
-          title: "نتایج",
+          title: "نمرات",
           visible: ["admin", "teacher", "student", "parent"],
-          url: "/list/result",
-        },
-        {
-          title: "بهترین ها",
-          visible: ["admin", "teacher", "student", "parent"],
-          url: "/list/best",
+          url: "/list/exam",
         },
       ],
     },
@@ -108,7 +148,7 @@ const data = {
       title: "مدیریت",
       visible: ["admin", "teacher"],
       url: "#",
-      icon: Settings2,
+      icon: BriefcaseBusiness,
       items: [
         {
           title: "حضور و غیاب",
@@ -125,43 +165,39 @@ const data = {
           visible: ["admin", "teacher"],
           url: "/list/activities",
         },
-        {
-          title: "رویداد ها",
-          visible: ["admin", "teacher"],
-          url: "/list/event",
-        },
-        {
-          title: "اعلامیه ها",
-          visible: ["admin", "teacher"],
-          url: "/list/event",
-        },
       ],
     },
   ],
-  projects: [
+  quickAccess: [
     {
-      name: "افزودن معلم",
+      name: "بهترین دانش آموزان",
       visible: ["admin"],
       url: "#",
-      icon: Frame,
+      icon: Medal,
     },
     {
-      name: "افزودن دانش آموز",
+      name: "بهترین 30 روز اخیر",
+      visible: ["admin", "teacher"],
+      url: "#",
+      icon: TrendingUp,
+    },
+    {
+      name: "ضعیف ترین دانش آموزان",
+      visible: ["admin", "teacher"],
+      url: "#",
+      icon: AlertTriangle,
+    },
+    {
+      name: "ضعیف ترین 30 روز اخیر",
+      visible: ["admin", "teacher"],
+      url: "#",
+      icon: TrendingDown,
+    },
+    {
+      name: "امتحانات امروز",
       visible: ["admin"],
       url: "#",
-      icon: PieChart,
-    },
-    {
-      name: "رویداد جدید",
-      visible: ["admin", "teacher"],
-      url: "#",
-      icon: Map,
-    },
-    {
-      name: "اعلامیه جدید",
-      visible: ["admin", "teacher"],
-      url: "#",
-      icon: Map,
+      icon: ClipboardList,
     },
   ],
 };
@@ -179,7 +215,7 @@ export function DashboardSidebar({
       </SidebarHeader>
       <SidebarContent className="overflow-x-hidden">
         <DashboardSidebarMain items={data.navMain} userInfo={userInfo} />
-        <DashboardSidebarOther projects={data.projects} />
+        <DashboardSidebarOther projects={data.quickAccess} />
       </SidebarContent>
       <SidebarFooter>
         <DashboardSidebarUser user={userInfo} />

@@ -16,11 +16,11 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useFormState } from "react-dom";
-import { gradeListProps } from "@/actions/gradeActions";
+import { GetGradeData, gradeListProps } from "@/actions/gradeActions";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Check, ChevronsUpDown, Loader2Icon, Search } from "lucide-react";
-import { teacherListProps } from "@/actions/dashboardAction";
+import { getTeacher, teacherListProps } from "@/actions/dashboardAction";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import {
   Command,
@@ -30,78 +30,128 @@ import {
   CommandList,
 } from "../ui/command";
 import { cn } from "@/lib/utils";
-import { AddClass } from "@/actions/classAction";
+import { EditClass } from "@/actions/classAction";
+import { AddClassFormSchema } from "@/lib/schemas";
+import { Grade, Teacher } from "@prisma/client";
 
-interface AddClassFormProps {
-  teacherList: teacherListProps[] | null;
-  gradeList: gradeListProps[] | null;
-  onCancel: () => void;
+interface RowData {
+  name: string;
+  grade: number;
+  capacity: number;
+  studentCount: number;
+  supervisor?: string;
 }
 
-const formSchema = z.object({
-  className: z
-    .string()
-    .nonempty("نام کلاس نمی‌تواند خالی باشد.")
-    .max(20, "حداکثر 20 حرف میتواند باشد"),
-  capacity: z
-    .string()
-    .nonempty("ظرفیت را مشخص کنید")
-    .refine((val) => {
-      const num = Number(val);
-      return num > 0;
-    }, "ظرفیت باید حداقل شامل 1 نفر باشد"),
-  supervisorId: z
-    .string()
-    .nonempty("باید یک معلم را به عنوان مشاور انتخاب کنید"),
-  grade: z.string().nonempty("باید سال تحصیلی را انتخاب کنید"),
-});
+type Row<T> = {
+  original: T;
+};
 
-const AddClassForm = ({
-  onCancel,
-  teacherList,
-  gradeList,
-}: AddClassFormProps) => {
-  const [state, formAction] = useFormState(AddClass, { message: "" });
+interface EditeClassFormProps {
+  teacherList?: teacherListProps[] | null;
+  gradeList?: gradeListProps[] | null;
+  onCancel: () => void;
+  row: Row<RowData>;
+}
+
+const EditClassForm = ({ onCancel, row }: EditeClassFormProps) => {
+  const [state, formAction] = useFormState(EditClass, { message: "" });
   const [pending, setPending] = useState(false);
 
   const [openTeacherList, setOpenTeacherList] = useState(false);
   const [supervisorValue, setSupervisorValue] = useState("");
   const [searchTeacher, setSearchTeacher] = useState("");
-  const filteredTeacherList = teacherList?.filter((teacher) =>
-    teacher.name.toLowerCase().includes(searchTeacher.toLowerCase())
-  );
 
   const [openGradeList, setOpenGradeList] = useState(false);
   const [gradeValue, setGradeValue] = useState("");
 
-  useEffect(() => {
-    if (state.message !== "") {
-      toast(state.message);
-      setPending(false);
-      onCancel();
-    }
-  }, [state]);
+  const [pendingTeacher, setPendingTeacher] = useState(false);
+  const [pendingGrade, setPendingGrade] = useState(false);
+  const [errorTeacher, setErrorTeacher] = useState(false);
+  const [errorGrade, setErrorGrade] = useState(false);
+  const [isFetchedTeacher, setIsFetchedTeacher] = useState(false);
+  const [isFetchedGrade, setIsFetchedGrade] = useState(false);
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const [teacherList, setTeacherList] = useState<Teacher[]>([]);
+  const [gradeList, setGradeList] = useState<Grade[]>([]);
+
+  const filteredTeacherList = teacherList?.filter((teacher) =>
+    teacher.name?.toLowerCase().includes(searchTeacher?.toLowerCase())
+  );
+
+  useEffect(() => {
+    if (!isFetchedTeacher) {
+      setPendingTeacher(true);
+      getTeacher()
+        .then((data) => {
+          setTeacherList(data);
+          setIsFetchedTeacher(true);
+          const fullName = row.original.supervisor;
+          const teacher = data.find(
+            (t) => `${t.name} ${t.surname}` === fullName
+          );
+          if (teacher) {
+            setSupervisorValue(teacher.id);
+          }
+        })
+        .catch(() => {
+          setErrorTeacher(true);
+        })
+        .finally(() => {
+          setPendingTeacher(false);
+        });
+    }
+  }, [isFetchedTeacher, row.original.supervisor]);
+
+  useEffect(() => {
+    if (!isFetchedGrade) {
+      setPendingGrade(true);
+      GetGradeData()
+        .then((data) => {
+          setGradeList(data);
+          setIsFetchedGrade(true);
+          const grade = data.find((g) => g.level === row.original.grade);
+          if (grade) {
+            setGradeValue(grade.id.toString());
+          }
+        })
+        .catch(() => {
+          setErrorGrade(true);
+        })
+        .finally(() => {
+          setPendingGrade(false);
+        });
+    }
+  }, [isFetchedGrade, row.original.grade]);
+
+  useEffect(() => {
+    if (pending) {
+      if (state.message !== "") {
+        toast(state.message);
+        setPending(false);
+        onCancel();
+      }
+    }
+  }, [state, onCancel, pending]);
+
+  const form = useForm<z.infer<typeof AddClassFormSchema>>({
+    resolver: zodResolver(AddClassFormSchema),
     defaultValues: {
-      className: "",
-      capacity: "",
-      supervisorId: "",
-      grade: "",
+      className: row.original.name,
+      capacity: row.original.capacity.toString(),
+      supervisorId: row.original.supervisor,
+      grade: row.original.grade.toString(),
     },
   });
 
-  const onSubmit = async (data: z.infer<typeof formSchema>) => {
+  const onSubmit = async (data: z.infer<typeof AddClassFormSchema>) => {
     setPending(true);
 
     const formData = new FormData();
+    formData.set("classId", row.original.name);
     formData.set("className", data.className);
     formData.set("capacity", data.capacity);
-    formData.set("supervisor", data.supervisorId);
-    formData.set("grade", data.grade);
-
-
+    formData.set("supervisor", supervisorValue);
+    formData.set("grade", gradeValue);
 
     formAction(formData);
   };
@@ -170,6 +220,8 @@ const AddClassForm = ({
                               ? teacherList?.find(
                                   (teacher) => teacher.id === supervisorValue
                                 )?.name
+                              : pendingTeacher
+                              ? "درحال دریافت داده ها ..."
                               : "یک معلم از لیست انتخاب کنید"}
                             <ChevronsUpDown className="opacity-50" />
                           </Button>
@@ -191,7 +243,13 @@ const AddClassForm = ({
                               />
                             </div>
                             <CommandList>
-                              <CommandEmpty>هیچ معلمی پیدا نشد</CommandEmpty>
+                              <CommandEmpty>
+                                {pendingTeacher
+                                  ? "در حال دریافت اطلاعات"
+                                  : errorTeacher
+                                  ? "دریافت با خطا روبه رو شد"
+                                  : "هیچ معلمی یافت نشد"}
+                              </CommandEmpty>
                               <CommandGroup>
                                 {filteredTeacherList?.map((teacher) => (
                                   <CommandItem
@@ -232,6 +290,7 @@ const AddClassForm = ({
               </FormItem>
             )}
           />
+
           <FormField
             control={form.control}
             name="grade"
@@ -242,6 +301,7 @@ const AddClassForm = ({
                   <FormControl>
                     <>
                       <Popover
+                        modal
                         open={openGradeList}
                         onOpenChange={setOpenGradeList}
                       >
@@ -256,21 +316,27 @@ const AddClassForm = ({
                               ? gradeList?.find(
                                   (grade) => grade.id === Number(gradeValue)
                                 )?.level
+                              : pendingGrade
+                              ? "درحال دریافت داده ها ..."
                               : "سال تحصیلی را از لیست انتخاب کنید"}
                             <ChevronsUpDown className="opacity-50" />
                           </Button>
                         </PopoverTrigger>
-                        <PopoverContent className="w-[250px] p-0">
+                        <PopoverContent className="w-[250px] p-0 ">
                           <Command>
                             <CommandList>
                               <CommandEmpty>
-                                هیچ سال تحصیلی ای یافت نشد
+                                {pendingGrade
+                                  ? "در حال دریافت اطلاعات"
+                                  : errorGrade
+                                  ? "دریافت با خطا روبه رو شد"
+                                  : "هیچ سال تحصیلی ای یافت نشد"}
                               </CommandEmpty>
                               <CommandGroup>
                                 {gradeList?.map((grade) => (
                                   <CommandItem
                                     key={grade.id}
-                                    className="z-[60] pointer-events-auto"
+                                    className="z-[60] pointer-events-auto overflow-auto"
                                     value={String(grade.id)}
                                     onSelect={(currentValue) => {
                                       const selectedValue =
@@ -309,7 +375,7 @@ const AddClassForm = ({
           <div className="flex gap-2">
             <Button
               className="w-full bg-orange-400 hover:bg-orange-300"
-              disabled={pending}
+              disabled={pending || pendingTeacher || pendingGrade}
               type="submit"
             >
               {pending ? (
@@ -318,7 +384,7 @@ const AddClassForm = ({
                   لطفا صبر کنید ...
                 </>
               ) : (
-                "ثبت"
+                "ویرایش"
               )}
             </Button>
             <Button
@@ -335,4 +401,4 @@ const AddClassForm = ({
     </div>
   );
 };
-export default AddClassForm;
+export default EditClassForm;

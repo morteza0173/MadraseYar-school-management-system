@@ -112,3 +112,82 @@ export async function AddClass(
     return { message: "مشکلی در ثبت کلاس جدید به وجود آمد" };
   }
 }
+
+export async function EditClass(
+  _PrevState: FormState,
+  formData: FormData
+): Promise<FormState> {
+  const classId = formData.get("classId") as string;
+  const className = formData.get("className") as string;
+  const capacity = Number(formData.get("capacity"));
+  const supervisor = formData.get("supervisor") as string;
+  const grade = Number(formData.get("grade"));
+
+  console.log("classId", classId);
+
+  try {
+    await prisma.class.update({
+      where: { name: classId },
+      data: {
+        name: className,
+        capacity: capacity,
+        supervisorId: supervisor,
+        gradeId: grade,
+      },
+    });
+
+    revalidatePath("/list/class");
+    return { message: "کلاس با موفقیت ویرایش شد" };
+  } catch (error) {
+    console.error("Error updating class:", error);
+    return { message: "مشکلی در ویرایش کلاس به وجود آمد" };
+  }
+}
+
+export async function DeleteClass(
+  _PrevState: FormState,
+  formData: FormData
+): Promise<FormState> {
+  const className = formData.get("classId") as string;
+
+  try {
+    // یافتن کلاس موردنظر
+    const existingClass = await prisma.class.findUnique({
+      where: { name: className },
+      include: { student: true }, // دریافت دانش‌آموزان کلاس
+    });
+
+    if (!existingClass) {
+      return { message: "کلاس موردنظر یافت نشد." };
+    }
+
+    const classId = existingClass.id;
+
+    await prisma.$transaction(async (prisma) => {
+      // حذف دانش‌آموزان کلاس
+      await prisma.student.deleteMany({
+        where: { classId: classId },
+      });
+
+      // حذف والدینی که دیگر دانش‌آموزی ندارند
+      await prisma.parent.deleteMany({
+        where: {
+          students: {
+            none: {}, // والدینی که هیچ دانش‌آموزی ندارند
+          },
+        },
+      });
+
+      // حذف خود کلاس
+      await prisma.class.delete({
+        where: { id: classId },
+      });
+    });
+
+    revalidatePath("/list/class");
+    return { message: "کلاس و دانش‌آموزان آن با موفقیت حذف شدند." };
+  } catch (error) {
+    console.error("Error deleting class and dependencies:", error);
+    return { message: "مشکلی در حذف کلاس به وجود آمد." };
+  }
+}

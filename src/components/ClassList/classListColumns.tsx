@@ -3,35 +3,11 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { DataTableColumnHeader } from "../tableComponent/data-table-column-header";
 
-import { Checkbox } from "../ui/checkbox";
-import { Expense } from "./schema";
-import { DataTableRowActions } from "./data-table-row-actions";
+import { ClassListDataTableRowActions } from "./ClassListDataTableRowActions";
+import { ClassListSchema } from "@/lib/schemas";
 
-export const columns: ColumnDef<Expense>[] = [
-  {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-        className="translate-y-0.5"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-        className="translate-y-0.5"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
+export const classListColumns: ColumnDef<ClassListSchema>[] = [
+
   {
     accessorKey: "name",
     header: ({ column }) => (
@@ -114,6 +90,6 @@ export const columns: ColumnDef<Expense>[] = [
   },
   {
     id: "actions",
-    cell: ({ row }) => <DataTableRowActions row={row} />,
+    cell: ({ row }) => <ClassListDataTableRowActions row={row} />,
   },
 ];
