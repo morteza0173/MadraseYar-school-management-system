@@ -1,8 +1,14 @@
-import { getUserInfo } from "@/actions/dashboardAction";
+"use client";
+import { useUserAuth } from "@/hooks/useUserAuth";
 import { DashboardSidebar } from "./DashboardSidebar";
 
-export async function Sidebar() {
-    const userinfo = await getUserInfo()
+export function Sidebar() {
+  const { userData, isUserPending } = useUserAuth([
+    "admin",
+    "teacher",
+    "student",
+    "parent",
+  ]);
 
-  return <DashboardSidebar userInfo={userinfo} />;
+  return <DashboardSidebar userInfo={userData} isUserPending={isUserPending} />;
 }

@@ -51,6 +51,7 @@ export async function getClassDetails(user: getUserInfoProps) {
 
   const classDetails = await prisma.class.findMany({
     where: classFilter,
+    orderBy: { grade: { level: "asc" } },
     select: {
       name: true, // نام کلاس
       grade: {
@@ -86,10 +87,7 @@ export type FormState = {
   message: string;
 };
 
-export async function AddClass(
-  _PrevState: FormState,
-  formData: FormData
-): Promise<FormState> {
+export async function AddClass(formData: FormData): Promise<FormState> {
   const className = formData.get("className") as string;
   const capacity = Number(formData.get("capacity"));
   const supervisor = formData.get("supervisor") as string;
@@ -109,14 +107,11 @@ export async function AddClass(
     return { message: "کلاس جدید با موفقیت ساخته شد" };
   } catch (error) {
     console.error("Error creating class:", error);
-    return { message: "مشکلی در ثبت کلاس جدید به وجود آمد" };
+    throw new Error("مشکلی در ثبت کلاس جدید به وجود آمد");
   }
 }
 
-export async function EditClass(
-  _PrevState: FormState,
-  formData: FormData
-): Promise<FormState> {
+export async function EditClass(formData: FormData): Promise<FormState> {
   const classId = formData.get("classId") as string;
   const className = formData.get("className") as string;
   const capacity = Number(formData.get("capacity"));
@@ -138,16 +133,12 @@ export async function EditClass(
 
     revalidatePath("/list/class");
     return { message: "کلاس با موفقیت ویرایش شد" };
-  } catch (error) {
-    console.error("Error updating class:", error);
-    return { message: "مشکلی در ویرایش کلاس به وجود آمد" };
+  } catch {
+    throw new Error("مشکلی در ویرایش کلاس به وجود آمد");
   }
 }
 
-export async function DeleteClass(
-  _PrevState: FormState,
-  formData: FormData
-): Promise<FormState> {
+export async function DeleteClass(formData: FormData): Promise<FormState> {
   const className = formData.get("classId") as string;
 
   try {
@@ -158,7 +149,7 @@ export async function DeleteClass(
     });
 
     if (!existingClass) {
-      return { message: "کلاس موردنظر یافت نشد." };
+      throw new Error("کلاس موردنظر یافت نشد.");
     }
 
     const classId = existingClass.id;
@@ -186,8 +177,7 @@ export async function DeleteClass(
 
     revalidatePath("/list/class");
     return { message: "کلاس و دانش‌آموزان آن با موفقیت حذف شدند." };
-  } catch (error) {
-    console.error("Error deleting class and dependencies:", error);
-    return { message: "مشکلی در حذف کلاس به وجود آمد." };
+  } catch {
+    throw new Error("مشکلی در حذف کلاس به وجود آمد.");
   }
 }

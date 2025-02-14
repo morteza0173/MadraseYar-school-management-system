@@ -5,7 +5,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Ellipsis } from "lucide-react";
@@ -13,6 +12,7 @@ import { useState } from "react";
 import ResponsiveModalForm from "../ResponsiveModalForm";
 import DeleteGradeForm from "./DeleteGradeForm";
 import EditGradeForm from "./EditGradeForm";
+import { useUserAuth } from "@/hooks/useUserAuth";
 
 interface RowData {
   id: number;
@@ -29,9 +29,12 @@ interface DataTableRowActionsProps {
   row: Row<RowData>;
 }
 
-export function GradeListDataTableRowActions({ row }: DataTableRowActionsProps) {
+export function GradeListDataTableRowActions({
+  row,
+}: DataTableRowActionsProps) {
   const [isOpenDelete, setIsOpenDelete] = useState(false);
   const [isOpenEdit, setIsOpenEdit] = useState(false);
+  const { userData } = useUserAuth(["admin", "teacher", "student", "parent"]);
 
   const closeDelete = () => setIsOpenDelete(false);
   const openDelete = () => setIsOpenDelete(true);
@@ -69,9 +72,17 @@ export function GradeListDataTableRowActions({ row }: DataTableRowActionsProps) 
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-[160px]">
-          <DropdownMenuItem onClick={openEdit}>ویرایش</DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={openDelete}>حذف</DropdownMenuItem>
+          <DropdownMenuItem disabled>جزئیات</DropdownMenuItem>
+          {userData?.role === "admin" && (
+            <>
+              <DropdownMenuItem onClick={openEdit} className="cursor-pointer">
+                ویرایش
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={openDelete} className="cursor-pointer">
+                حذف
+              </DropdownMenuItem>
+            </>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
     </>

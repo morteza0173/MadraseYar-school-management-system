@@ -15,12 +15,18 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useFormState } from "react-dom";
-import { GetGradeData, gradeListProps } from "@/actions/gradeActions";
+import { gradeListProps } from "@/actions/gradeActions";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Check, ChevronsUpDown, Loader2Icon, Search } from "lucide-react";
-import { getTeacher, teacherListProps } from "@/actions/dashboardAction";
+import {
+  Check,
+  ChevronsUpDown,
+  Loader2,
+  Loader2Icon,
+  Search,
+  TriangleAlert,
+} from "lucide-react";
+import { teacherListProps } from "@/actions/dashboardAction";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import {
   Command,
@@ -32,7 +38,9 @@ import {
 import { cn } from "@/lib/utils";
 import { EditClass } from "@/actions/classAction";
 import { AddClassFormSchema } from "@/lib/schemas";
-import { Grade, Teacher } from "@prisma/client";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import useGetTeacher from "@/hooks/useGetTeacher";
+import useGetGradeData from "@/hooks/useGetGradeData";
 
 interface RowData {
   name: string;
@@ -54,7 +62,6 @@ interface EditeClassFormProps {
 }
 
 const EditClassForm = ({ onCancel, row }: EditeClassFormProps) => {
-  const [state, formAction] = useFormState(EditClass, { message: "" });
   const [pending, setPending] = useState(false);
 
   const [openTeacherList, setOpenTeacherList] = useState(false);
@@ -64,74 +71,55 @@ const EditClassForm = ({ onCancel, row }: EditeClassFormProps) => {
   const [openGradeList, setOpenGradeList] = useState(false);
   const [gradeValue, setGradeValue] = useState("");
 
-  const [pendingTeacher, setPendingTeacher] = useState(false);
-  const [pendingGrade, setPendingGrade] = useState(false);
-  const [errorTeacher, setErrorTeacher] = useState(false);
-  const [errorGrade, setErrorGrade] = useState(false);
-  const [isFetchedTeacher, setIsFetchedTeacher] = useState(false);
-  const [isFetchedGrade, setIsFetchedGrade] = useState(false);
+  const queryClient = useQueryClient();
+  const mutation = useMutation({
+    mutationFn: async (data: FormData) => EditClass(data),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["classDetails"] });
+      toast.success(data.message || "کلاس با موفقیت ویرایش شد");
+      setPending(false);
+      onCancel();
+    },
+    onError: (data) => {
+      toast.error(data.message || "مشکلی در ویرایش کلاس به وجود آمد");
+      setPending(false);
+    },
+  });
 
-  const [teacherList, setTeacherList] = useState<Teacher[]>([]);
-  const [gradeList, setGradeList] = useState<Grade[]>([]);
+  const { teacherData, isTeacherError, isTeacherPending, teacherRefetch } =
+    useGetTeacher();
 
-  const filteredTeacherList = teacherList?.filter((teacher) =>
-    teacher.name?.toLowerCase().includes(searchTeacher?.toLowerCase())
-  );
+  const { gradeData, gradeRefetch, isGradeError, isGradePending } =
+    useGetGradeData();
 
-  useEffect(() => {
-    if (!isFetchedTeacher) {
-      setPendingTeacher(true);
-      getTeacher()
-        .then((data) => {
-          setTeacherList(data);
-          setIsFetchedTeacher(true);
-          const fullName = row.original.supervisor;
-          const teacher = data.find(
-            (t) => `${t.name} ${t.surname}` === fullName
-          );
-          if (teacher) {
-            setSupervisorValue(teacher.id);
-          }
-        })
-        .catch(() => {
-          setErrorTeacher(true);
-        })
-        .finally(() => {
-          setPendingTeacher(false);
-        });
-    }
-  }, [isFetchedTeacher, row.original.supervisor]);
+  const filteredTeacherList = teacherData?.filter((teacher) => {
+    if (!searchTeacher) return true;
+
+    const fullName = `${teacher.name} ${teacher.surname}`.toLowerCase();
+    return fullName.includes(searchTeacher.toLowerCase());
+  });
 
   useEffect(() => {
-    if (!isFetchedGrade) {
-      setPendingGrade(true);
-      GetGradeData()
-        .then((data) => {
-          setGradeList(data);
-          setIsFetchedGrade(true);
-          const grade = data.find((g) => g.level === row.original.grade);
-          if (grade) {
-            setGradeValue(grade.id.toString());
-          }
-        })
-        .catch(() => {
-          setErrorGrade(true);
-        })
-        .finally(() => {
-          setPendingGrade(false);
-        });
-    }
-  }, [isFetchedGrade, row.original.grade]);
-
-  useEffect(() => {
-    if (pending) {
-      if (state.message !== "") {
-        toast(state.message);
-        setPending(false);
-        onCancel();
+    if (!isTeacherPending && !isTeacherError) {
+      const fullName = row.original.supervisor;
+      const teacher = teacherData?.find(
+        (t) => `${t.name} ${t.surname}` === fullName
+      );
+      console.log(teacher);
+      if (teacher) {
+        setSupervisorValue(teacher.id);
       }
     }
-  }, [state, onCancel, pending]);
+  }, [isTeacherPending, row.original.supervisor, isTeacherError, teacherData]);
+
+  useEffect(() => {
+    if (!isGradePending && !isGradeError) {
+      const grade = gradeData?.find((g) => g.level === row.original.grade);
+      if (grade) {
+        setGradeValue(grade.id.toString());
+      }
+    }
+  }, [isGradePending, row.original.grade, isGradeError, gradeData]);
 
   const form = useForm<z.infer<typeof AddClassFormSchema>>({
     resolver: zodResolver(AddClassFormSchema),
@@ -152,8 +140,7 @@ const EditClassForm = ({ onCancel, row }: EditeClassFormProps) => {
     formData.set("capacity", data.capacity);
     formData.set("supervisor", supervisorValue);
     formData.set("grade", gradeValue);
-
-    formAction(formData);
+    mutation.mutate(formData);
   };
   return (
     <div className="p-4">
@@ -208,6 +195,7 @@ const EditClassForm = ({ onCancel, row }: EditeClassFormProps) => {
                       <Popover
                         open={openTeacherList}
                         onOpenChange={setOpenTeacherList}
+                        modal
                       >
                         <PopoverTrigger asChild>
                           <Button
@@ -217,38 +205,65 @@ const EditClassForm = ({ onCancel, row }: EditeClassFormProps) => {
                             className="w-[250px] justify-between "
                           >
                             {supervisorValue
-                              ? teacherList?.find(
-                                  (teacher) => teacher.id === supervisorValue
-                                )?.name
-                              : pendingTeacher
-                              ? "درحال دریافت داده ها ..."
+                              ? `${
+                                  teacherData?.find(
+                                    (teacher) => teacher.id === supervisorValue
+                                  )?.name
+                                } ${
+                                  teacherData?.find(
+                                    (teacher) => teacher.id === supervisorValue
+                                  )?.surname
+                                }`
                               : "یک معلم از لیست انتخاب کنید"}
                             <ChevronsUpDown className="opacity-50" />
                           </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-[250px] p-0">
                           <Command>
-                            <div
-                              className="flex items-center border-b px-3 w-full pointer-events-auto"
-                              cmdk-input-wrapper=""
-                            >
-                              <Search className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                              <input
-                                placeholder="نام معلم را جستجو کنید"
-                                className="flex h-10 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
-                                value={searchTeacher}
-                                onChange={(e) =>
-                                  setSearchTeacher(e.target.value)
-                                }
-                              />
-                            </div>
+                            {!isTeacherPending && !isTeacherError && (
+                              <div
+                                className="hidden md:flex items-center border-b px-3 w-full"
+                                cmdk-input-wrapper=""
+                              >
+                                <Search className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                <input
+                                  placeholder="نام معلم را جستجو کنید"
+                                  className="flex h-10 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
+                                  value={searchTeacher}
+                                  tabIndex={-1}
+                                  onChange={(e) =>
+                                    setSearchTeacher(e.target.value)
+                                  }
+                                />
+                              </div>
+                            )}
                             <CommandList>
                               <CommandEmpty>
-                                {pendingTeacher
-                                  ? "در حال دریافت اطلاعات"
-                                  : errorTeacher
-                                  ? "دریافت با خطا روبه رو شد"
-                                  : "هیچ معلمی یافت نشد"}
+                                <div className="flex items-center justify-center h-full w-full">
+                                  {isTeacherPending ? (
+                                    <div className="flex gap-2 items-center">
+                                      <Loader2 className="size-4 animate-spin" />
+                                      <p>در حال دریافت اطلاعات</p>
+                                    </div>
+                                  ) : isTeacherError ? (
+                                    <div className="flex flex-col gap-4 items-center">
+                                      <div className="flex gap-2">
+                                        <TriangleAlert className="size-4" />
+                                        <p className="text-xs font-semibold">
+                                          اینترنت خود را ببرسی کنید
+                                        </p>
+                                      </div>
+                                      <Button
+                                        variant="outline"
+                                        onClick={() => teacherRefetch()}
+                                      >
+                                        تلاش مجدد
+                                      </Button>
+                                    </div>
+                                  ) : (
+                                    "نتیجه‌ای یافت نشد"
+                                  )}
+                                </div>
                               </CommandEmpty>
                               <CommandGroup>
                                 {filteredTeacherList?.map((teacher) => (
@@ -313,11 +328,9 @@ const EditClassForm = ({ onCancel, row }: EditeClassFormProps) => {
                             className="w-[250px] justify-between "
                           >
                             {gradeValue
-                              ? gradeList?.find(
+                              ? gradeData?.find(
                                   (grade) => grade.id === Number(gradeValue)
                                 )?.level
-                              : pendingGrade
-                              ? "درحال دریافت داده ها ..."
                               : "سال تحصیلی را از لیست انتخاب کنید"}
                             <ChevronsUpDown className="opacity-50" />
                           </Button>
@@ -326,14 +339,34 @@ const EditClassForm = ({ onCancel, row }: EditeClassFormProps) => {
                           <Command>
                             <CommandList>
                               <CommandEmpty>
-                                {pendingGrade
-                                  ? "در حال دریافت اطلاعات"
-                                  : errorGrade
-                                  ? "دریافت با خطا روبه رو شد"
-                                  : "هیچ سال تحصیلی ای یافت نشد"}
+                                <div className="flex items-center justify-center h-full w-full">
+                                  {isGradePending ? (
+                                    <div className="flex gap-2 items-center">
+                                      <Loader2 className="size-4 animate-spin" />
+                                      <p>در حال دریافت اطلاعات</p>
+                                    </div>
+                                  ) : isGradeError ? (
+                                    <div className="flex flex-col gap-4 items-center">
+                                      <div className="flex gap-2">
+                                        <TriangleAlert className="size-4" />
+                                        <p className="text-xs font-semibold">
+                                          اینترنت خود را ببرسی کنید
+                                        </p>
+                                      </div>
+                                      <Button
+                                        variant="outline"
+                                        onClick={() => gradeRefetch()}
+                                      >
+                                        تلاش مجدد
+                                      </Button>
+                                    </div>
+                                  ) : (
+                                    "نتیجه‌ای یافت نشد"
+                                  )}
+                                </div>
                               </CommandEmpty>
                               <CommandGroup>
-                                {gradeList?.map((grade) => (
+                                {gradeData?.map((grade) => (
                                   <CommandItem
                                     key={grade.id}
                                     className="z-[60] pointer-events-auto overflow-auto"
@@ -375,7 +408,7 @@ const EditClassForm = ({ onCancel, row }: EditeClassFormProps) => {
           <div className="flex gap-2">
             <Button
               className="w-full bg-orange-400 hover:bg-orange-300"
-              disabled={pending || pendingTeacher || pendingGrade}
+              disabled={pending || isTeacherPending || isGradePending}
               type="submit"
             >
               {pending ? (

@@ -2,11 +2,11 @@
 
 import { Button } from "@/components/ui/button";
 
-import { useFormState } from "react-dom";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { Loader2Icon } from "lucide-react";
 import { DeleteClass } from "@/actions/classAction";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 interface RowData {
   name: string;
@@ -26,18 +26,21 @@ interface DataTableRowActionsProps {
 }
 
 const DeleteClassForm = ({ onCancel, row }: DataTableRowActionsProps) => {
-  const [state, formAction] = useFormState(DeleteClass, { message: "" });
   const [pending, setPending] = useState(false);
-
-  useEffect(() => {
-    if (pending) {
-      if (state.message !== "") {
-        toast(state.message);
-        setPending(false);
-        onCancel();
-      }
-    }
-  }, [state, onCancel, pending]);
+  const queryClient = useQueryClient();
+  const mutation = useMutation({
+    mutationFn: async (data: FormData) => DeleteClass(data),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["classDetails"] });
+      toast.success(data.message || "کلاس با موفقیت حذف شد");
+      setPending(false);
+      onCancel();
+    },
+    onError: (error) => {
+      toast.error(error.message || "خطا در حذف کلاس");
+      setPending(false);
+    },
+  });
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -45,8 +48,7 @@ const DeleteClassForm = ({ onCancel, row }: DataTableRowActionsProps) => {
     const formData = new FormData();
     const className = row.original.name;
     formData.set("classId", className);
-
-    formAction(formData);
+    mutation.mutate(formData);
   };
   return (
     <>

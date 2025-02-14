@@ -19,13 +19,34 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { getUserInfoProps } from "@/actions/dashboardAction";
+import { Skeleton } from "../ui/skeleton";
 
 export function DashboardSidebarUser({
   user,
+  isUserPending,
 }: {
   user: getUserInfoProps | undefined;
+  isUserPending: boolean;
 }) {
   const { isMobile } = useSidebar();
+
+  if (isUserPending) {
+    return (
+      <SidebarMenu>
+        <SidebarMenuItem>
+          <div className="flex gap-2 p-2">
+            <Skeleton className="w-8 h-8 rounded-lg" />
+            <div className="grid flex-1">
+              <Skeleton className="h-3 w-8" />
+              <Skeleton className="h-3 w-32" />
+            </div>
+            <Skeleton className="h-8 w-4" />
+          </div>
+        </SidebarMenuItem>
+      </SidebarMenu>
+    );
+  }
+
   if (!user) {
     return;
   }

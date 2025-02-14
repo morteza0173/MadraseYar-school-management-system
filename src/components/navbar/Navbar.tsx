@@ -1,14 +1,17 @@
+"use client";
 import { Search } from "lucide-react";
 import { SidebarTrigger } from "../ui/sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { getUserInfo } from "@/actions/dashboardAction";
-import { redirect } from "next/navigation";
+import { useUserAuth } from "@/hooks/useUserAuth";
+import { Skeleton } from "../ui/skeleton";
 
-const Navbar = async () => {
-  const userinfo = await getUserInfo();
-  if (!userinfo) {
-    redirect("/login");
-  }
+const Navbar = () => {
+  const { isUserPending, userData } = useUserAuth([
+    "admin",
+    "teacher",
+    "student",
+    "parent",
+  ]);
 
   return (
     <div className="flex items-center justify-between p-4">
@@ -24,19 +27,29 @@ const Navbar = async () => {
         </div>
       </div>
       <div className="flex items-center gap-6">
-        <div className="flex flex-col">
-          <span className="text-xs font-medium">{userinfo.name}</span>
-          <span className="text-[10px] text-right text-gray-500">
-            {userinfo.role}
-          </span>
+        <div className="flex flex-col gap-2">
+          {isUserPending ? (
+            <Skeleton className="h-3 w-16" />
+          ) : (
+            <span className="text-xs font-medium">{userData?.name}</span>
+          )}
+          {isUserPending ? (
+            <Skeleton className="h-2 w-10" />
+          ) : (
+            <span className="text-[10px] text-right text-gray-500">
+              {userData?.role}
+            </span>
+          )}
         </div>
-        {userinfo.img ? (
+        {isUserPending ? (
+          <Skeleton className="h-10 w-10 rounded-full" />
+        ) : userData?.img ? (
           <Avatar>
-            <AvatarImage src={userinfo.img} />
+            <AvatarImage src={userData?.img} />
           </Avatar>
         ) : (
           <Avatar>
-            <AvatarFallback>{userinfo.name.charAt(0)}</AvatarFallback>
+            <AvatarFallback>{userData?.name.charAt(0)}</AvatarFallback>
           </Avatar>
         )}
       </div>

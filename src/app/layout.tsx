@@ -3,8 +3,9 @@ import type { Metadata } from "next";
 import { Vazirmatn } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
+import QueryProvider from "./QueryProvider";
 
-const vazirmatn = Vazirmatn({ style: "normal", subsets: ["arabic"] });
+const vazirmatn = Vazirmatn({ style: "normal", subsets: ["latin"] });
 
 // const geistSans = localFont({
 //   src: "./fonts/GeistVF.woff",
@@ -30,8 +31,10 @@ export default function RootLayout({
   return (
     <html lang="en" dir="rtl">
       <body className={`${vazirmatn.className} antialiased`}>
-        {children}{" "}
-        <Toaster closeButton richColors dir="rtl" position="bottom-left" />
+        <QueryProvider>
+          {children}
+          <Toaster closeButton richColors dir="rtl" position="bottom-left" />
+        </QueryProvider>
       </body>
     </html>
   );

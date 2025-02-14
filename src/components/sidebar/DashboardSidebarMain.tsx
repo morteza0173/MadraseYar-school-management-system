@@ -20,10 +20,12 @@ import {
 import { getUserInfoProps } from "@/actions/dashboardAction";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Skeleton } from "../ui/skeleton";
 
 export function DashboardSidebarMain({
   items,
   userInfo,
+  isUserPending,
 }: {
   items: {
     title: string;
@@ -37,8 +39,25 @@ export function DashboardSidebarMain({
     }[];
   }[];
   userInfo: getUserInfoProps | undefined;
+  isUserPending: boolean;
 }) {
   const pathname = usePathname();
+
+  if (isUserPending) {
+    return (
+      <div className="flex flex-col space-y-4 p-2">
+        <Skeleton className="h-4 w-8 rounded-md" />
+        <Skeleton className="h-4 w-16 rounded-md" />
+        <Skeleton className="h-4 w-20 rounded-md" />
+        <Skeleton className="h-4 w-24 rounded-md" />
+        <Skeleton className="h-4 w-20 rounded-md" />
+        <Skeleton className="h-4 w-28 rounded-md" />
+        <Skeleton className="h-4 w-20 rounded-md" />
+        <Skeleton className="h-4 w-16 rounded-md" />
+      </div>
+    );
+  }
+
   return (
     <SidebarGroup>
       <SidebarGroupLabel>منو</SidebarGroupLabel>

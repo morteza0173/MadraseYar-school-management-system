@@ -204,9 +204,11 @@ const data = {
 
 export function DashboardSidebar({
   userInfo,
+  isUserPending,
   ...props
 }: React.ComponentProps<typeof Sidebar> & {
   userInfo: getUserInfoProps | undefined;
+  isUserPending: boolean;
 }) {
   return (
     <Sidebar collapsible="icon" {...props} side="right">
@@ -214,11 +216,15 @@ export function DashboardSidebar({
         <DashboardSidebarSwitcher team={data.team} />
       </SidebarHeader>
       <SidebarContent className="overflow-x-hidden">
-        <DashboardSidebarMain items={data.navMain} userInfo={userInfo} />
+        <DashboardSidebarMain
+          items={data.navMain}
+          userInfo={userInfo}
+          isUserPending={isUserPending}
+        />
         <DashboardSidebarOther projects={data.quickAccess} />
       </SidebarContent>
       <SidebarFooter>
-        <DashboardSidebarUser user={userInfo} />
+        <DashboardSidebarUser user={userInfo} isUserPending={isUserPending} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

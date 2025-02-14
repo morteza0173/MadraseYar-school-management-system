@@ -15,13 +15,12 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useFormState } from "react-dom";
 import { EditGrade } from "@/actions/gradeActions";
-import { useEffect, useState } from "react";
+import {  useState } from "react";
 import { toast } from "sonner";
 import { Loader2Icon } from "lucide-react";
 import { GradeFormSchema } from "@/lib/schemas";
-
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 interface RowData {
   id: number;
@@ -40,18 +39,23 @@ interface DataTableRowActionsProps {
 }
 
 const EditGradeForm = ({ onCancel, row }: DataTableRowActionsProps) => {
-  const [state, formAction] = useFormState(EditGrade, { message: "" });
   const [pending, setPending] = useState(false);
+  const queryClient = useQueryClient();
 
-   useEffect(() => {
-     if (pending) {
-       if (state.message !== "") {
-         toast(state.message);
-         setPending(false);
-         onCancel();
-       }
-     }
-   }, [state, onCancel, pending]);
+  const mutation = useMutation({
+    mutationFn: async (data: FormData) => EditGrade(data),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["grade"] });
+      queryClient.invalidateQueries({ queryKey: ["classDetails"] });
+      toast.success(data.message || "با موفقیت ثبت شد");
+      setPending(false);
+      onCancel();
+    },
+    onError: (error) => {
+      toast.error(error.message || "خطا در ثبت");
+      setPending(false);
+    },
+  });
 
   const form = useForm<z.infer<typeof GradeFormSchema>>({
     resolver: zodResolver(GradeFormSchema),
@@ -67,7 +71,7 @@ const EditGradeForm = ({ onCancel, row }: DataTableRowActionsProps) => {
     const formData = new FormData();
     formData.set("grade", data.grade);
     formData.set("gradeId", row.original.id.toString());
-    formAction(formData);
+    mutation.mutate(formData);
   };
   return (
     <div className="p-4">

@@ -1,7 +1,15 @@
-import { ArrowDown, Ellipsis } from "lucide-react";
+import { ArrowDown, Ellipsis, Loader2 } from "lucide-react";
 import { Button } from "./ui/button";
 
-const UserCard = ({ type, Number }: { type: string; Number?: number }) => {
+const UserCard = ({
+  type,
+  Number,
+  pending,
+}: {
+  type: string;
+  Number?: number;
+  pending: boolean;
+}) => {
   return (
     <div className="rounded-2xl odd:bg-Purple even:bg-Yellow p-4 flex-1 min-w-[170px] shadow-sm w-full h-full">
       <div>
@@ -20,7 +28,16 @@ const UserCard = ({ type, Number }: { type: string; Number?: number }) => {
             </Button>
           </div>
         </div>
-        <h2 className="font-semibold my-4 text-2xl">{Number}</h2>
+        {pending ? (
+          <div className="flex justify-between items-center">
+            <h2 className="font-semibold my-4 text-2xl text-gray-400 animate-bounce">
+              0
+            </h2>
+            <Loader2 className="size-4 text-gray-400 animate-spin" />
+          </div>
+        ) : (
+          <h2 className="font-semibold my-4 text-2xl">{Number}</h2>
+        )}
         <h3 className="font-bold text-gray-700 text-sm">{type}</h3>
       </div>
     </div>

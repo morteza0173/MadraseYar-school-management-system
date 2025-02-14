@@ -20,12 +20,22 @@ import { teacherListProps } from "@/actions/dashboardAction";
 import { gradeListProps } from "@/actions/gradeActions";
 import { useIsMobile } from "@/hooks/use-mobile";
 import TanstackTable from "../tableComponent/TanstackTable";
+import { UseQueryResult } from "@tanstack/react-query";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   teacherList: teacherListProps[] | null;
   gradeList: gradeListProps[] | null;
   data: TData[];
+  isClassPending: boolean;
+  isClassError: boolean;
+  ClassRefetch: UseQueryResult<TData[]>["refetch"];
+  isTeacherPending: boolean;
+  isTeacherError: boolean;
+  teacherRefetch: UseQueryResult<teacherListProps[]>["refetch"];
+  isGradePending: boolean;
+  isGradeError: boolean;
+  gradeRefetch: UseQueryResult<gradeListProps[]>["refetch"];
 }
 
 export function ClassListDataTable<TData, TValue>({
@@ -33,6 +43,15 @@ export function ClassListDataTable<TData, TValue>({
   teacherList,
   gradeList,
   data,
+  isClassPending,
+  isClassError,
+  ClassRefetch,
+  isTeacherPending,
+  isTeacherError,
+  teacherRefetch,
+  isGradePending,
+  isGradeError,
+  gradeRefetch,
 }: DataTableProps<TData, TValue>) {
   const isMobile = useIsMobile();
   const [rowSelection, setRowSelection] = useState({});
@@ -85,11 +104,23 @@ export function ClassListDataTable<TData, TValue>({
   return (
     <div className="space-y-2 ">
       <ClassListDataTableViewOptions
+        isTeacherPending={isTeacherPending}
+        isTeacherError={isTeacherError}
+        teacherRefetch={teacherRefetch}
+        isGradePending={isGradePending}
+        isGradeError={isGradeError}
+        gradeRefetch={gradeRefetch}
         table={table}
         teacherList={teacherList}
         gradeList={gradeList}
       />
-      <TanstackTable table={table} columns={columns} />
+      <TanstackTable
+        isPending={isClassPending}
+        isError={isClassError}
+        refetch={ClassRefetch}
+        table={table}
+        columns={columns}
+      />
     </div>
   );
 }

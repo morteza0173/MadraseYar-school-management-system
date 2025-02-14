@@ -15,11 +15,17 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useFormState } from "react-dom";
 import { gradeListProps } from "@/actions/gradeActions";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
-import { Check, ChevronsUpDown, Loader2Icon, Search } from "lucide-react";
+import {
+  Check,
+  ChevronsUpDown,
+  Loader2,
+  Loader2Icon,
+  Search,
+  TriangleAlert,
+} from "lucide-react";
 import { teacherListProps } from "@/actions/dashboardAction";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import {
@@ -32,40 +38,65 @@ import {
 import { cn } from "@/lib/utils";
 import { AddClass } from "@/actions/classAction";
 import { AddClassFormSchema } from "@/lib/schemas";
+import {
+  useMutation,
+  useQueryClient,
+  UseQueryResult,
+} from "@tanstack/react-query";
 
 interface AddClassFormProps {
   teacherList: teacherListProps[] | null;
   gradeList: gradeListProps[] | null;
   onCancel: () => void;
+  isTeacherPending: boolean;
+  isTeacherError: boolean;
+  teacherRefetch: UseQueryResult<teacherListProps[]>["refetch"];
+  isGradePending: boolean;
+  isGradeError: boolean;
+  gradeRefetch: UseQueryResult<gradeListProps[]>["refetch"];
 }
 
 const AddClassForm = ({
   onCancel,
   teacherList,
   gradeList,
+  isTeacherPending,
+  isTeacherError,
+  teacherRefetch,
+  isGradePending,
+  isGradeError,
+  gradeRefetch,
 }: AddClassFormProps) => {
-  const [state, formAction] = useFormState(AddClass, { message: "" });
   const [pending, setPending] = useState(false);
 
   const [openTeacherList, setOpenTeacherList] = useState(false);
   const [supervisorValue, setSupervisorValue] = useState("");
   const [searchTeacher, setSearchTeacher] = useState("");
-  const filteredTeacherList = teacherList?.filter((teacher) =>
-    teacher.name.toLowerCase().includes(searchTeacher.toLowerCase())
-  );
+  const filteredTeacherList = teacherList?.filter((teacher) => {
+    if (!searchTeacher) return true;
+
+    const fullName = `${teacher.name} ${teacher.surname}`.toLowerCase();
+    return fullName.includes(searchTeacher.toLowerCase());
+  });
 
   const [openGradeList, setOpenGradeList] = useState(false);
   const [gradeValue, setGradeValue] = useState("");
 
-  useEffect(() => {
-    if (pending) {
-      if (state.message !== "") {
-        toast(state.message);
-        setPending(false);
-        onCancel();
-      }
-    }
-  }, [state, onCancel, pending]);
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: async (data: FormData) => AddClass(data),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["classDetails"] });
+      setPending(false);
+      toast.success(data.message || "کلاس جدید با موفقیت ساخته شد");
+      onCancel();
+    },
+    onError: (error) => {
+      setPending(false);
+      toast.error(error.message || "مشکلی در ثبت کلاس جدید به وجود آمد");
+    },
+  });
 
   const form = useForm<z.infer<typeof AddClassFormSchema>>({
     resolver: zodResolver(AddClassFormSchema),
@@ -85,8 +116,7 @@ const AddClassForm = ({
     formData.set("capacity", data.capacity);
     formData.set("supervisor", data.supervisorId);
     formData.set("grade", data.grade);
-
-    formAction(formData);
+    mutation.mutate(formData);
   };
   return (
     <div className="p-4">
@@ -160,23 +190,51 @@ const AddClassForm = ({
                         </PopoverTrigger>
                         <PopoverContent className="w-[250px] p-0">
                           <Command>
-                            <div
-                              className="hidden md:flex items-center border-b px-3 w-full"
-                              cmdk-input-wrapper=""
-                            >
-                              <Search className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                              <input
-                                placeholder="نام معلم را جستجو کنید"
-                                className="flex h-10 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
-                                value={searchTeacher}
-                                tabIndex={-1}
-                                onChange={(e) =>
-                                  setSearchTeacher(e.target.value)
-                                }
-                              />
-                            </div>
+                            {!isTeacherPending && !isTeacherError && (
+                              <div
+                                className="hidden md:flex items-center border-b px-3 w-full"
+                                cmdk-input-wrapper=""
+                              >
+                                <Search className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                <input
+                                  placeholder="نام معلم را جستجو کنید"
+                                  className="flex h-10 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
+                                  value={searchTeacher}
+                                  tabIndex={-1}
+                                  onChange={(e) =>
+                                    setSearchTeacher(e.target.value)
+                                  }
+                                />
+                              </div>
+                            )}
                             <CommandList>
-                              <CommandEmpty>هیچ معلمی پیدا نشد</CommandEmpty>
+                              <CommandEmpty>
+                                <div className="flex items-center justify-center h-full w-full">
+                                  {isTeacherPending ? (
+                                    <div className="flex gap-2 items-center">
+                                      <Loader2 className="size-4 animate-spin" />
+                                      <p>در حال دریافت اطلاعات</p>
+                                    </div>
+                                  ) : isTeacherError ? (
+                                    <div className="flex flex-col gap-4 items-center">
+                                      <div className="flex gap-2">
+                                        <TriangleAlert className="size-4" />
+                                        <p className="text-xs font-semibold">
+                                          اینترنت خود را ببرسی کنید
+                                        </p>
+                                      </div>
+                                      <Button
+                                        variant="outline"
+                                        onClick={() => teacherRefetch()}
+                                      >
+                                        تلاش مجدد
+                                      </Button>
+                                    </div>
+                                  ) : (
+                                    "نتیجه‌ای یافت نشد"
+                                  )}
+                                </div>
+                              </CommandEmpty>
                               <CommandGroup>
                                 {filteredTeacherList?.map((teacher) => (
                                   <CommandItem
@@ -250,7 +308,31 @@ const AddClassForm = ({
                           <Command>
                             <CommandList>
                               <CommandEmpty>
-                                هیچ سال تحصیلی ای یافت نشد
+                                <div className="flex items-center justify-center h-full w-full">
+                                  {isGradePending ? (
+                                    <div className="flex gap-2 items-center">
+                                      <Loader2 className="size-4 animate-spin" />
+                                      <p>در حال دریافت اطلاعات</p>
+                                    </div>
+                                  ) : isGradeError ? (
+                                    <div className="flex flex-col gap-4 items-center">
+                                      <div className="flex gap-2">
+                                        <TriangleAlert className="size-4" />
+                                        <p className="text-xs font-semibold">
+                                          اینترنت خود را ببرسی کنید
+                                        </p>
+                                      </div>
+                                      <Button
+                                        variant="outline"
+                                        onClick={() => gradeRefetch()}
+                                      >
+                                        تلاش مجدد
+                                      </Button>
+                                    </div>
+                                  ) : (
+                                    "نتیجه‌ای یافت نشد"
+                                  )}
+                                </div>
                               </CommandEmpty>
                               <CommandGroup>
                                 {gradeList?.map((grade) => (

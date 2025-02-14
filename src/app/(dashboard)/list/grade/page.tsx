@@ -1,13 +1,29 @@
-import GradeListContent from "@/components/listGrade/GradeListContent";
-import DataTableSkeleton from "@/components/skeleton/DataTableSkeleton";
-import { Suspense } from "react";
-const page = () => {
+"use client";
+import { gradeListColumns } from "@/components/listGrade/gradeListColumns";
+import { GradeListDataTable } from "@/components/listGrade/GradeListDataTable";
+import useGetGradeData from "@/hooks/useGetGradeData";
+import { useUserAuth } from "@/hooks/useUserAuth";
+const GradePage = () => {
+  useUserAuth(["admin"]);
+
+  const { gradeData, gradeRefetch, isGradeError, isGradePending } =
+    useGetGradeData();
+
   return (
-    <div>
-      <Suspense fallback={<DataTableSkeleton />}>
-        <GradeListContent />
-      </Suspense>
+    <div className="h-auto pb-10 flex-1 flex-col px-8 md:flex">
+      <div className="flex items-center justify-between my-8">
+        <p className="text-muted-foreground mb-1 text-sm md:text-base">
+          لیست سال تحصیلی در جدول زیر نمایش داده میشود
+        </p>
+      </div>
+      <GradeListDataTable
+        isPending={isGradePending}
+        isError={isGradeError}
+        refetch={gradeRefetch}
+        data={gradeData || []}
+        columns={gradeListColumns}
+      />
     </div>
   );
 };
-export default page;
+export default GradePage;

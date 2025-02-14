@@ -15,11 +15,11 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useFormState } from "react-dom";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { Loader2Icon } from "lucide-react";
 import { deleteGrade } from "@/actions/gradeActions";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 interface RowData {
   id: number;
@@ -38,18 +38,22 @@ interface DataTableRowActionsProps {
 }
 
 const DeleteGradeForm = ({ onCancel, row }: DataTableRowActionsProps) => {
-  const [state, formAction] = useFormState(deleteGrade, { message: "" });
   const [pending, setPending] = useState(false);
-
-  useEffect(() => {
-    if (pending) {
-      if (state.message !== "") {
-        toast(state.message);
-        setPending(false);
-        onCancel();
-      }
-    }
-  }, [state, onCancel, pending]);
+  const queryClient = useQueryClient();
+  const mutation = useMutation({
+    mutationFn: async (data: FormData) => deleteGrade(data),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["grade"] });
+      queryClient.invalidateQueries({ queryKey: ["classDetails"] });
+      toast.success(data.message || "با موفقیت ثبت شد");
+      setPending(false);
+      onCancel();
+    },
+    onError: (error) => {
+      toast.error(error.message || "خطا در ثبت");
+      setPending(false);
+    },
+  });
 
   const expectedText = `remove ${row.original.level} and all ${row.original.classes} classes and all ${row.original.students} students`;
 
@@ -78,8 +82,7 @@ const DeleteGradeForm = ({ onCancel, row }: DataTableRowActionsProps) => {
     const formData = new FormData();
     const gradeId = row.original.id.toString();
     formData.set("gradeId", gradeId);
-
-    formAction(formData);
+    mutation.mutate(formData);
   };
   return (
     <div className="p-4">

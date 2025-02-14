@@ -17,19 +17,34 @@ import { gradeListProps } from "@/actions/gradeActions";
 import { useState } from "react";
 import AddClassForm from "./AddClassForm";
 import ResponsiveModalForm from "../ResponsiveModalForm";
+import { UseQueryResult } from "@tanstack/react-query";
+import { useUserAuth } from "@/hooks/useUserAuth";
 
 interface DataTableViewOptionsProps<TData> {
   table: Table<TData>;
   teacherList: teacherListProps[] | null;
   gradeList: gradeListProps[] | null;
+  isTeacherPending: boolean;
+  isTeacherError: boolean;
+  teacherRefetch: UseQueryResult<teacherListProps[]>["refetch"];
+  isGradePending: boolean;
+  isGradeError: boolean;
+  gradeRefetch: UseQueryResult<gradeListProps[]>["refetch"];
 }
 
 export function ClassListDataTableViewOptions<TData>({
   table,
   teacherList,
   gradeList,
+  isTeacherPending,
+  isTeacherError,
+  teacherRefetch,
+  isGradePending,
+  isGradeError,
+  gradeRefetch,
 }: DataTableViewOptionsProps<TData>) {
   const [isOpen, setIsOpen] = useState(false);
+  const { userData } = useUserAuth(["admin", "teacher", "student", "parent"]);
 
   const close = () => setIsOpen(false);
   const open = () => setIsOpen(true);
@@ -47,17 +62,25 @@ export function ClassListDataTableViewOptions<TData>({
           onCancel={close}
           teacherList={teacherList}
           gradeList={gradeList}
+          isTeacherPending={isTeacherPending}
+          isTeacherError={isTeacherError}
+          teacherRefetch={teacherRefetch}
+          isGradePending={isGradePending}
+          isGradeError={isGradeError}
+          gradeRefetch={gradeRefetch}
         />
       </ResponsiveModalForm>
-      <Button
-        variant="outline"
-        size="sm"
-        className="ml-auto h-8 lg:flex w-full md:w-auto"
-        onClick={open}
-      >
-        <CirclePlus className="ml-2 h-4 w-4" />
-        افزودن
-      </Button>
+      {userData?.role === "admin" && (
+        <Button
+          variant="outline"
+          size="sm"
+          className="ml-auto h-8 lg:flex w-full md:w-auto"
+          onClick={open}
+        >
+          <CirclePlus className="ml-2 h-4 w-4" />
+          افزودن
+        </Button>
+      )}
       <DropdownMenu dir="rtl">
         <DropdownMenuTrigger asChild>
           <Button

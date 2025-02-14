@@ -18,13 +18,20 @@ import { GradeListDataTableViewOptions } from "./GradeListDataTableViewOptions";
 import { useEffect, useState } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import TanstackTable from "../tableComponent/TanstackTable";
+import { UseQueryResult } from "@tanstack/react-query";
 
 interface DataTableProps<TData, TValue> {
+  isPending: boolean;
+  isError: boolean;
+  refetch: UseQueryResult<TData[]>["refetch"];
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
 }
 
 export function GradeListDataTable<TData, TValue>({
+  isPending,
+  isError,
+  refetch,
   columns,
   data,
 }: DataTableProps<TData, TValue>) {
@@ -75,7 +82,13 @@ export function GradeListDataTable<TData, TValue>({
   return (
     <div className="space-y-2 ">
       <GradeListDataTableViewOptions table={table} />
-      <TanstackTable table={table} columns={columns} />
+      <TanstackTable
+        isPending={isPending}
+        isError={isError}
+        refetch={refetch}
+        table={table}
+        columns={columns}
+      />
     </div>
   );
 }

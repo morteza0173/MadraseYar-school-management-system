@@ -42,7 +42,7 @@ function CardContentUsers({
                 id="user"
                 name="user"
                 className="h-12"
-                defaultValue="test@test.com"
+                defaultValue="morteza0173"
               />
             </div>
             <div className="space-y-2">
@@ -51,7 +51,7 @@ function CardContentUsers({
                 id="password"
                 name="password"
                 className="h-12"
-                defaultValue="123456789"
+                defaultValue="morteza"
               />
             </div>
           </CardContent>
