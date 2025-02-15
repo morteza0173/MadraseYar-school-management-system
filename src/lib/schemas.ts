@@ -28,6 +28,9 @@ export const GradeFormSchema = z.object({
     }, "سال تحصیلی باید بزرگ‌تر از صفر باشد."),
 });
 
+export const SubjectFormSchema = z.object({
+  name: z.string().min(1, "سال تحصیلی نمی‌تواند خالی باشد"),
+});
 
 export const classListSchema = z.object({
   name: z.string(),
@@ -39,7 +42,13 @@ export const classListSchema = z.object({
 
 export type ClassListSchema = z.infer<typeof classListSchema>;
 
+export const subjectListSchema = z.object({
+  name: z.string(),
+  teacherCount: z.number(),
+  lessonCount: z.number(),
+});
 
+export type SubjectListSchema = z.infer<typeof subjectListSchema>;
 
 export const gradeListSchema = z.object({
   id: z.number(),
