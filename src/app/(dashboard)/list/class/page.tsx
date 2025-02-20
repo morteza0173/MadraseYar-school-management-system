@@ -18,13 +18,9 @@ const ClassPage = () => {
   const { gradeData, gradeRefetch, isGradeError, isGradePending } =
     useGetGradeData();
 
-  // const [classDetails, teacherList, gradeList] =
-  //   user.role === "admin"
-  //     ? await Promise.all([getClassDetails(user), getTeacher(), GetGradeData()])
-  //     : [await getClassDetails(user), null, null];
 
   return (
-    <div className="h-auto pb-10 flex-1 flex-col px-8 md:flex">
+    <div className="h-auto pb-10 flex-1 flex-col px-1 md:px-4 lg:px-8 md:flex">
       <div className="flex items-center justify-between my-8">
         <p className="text-muted-foreground mb-1 text-sm md:text-base">
           لیست تمام کلاس ها در جدول زیر نمایش داده میشود

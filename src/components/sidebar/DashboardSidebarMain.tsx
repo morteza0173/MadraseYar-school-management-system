@@ -36,6 +36,7 @@ export function DashboardSidebarMain({
     items?: {
       title: string;
       url: string;
+      disabled?: boolean;
     }[];
   }[];
   userInfo: getUserInfoProps | undefined;
@@ -105,6 +106,7 @@ export function DashboardSidebarMain({
                           <SidebarMenuSubItem key={subItem.title}>
                             <SidebarMenuSubButton
                               asChild
+                              aria-disabled={subItem.disabled}
                               isActive={pathname === subItem.url}
                               className="data-[active=true]:bg-orange-100 hover:bg-orange-50 data-[state=open]:hover:bg-orange-50 active:bg-orange-100 w-full"
                             >

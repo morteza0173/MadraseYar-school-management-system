@@ -1,6 +1,5 @@
 "use client";
 
-
 import { SubjectListColumns } from "@/components/listSubject/SubjectListColumns";
 import { SubjectListDataTable } from "@/components/listSubject/SubjectListDataTable";
 import useGetSubjects from "@/hooks/useGetSubjects";
@@ -12,9 +11,8 @@ const ClassPage = () => {
   const { isSubjectError, subjectRefetch, subjectData, isSubjectPending } =
     useGetSubjects(userData);
 
-
   return (
-    <div className="h-auto pb-10 flex-1 flex-col px-8 md:flex">
+    <div className="h-auto pb-10 flex-1 flex-col px-1 md:px-4 lg:px-8 md:flex">
       <div className="flex items-center justify-between my-8">
         <p className="text-muted-foreground mb-1 text-sm md:text-base">
           لیست حوزه تدریس درواقع یک دسته بندی برای حوزه درسی میباشد و جزئیات

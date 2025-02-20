@@ -14,27 +14,23 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
 import { toast } from "sonner";
 import { Loader2Icon } from "lucide-react";
 import { SubjectFormSchema } from "@/lib/schemas";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createSubjectAction } from "@/actions/subjectAction";
 const AddSubjectForm = ({ onCancel }: { onCancel: () => void }) => {
-  const [pending, setPending] = useState(false);
   const queryClient = useQueryClient();
 
-  const mutation = useMutation({
+  const {mutate,isPending} = useMutation({
     mutationFn: async (data: FormData) => createSubjectAction(data),
     onSuccess: (data) => {
       toast.success(data.message || "با موفقیت ثبت شد");
       queryClient.invalidateQueries({ queryKey: ["subjects"] });
-      setPending(false);
       onCancel();
     },
     onError: (data) => {
       toast.error(data.message || "خطا در ثبت");
-      setPending(false);
     },
   });
 
@@ -46,12 +42,10 @@ const AddSubjectForm = ({ onCancel }: { onCancel: () => void }) => {
   });
 
   const onSubmit = async (data: z.infer<typeof SubjectFormSchema>) => {
-    setPending(true);
-    console.log(pending);
 
     const formData = new FormData();
     formData.set("subjectName", data.name);
-    mutation.mutate(formData);
+    mutate(formData);
   };
   return (
     <div className="p-4">
@@ -79,10 +73,10 @@ const AddSubjectForm = ({ onCancel }: { onCancel: () => void }) => {
           <div className="flex gap-2">
             <Button
               className="w-full bg-orange-400 hover:bg-orange-300"
-              disabled={pending}
+              disabled={isPending}
               type="submit"
             >
-              {pending ? (
+              {isPending ? (
                 <>
                   <Loader2Icon className="ml-2 h-4 w-4 animate-spin" />
                   لطفا صبر کنید ...

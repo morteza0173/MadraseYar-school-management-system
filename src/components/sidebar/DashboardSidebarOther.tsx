@@ -1,16 +1,11 @@
 "use client";
 
-import {
-  PlusCircle,
-  type LucideIcon,
-} from "lucide-react";
-
+import { type LucideIcon } from "lucide-react";
 
 import {
   SidebarGroup,
   SidebarGroupLabel,
   SidebarMenu,
-  SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
@@ -22,25 +17,25 @@ export function DashboardSidebarOther({
     name: string;
     url: string;
     icon: LucideIcon;
+    disabled?: boolean;
   }[];
 }) {
-
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
       <SidebarGroupLabel>دسترسی سریع</SidebarGroupLabel>
       <SidebarMenu>
         {projects.map((item) => (
           <SidebarMenuItem key={item.name}>
-            <SidebarMenuButton asChild>
+            <SidebarMenuButton asChild aria-disabled={item.disabled}>
               <a href={item.url}>
                 <item.icon />
                 <span>{item.name}</span>
               </a>
             </SidebarMenuButton>
-                <SidebarMenuAction showOnHover>
-                  <PlusCircle />
-                  <span className="sr-only">افزودن</span>
-                </SidebarMenuAction>
+            {/* <SidebarMenuAction showOnHover>
+              <PlusCircle />
+              <span className="sr-only">افزودن</span>
+            </SidebarMenuAction> */}
           </SidebarMenuItem>
         ))}
         {/* <SidebarMenuItem>

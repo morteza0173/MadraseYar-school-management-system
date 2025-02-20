@@ -16,27 +16,23 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { AddGrade } from "@/actions/gradeActions";
-import { useState } from "react";
 import { toast } from "sonner";
 import { Loader2Icon } from "lucide-react";
 import { GradeFormSchema } from "@/lib/schemas";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 const AddGradeForm = ({ onCancel }: { onCancel: () => void }) => {
-  const [pending, setPending] = useState(false);
   const queryClient = useQueryClient();
 
-  const mutation = useMutation({
+  const {mutate,isPending} = useMutation({
     mutationFn: async (data: FormData) => AddGrade(data),
     onSuccess: (data) => {
       toast.success(data.message || "با موفقیت ثبت شد");
       queryClient.invalidateQueries({ queryKey: ["grade"] });
       queryClient.invalidateQueries({ queryKey: ["classDetails"] });
-      setPending(false);
       onCancel();
     },
     onError: (data) => {
       toast.error(data.message || "خطا در ثبت");
-      setPending(false);
     },
   });
 
@@ -48,12 +44,10 @@ const AddGradeForm = ({ onCancel }: { onCancel: () => void }) => {
   });
 
   const onSubmit = async (data: z.infer<typeof GradeFormSchema>) => {
-    setPending(true);
-    console.log(pending);
 
     const formData = new FormData();
     formData.set("grade", data.grade);
-    mutation.mutate(formData);
+    mutate(formData);
   };
   return (
     <div className="p-4">
@@ -81,10 +75,10 @@ const AddGradeForm = ({ onCancel }: { onCancel: () => void }) => {
           <div className="flex gap-2">
             <Button
               className="w-full bg-orange-400 hover:bg-orange-300"
-              disabled={pending}
+              disabled={isPending}
               type="submit"
             >
-              {pending ? (
+              {isPending ? (
                 <>
                   <Loader2Icon className="ml-2 h-4 w-4 animate-spin" />
                   لطفا صبر کنید ...

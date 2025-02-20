@@ -67,7 +67,6 @@ const AddClassForm = ({
   isGradeError,
   gradeRefetch,
 }: AddClassFormProps) => {
-  const [pending, setPending] = useState(false);
 
   const [openTeacherList, setOpenTeacherList] = useState(false);
   const [supervisorValue, setSupervisorValue] = useState("");
@@ -84,16 +83,14 @@ const AddClassForm = ({
 
   const queryClient = useQueryClient();
 
-  const mutation = useMutation({
+  const {mutate , isPending} = useMutation({
     mutationFn: async (data: FormData) => AddClass(data),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["classDetails"] });
-      setPending(false);
       toast.success(data.message || "کلاس جدید با موفقیت ساخته شد");
       onCancel();
     },
     onError: (error) => {
-      setPending(false);
       toast.error(error.message || "مشکلی در ثبت کلاس جدید به وجود آمد");
     },
   });
@@ -109,14 +106,13 @@ const AddClassForm = ({
   });
 
   const onSubmit = async (data: z.infer<typeof AddClassFormSchema>) => {
-    setPending(true);
 
     const formData = new FormData();
     formData.set("className", data.className);
     formData.set("capacity", data.capacity);
     formData.set("supervisor", data.supervisorId);
     formData.set("grade", data.grade);
-    mutation.mutate(formData);
+    mutate(formData);
   };
   return (
     <div className="p-4">
@@ -377,10 +373,10 @@ const AddClassForm = ({
           <div className="flex gap-2">
             <Button
               className="w-full bg-orange-400 hover:bg-orange-300"
-              disabled={pending}
+              disabled={isPending}
               type="submit"
             >
-              {pending ? (
+              {isPending ? (
                 <>
                   <Loader2Icon className="ml-2 h-4 w-4 animate-spin" />
                   لطفا صبر کنید ...

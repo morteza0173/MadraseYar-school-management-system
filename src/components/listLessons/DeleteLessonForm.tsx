@@ -5,42 +5,37 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Loader2Icon } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { deleteSubjectAction } from "@/actions/subjectAction";
-
-interface RowData {
-  name: string;
-  teacherCount: number;
-  lessonCount: number;
-}
+import { LessonsListSchema } from "@/lib/schemas";
+import { DeleteLesson } from "@/actions/lessonsAction";
 
 type Row<T> = {
   original: T;
 };
 
 interface DataTableRowActionsProps {
-  row: Row<RowData>;
+  row: Row<LessonsListSchema>;
   onCancel: () => void;
 }
 
-const DeleteSubjectForm = ({ onCancel, row }: DataTableRowActionsProps) => {
+const DeleteLessonForm = ({ onCancel, row }: DataTableRowActionsProps) => {
   const queryClient = useQueryClient();
-  const {mutate , isPending} = useMutation({
-    mutationFn: async (data: FormData) => deleteSubjectAction(data),
+  const { mutate, isPending } = useMutation({
+    mutationFn: async (data: FormData) => DeleteLesson(data),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["subjects"] });
-      toast.success(data.message || "حوزه تدریس با موفقیت حذف شد");
+      queryClient.invalidateQueries({ queryKey: ["lessons"] });
+      toast.success(data.message || "کلاس با موفقیت حذف شد");
       onCancel();
     },
     onError: (error) => {
-      toast.error(error.message || "خطا در حذف حوزه تدریس");
+      toast.error(error.message || "خطا در حذف کلاس");
     },
   });
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData();
-    const subjectName = row.original.name;
-    formData.set("subjectName", subjectName);
+    const lessonId = row.original.lessonId;
+    formData.set("id", String(lessonId));
     mutate(formData);
   };
   return (
@@ -74,4 +69,4 @@ const DeleteSubjectForm = ({ onCancel, row }: DataTableRowActionsProps) => {
     </>
   );
 };
-export default DeleteSubjectForm;
+export default DeleteLessonForm;

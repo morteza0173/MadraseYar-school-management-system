@@ -5,43 +5,30 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Loader2Icon } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { deleteSubjectAction } from "@/actions/subjectAction";
-
-interface RowData {
-  name: string;
-  teacherCount: number;
-  lessonCount: number;
-}
-
-type Row<T> = {
-  original: T;
-};
+import {  DeleteLessons } from "@/actions/lessonsAction";
 
 interface DataTableRowActionsProps {
-  row: Row<RowData>;
   onCancel: () => void;
+  ids: number[];
 }
 
-const DeleteSubjectForm = ({ onCancel, row }: DataTableRowActionsProps) => {
+const DeleteLessonsForm = ({ onCancel,ids }: DataTableRowActionsProps) => {
   const queryClient = useQueryClient();
-  const {mutate , isPending} = useMutation({
-    mutationFn: async (data: FormData) => deleteSubjectAction(data),
+  const { mutate, isPending } = useMutation({
+    mutationFn: async () => DeleteLessons(ids),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["subjects"] });
-      toast.success(data.message || "حوزه تدریس با موفقیت حذف شد");
+      queryClient.invalidateQueries({ queryKey: ["lessons"] });
+      toast.success(data.message || "درس ها با موفقیت حذف شد");
       onCancel();
     },
     onError: (error) => {
-      toast.error(error.message || "خطا در حذف حوزه تدریس");
+      toast.error(error.message || "خطا در حذف درس ها");
     },
   });
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const formData = new FormData();
-    const subjectName = row.original.name;
-    formData.set("subjectName", subjectName);
-    mutate(formData);
+    mutate();
   };
   return (
     <>
@@ -74,4 +61,4 @@ const DeleteSubjectForm = ({ onCancel, row }: DataTableRowActionsProps) => {
     </>
   );
 };
-export default DeleteSubjectForm;
+export default DeleteLessonsForm;

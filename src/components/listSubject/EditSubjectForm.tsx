@@ -14,7 +14,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
 import { toast } from "sonner";
 import { Loader2Icon } from "lucide-react";
 import { SubjectFormSchema } from "@/lib/schemas";
@@ -35,20 +34,17 @@ interface DataTableRowActionsProps {
 }
 
 const EditSubjectForm = ({ onCancel, row }: DataTableRowActionsProps) => {
-  const [pending, setPending] = useState(false);
   const queryClient = useQueryClient();
 
-  const mutation = useMutation({
+  const {mutate , isPending} = useMutation({
     mutationFn: async (data: FormData) => updateSubjectAction(data),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["subjects"] });
       toast.success(data.message || "با موفقیت ثبت شد");
-      setPending(false);
       onCancel();
     },
     onError: (error) => {
       toast.error(error.message || "خطا در ثبت");
-      setPending(false);
     },
   });
 
@@ -60,13 +56,10 @@ const EditSubjectForm = ({ onCancel, row }: DataTableRowActionsProps) => {
   });
 
   const onSubmit = async (data: z.infer<typeof SubjectFormSchema>) => {
-    setPending(true);
-    console.log(pending);
-
     const formData = new FormData();
     formData.set("newSubjectName", data.name);
     formData.set("oldSubjectName", row.original.name);
-    mutation.mutate(formData);
+    mutate(formData);
   };
   return (
     <div className="p-4">
@@ -94,10 +87,10 @@ const EditSubjectForm = ({ onCancel, row }: DataTableRowActionsProps) => {
           <div className="flex gap-2">
             <Button
               className="w-full bg-orange-400 hover:bg-orange-300"
-              disabled={pending}
+              disabled={isPending}
               type="submit"
             >
-              {pending ? (
+              {isPending ? (
                 <>
                   <Loader2Icon className="ml-2 h-4 w-4 animate-spin" />
                   لطفا صبر کنید ...

@@ -62,7 +62,6 @@ interface EditeClassFormProps {
 }
 
 const EditClassForm = ({ onCancel, row }: EditeClassFormProps) => {
-  const [pending, setPending] = useState(false);
 
   const [openTeacherList, setOpenTeacherList] = useState(false);
   const [supervisorValue, setSupervisorValue] = useState("");
@@ -72,17 +71,15 @@ const EditClassForm = ({ onCancel, row }: EditeClassFormProps) => {
   const [gradeValue, setGradeValue] = useState("");
 
   const queryClient = useQueryClient();
-  const mutation = useMutation({
+  const {mutate,isPending} = useMutation({
     mutationFn: async (data: FormData) => EditClass(data),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["classDetails"] });
       toast.success(data.message || "کلاس با موفقیت ویرایش شد");
-      setPending(false);
       onCancel();
     },
     onError: (data) => {
       toast.error(data.message || "مشکلی در ویرایش کلاس به وجود آمد");
-      setPending(false);
     },
   });
 
@@ -132,7 +129,6 @@ const EditClassForm = ({ onCancel, row }: EditeClassFormProps) => {
   });
 
   const onSubmit = async (data: z.infer<typeof AddClassFormSchema>) => {
-    setPending(true);
 
     const formData = new FormData();
     formData.set("classId", row.original.name);
@@ -140,7 +136,7 @@ const EditClassForm = ({ onCancel, row }: EditeClassFormProps) => {
     formData.set("capacity", data.capacity);
     formData.set("supervisor", supervisorValue);
     formData.set("grade", gradeValue);
-    mutation.mutate(formData);
+    mutate(formData);
   };
   return (
     <div className="p-4">
@@ -408,10 +404,10 @@ const EditClassForm = ({ onCancel, row }: EditeClassFormProps) => {
           <div className="flex gap-2">
             <Button
               className="w-full bg-orange-400 hover:bg-orange-300"
-              disabled={pending || isTeacherPending || isGradePending}
+              disabled={isPending || isTeacherPending || isGradePending}
               type="submit"
             >
-              {pending ? (
+              {isPending ? (
                 <>
                   <Loader2Icon className="ml-2 h-4 w-4 animate-spin" />
                   لطفا صبر کنید ...
