@@ -11,7 +11,7 @@ const InfoCard = ({
   icon: string;
 }) => {
   return (
-    <Card className="h-full bg-Purple hover:opacity-80 cursor-pointer">
+    <Card className="h-full bg-sky-100 hover:opacity-80 cursor-pointer">
       <CardContent className="p-0 h-full">
         <div className=" h-full">
           <div className="flex gap-2 items-center p-1 px-2 md:pr-4 lg:px-2">

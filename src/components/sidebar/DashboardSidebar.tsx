@@ -76,7 +76,6 @@ const data = {
           title: "معلم ها",
           visible: ["admin", "teacher", "student", "parent"],
           url: "/list/teacher",
-          disabled: true,
         },
       ],
     },

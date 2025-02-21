@@ -1,12 +1,16 @@
 "use client";
 
 import { Ellipsis } from "lucide-react";
-import { CartesianGrid, LabelList, Line, LineChart, XAxis, YAxis } from "recharts";
-
 import {
-  Card,
-  CardContent,
-} from "@/components/ui/card";
+  CartesianGrid,
+  LabelList,
+  Line,
+  LineChart,
+  XAxis,
+  YAxis,
+} from "recharts";
+
+import { Card, CardContent } from "@/components/ui/card";
 import {
   ChartConfig,
   ChartContainer,
@@ -14,6 +18,7 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { Button } from "./ui/button";
+import { useIsMobile } from "@/hooks/use-mobile";
 const chartData = [
   { date: "1403-10-22", desktop: 16.3 },
   { date: "1403-10-23", desktop: 17.2 },
@@ -30,7 +35,7 @@ const chartData = [
 const chartConfig = {
   desktop: {
     label: "نمره",
-    color: "hsl(var(--chart-1))",
+    color: "#fb923c ",
   },
   mobile: {
     label: "Mobile",
@@ -39,11 +44,14 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export function LineChartLable() {
+  const isMobile = useIsMobile();
+  const lineStroke = isMobile ? 0.5 : 2;
+  const fontSize = isMobile ? 10 : 12;
   return (
     <Card>
       <CardContent className="h-full flex flex-col justify-between">
-        <div className="flex items-center justify-between mt-4">
-          <p>میانگین نمرات دانش آموزان</p>
+        <div className="flex items-center justify-between font-bold my-4">
+          <p className="text-sm md:text-base">میانگین نمرات دانش آموزان</p>
           <Button
             variant="outline"
             size="icon"
@@ -68,6 +76,7 @@ export function LineChartLable() {
               tickLine={false}
               axisLine={false}
               tickMargin={8}
+              tick={{ fontSize: 10, fill: "#555" }}
               tickFormatter={(value) => {
                 const date = new Date(value);
                 return date.toLocaleDateString("en", {
@@ -76,12 +85,13 @@ export function LineChartLable() {
                 });
               }}
             />
+
             <YAxis
               tickLine={false}
               axisLine={false}
               tickMargin={50}
               domain={[14, 18]}
-
+              tick={{ fontSize: 10, fill: "#555" }}
               tickFormatter={(value) => value.toFixed(1)}
             />
             <ChartTooltip
@@ -92,7 +102,7 @@ export function LineChartLable() {
               dataKey="desktop"
               type="natural"
               stroke="var(--color-desktop)"
-              strokeWidth={2}
+              strokeWidth={lineStroke}
               dot={{
                 fill: "var(--color-desktop)",
               }}
@@ -104,7 +114,7 @@ export function LineChartLable() {
                 position="top"
                 offset={30}
                 className="fill-foreground"
-                fontSize={12}
+                fontSize={fontSize}
               />
             </Line>
           </LineChart>

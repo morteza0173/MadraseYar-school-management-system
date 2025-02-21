@@ -144,9 +144,14 @@ table.rdp-month_grid > thead > tr > th:nth-child(7) {
   height: 100%;
 }
 
+.fc-event {
+  font-size: 0.7rem;
+}
+
 .fc-event-title {
   text-align: center;
   padding-bottom: 17px;
+  white-space: pre-line;
 }
 /* شخصی سازی ارتفاع تقویم */
 .fc {
@@ -166,6 +171,9 @@ table.rdp-month_grid > thead > tr > th:nth-child(7) {
 @media (min-width: 768px) {
   .fc-col-header-cell-cushion {
     font-size: 0.75rem !important;
+  }
+  .fc-event {
+    font-size: 1rem;
   }
 }
 .fc-toolbar-title {
@@ -202,4 +210,3 @@ html body[data-scroll-locked] {
   margin-right: 0 !important; /* جلوگیری از اضافه شدن مارجین راست */
   overflow: visible !important;
 }
-

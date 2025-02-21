@@ -6,12 +6,12 @@ import rrulePlugin from "@fullcalendar/rrule";
 import { Card, CardContent } from "./ui/card";
 import { Button } from "./ui/button";
 
-
 const events = [
   {
     title: "شیمی1",
     duration: "01:15",
-    color: "#fda4af",
+    color: "#ffedd5  ",
+    borderColor: "gray",
     rrule: {
       freq: "weekly",
       interval: 1,
@@ -23,7 +23,8 @@ const events = [
   {
     title: "هندسه1",
     duration: "01:15",
-    color: "#0ea5e9",
+    color: "#ffedd5  ",
+    borderColor: "gray",
     rrule: {
       freq: "weekly",
       interval: 1,
@@ -35,7 +36,8 @@ const events = [
   {
     title: "فیزیک1",
     duration: "01:15",
-    color: "#fda4af",
+    color: "#ffedd5  ",
+    borderColor: "gray",
     rrule: {
       freq: "weekly",
       interval: 1,
@@ -47,7 +49,8 @@ const events = [
   {
     title: "تربیت بدنی",
     duration: "01:15",
-    color: "#0ea5e9",
+    color: "#ffedd5  ",
+    borderColor: "gray",
     rrule: {
       freq: "weekly",
       interval: 1,
@@ -59,7 +62,8 @@ const events = [
   {
     title: "تعلیمات دینی",
     duration: "01:15",
-    color: "#0ea5e9",
+    color: "#ffedd5  ",
+    borderColor: "gray",
     rrule: {
       freq: "weekly",
       interval: 1,
@@ -71,7 +75,8 @@ const events = [
   {
     title: "نگارش1",
     duration: "01:15",
-    color: "#fda4af",
+    color: "#ffedd5  ",
+    borderColor: "gray",
     rrule: {
       freq: "weekly",
       interval: 1,
@@ -83,7 +88,8 @@ const events = [
   {
     title: "ریاضی1",
     duration: "01:15",
-    color: "#0ea5e9",
+    color: "#ffedd5  ",
+    borderColor: "gray",
     rrule: {
       freq: "weekly",
       interval: 1,
@@ -95,7 +101,8 @@ const events = [
   {
     title: "فارسی1",
     duration: "01:15",
-    color: "#0ea5e9",
+    color: "#ffedd5  ",
+    borderColor: "gray",
     rrule: {
       freq: "weekly",
       interval: 1,
@@ -107,7 +114,8 @@ const events = [
   {
     title: "علوم تجربی 1",
     duration: "01:15",
-    color: "#0ea5e9",
+    color: "#ffedd5  ",
+    borderColor: "gray",
     rrule: {
       freq: "weekly",
       interval: 1,
@@ -119,7 +127,8 @@ const events = [
   {
     title: "زبان خارجه1",
     duration: "01:15",
-    color: "#fda4af",
+    color: "#ffedd5  ",
+    borderColor: "gray",
     rrule: {
       freq: "weekly",
       interval: 1,
@@ -131,7 +140,8 @@ const events = [
   {
     title: "شیمی1",
     duration: "00:35",
-    color: "#0ea5e9",
+    color: "#ffedd5  ",
+    borderColor: "gray",
     rrule: {
       freq: "weekly",
       interval: 1,
@@ -143,7 +153,8 @@ const events = [
   {
     title: "فارسی1",
     duration: "01:15",
-    color: "#0ea5e9",
+    color: "#ffedd5  ",
+    borderColor: "gray",
     rrule: {
       freq: "weekly",
       interval: 1,
@@ -155,7 +166,8 @@ const events = [
   {
     title: "عربی1",
     duration: "01:15",
-    color: "#fda4af",
+    color: "#ffedd5  ",
+    borderColor: "gray",
     rrule: {
       freq: "weekly",
       interval: 1,
@@ -167,7 +179,8 @@ const events = [
   {
     title: "زمین شناسی",
     duration: "01:15",
-    color: "#0ea5e9",
+    color: "#ffedd5  ",
+    borderColor: "gray",
     rrule: {
       freq: "weekly",
       interval: 1,
@@ -179,7 +192,8 @@ const events = [
   {
     title: "دفاعی",
     duration: "01:15",
-    color: "#fda4af",
+    color: "#ffedd5  ",
+    borderColor: "gray",
     rrule: {
       freq: "weekly",
       interval: 1,
@@ -191,7 +205,8 @@ const events = [
   {
     title: "زبان خارجه",
     duration: "01:15",
-    color: "#fda4af",
+    color: "#ffedd5  ",
+    borderColor: "gray",
     rrule: {
       freq: "weekly",
       interval: 1,
@@ -202,13 +217,11 @@ const events = [
   },
 ];
 
-
-
 export default function WeeklyCalendar() {
   return (
     <Card>
       <CardContent className="p-0 md:p-2 lg:p-4">
-        <div className="flex justify-between m-4 md:m-2 lg:m-0 md:mb-2 lg:mb-4">
+        <div className="flex justify-between m-4 md:m-2 lg:m-0 md:mb-2 lg:mb-4 ">
           <h2 className="">برنامه هفتگی</h2>
           <Button disabled variant="outline">
             <p className="text-sm font-bold text-gray-500">کلاس 10C</p>
@@ -233,8 +246,8 @@ export default function WeeklyCalendar() {
           eventMinHeight={60}
           expandRows={true}
           events={events}
+          eventTextColor="black"
           aspectRatio={1}
-
         />
       </CardContent>
     </Card>

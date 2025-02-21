@@ -11,7 +11,7 @@ import Link from "next/link";
 
 const StudentCard = () => {
   return (
-    <div className="bg-Sky w-full rounded-xl shadow-sm border border-gray-300 p-2">
+    <div className="bg-orange-50 w-full rounded-xl shadow-sm border border-gray-300 p-2">
       <div className="flex gap-4 items-center justify-start  h-full">
         <Avatar className="w-28 h-28">
           <AvatarImage src="/teacher1.jpg" alt="teacher photo" />

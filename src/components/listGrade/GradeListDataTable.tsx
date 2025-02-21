@@ -45,8 +45,8 @@ export function GradeListDataTable<TData, TValue>({
     if (isMobile) {
       setColumnVisibility((prevState) => ({
         ...prevState,
-        students: false,
-        classes: false,
+        students: true,
+        classes: true,
       }));
     } else {
       setColumnVisibility({

@@ -45,8 +45,8 @@ export function SubjectListDataTable<TData, TValue>({
     if (isMobile) {
       setColumnVisibility((prevState) => ({
         ...prevState,
-        teacherCount: false,
-        lessonCount: false,
+        teacherCount: true,
+        lessonCount: true,
       }));
     } else {
       setColumnVisibility({
@@ -81,9 +81,7 @@ export function SubjectListDataTable<TData, TValue>({
 
   return (
     <div className="space-y-2 ">
-      <SubjectListDataTableViewOptions
-        table={table}
-      />
+      <SubjectListDataTableViewOptions table={table} />
       <TanstackTable
         isPending={isSubjectPending}
         isError={isSubjectError}

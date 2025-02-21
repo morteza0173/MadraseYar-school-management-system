@@ -7,7 +7,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Ellipsis } from "lucide-react";
@@ -16,10 +15,9 @@ interface DataTableRowActionsProps<TData> {
   row: Row<TData>;
 }
 
-export function DataTableRowActions<TData>({
+export function TeacherDataTableRowActions<TData>({
   row,
 }: DataTableRowActionsProps<TData>) {
-  // const task = taskSchema.parse(row.original);
   console.log(row);
 
   return (
@@ -34,9 +32,9 @@ export function DataTableRowActions<TData>({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[160px]">
-        <DropdownMenuItem>ویرایش</DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem>حذف</DropdownMenuItem>
+        <DropdownMenuItem disabled>جزئیات</DropdownMenuItem>
+        <DropdownMenuItem disabled>ویرایش</DropdownMenuItem>
+        <DropdownMenuItem disabled>حذف</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

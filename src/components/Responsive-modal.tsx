@@ -30,7 +30,6 @@ export const ResponsiveModal = ({
   discription,
 }: ResponsiveModalProps) => {
   const isMobile = useIsMobile();
-  
 
   if (!isMobile) {
     return (
@@ -55,7 +54,9 @@ export const ResponsiveModal = ({
           <DrawerTitle>{title}</DrawerTitle>
           <DrawerDescription>{discription}</DrawerDescription>
         </DrawerHeader>
-        <div className="overflow-y-auto hide-scrollbar">{children}</div>
+        <div className="overflow-y-auto hide-scrollbar max-h-[65vh] overflow-auto">
+          {children}
+        </div>
       </DrawerContent>
     </Drawer>
   );

@@ -40,7 +40,7 @@ const TanstackTable = <TData, TValue>({
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
                   <TableHead
-                    className="px-4 py-2"
+                    className="px-1 md:px-2 lg:px-4 py-2 text-xs md:text-sm"
                     key={header.id}
                     colSpan={header.colSpan}
                   >
@@ -64,7 +64,10 @@ const TanstackTable = <TData, TValue>({
                   className="even:bg-gray-100"
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell className="px-4 py-2" key={cell.id}>
+                    <TableCell
+                      className="px-1 md:px-2 lg:px-4 py-2  text-xs md:text-sm"
+                      key={cell.id}
+                    >
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()

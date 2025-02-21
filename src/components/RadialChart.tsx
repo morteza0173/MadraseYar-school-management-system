@@ -3,10 +3,7 @@
 import { Ellipsis, Users } from "lucide-react";
 import { Label, PolarRadiusAxis, RadialBar, RadialBarChart } from "recharts";
 
-import {
-  Card,
-  CardContent,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   ChartConfig,
   ChartContainer,
@@ -19,22 +16,20 @@ const chartData = [{ month: "january", boys: 1260, grils: 570 }];
 const chartConfig = {
   boys: {
     label: "پسران",
-    color: "#C3EBFA",
+    color: "#bae6fd",
   },
   grils: {
     label: "دختران",
-    color: "#FAE27C",
+    color: "#fed7aa",
   },
 } satisfies ChartConfig;
 
 export function RadialChart() {
-
-
   return (
     <Card className="flex flex-col border-none ring-0 w-full h-[300px] xl:h-[450px]">
       <CardContent className="h-full flex flex-col justify-between p-0">
         <div className="flex items-center justify-between py-2 p-4">
-          <p>دانش آموزان</p>
+          <p className="text-sm md:text-base font-bold">دانش آموزان</p>
           <Button
             variant="outline"
             size="icon"
@@ -93,12 +88,12 @@ export function RadialChart() {
         </ChartContainer>
         <div className="-mt-24 flex gap-2 items-center justify-between p-4">
           <div className="flex flex-col justify-center items-center gap-2">
-            <div className="w-5 h-5 rounded-full bg-Sky" />
+            <div className="w-5 h-5 rounded-full bg-sky-200" />
             <p className="font-medium ">1200</p>
             <p className="text-xs">پسران</p>
           </div>
           <div className="flex flex-col justify-center items-center gap-2">
-            <div className="w-5 h-5 rounded-full bg-Yellow" />
+            <div className="w-5 h-5 rounded-full bg-orange-200" />
             <p className="font-medium ">1300</p>
             <p className="text-xs">دختران</p>
           </div>

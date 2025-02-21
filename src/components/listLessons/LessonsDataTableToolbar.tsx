@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 import { TrashIcon, X } from "lucide-react";
-import { DataTableFacetedFilter } from "../listTeacher/data-table-faceted-filter";
 import useGetSubjects from "@/hooks/useGetSubjects";
 import { useUserAuth } from "@/hooks/useUserAuth";
 import useGetClassDetails from "@/hooks/useGetClassDetails";
@@ -14,6 +13,7 @@ import { LessonsListDataTableViewOptions } from "./LessonsListDataTableViewOptio
 import ResponsiveModalForm from "../ResponsiveModalForm";
 import { useState } from "react";
 import DeleteLessonsForm from "./DeleteLessonsForm";
+import { DataTableFacetedFilter } from "../tableComponent/data-table-faceted-filter";
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
@@ -39,6 +39,8 @@ export function LessonsDataTableToolbar<TData>({
     value: Class?.name,
     label: Class?.name,
   }));
+
+
 
   const selectedIds = table
     .getFilteredSelectedRowModel()

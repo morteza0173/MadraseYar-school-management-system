@@ -174,7 +174,7 @@ const EditLessonsForm = ({ onCancel, row }: EditLessonFormProps) => {
   );
 
   const selectedDay = form.watch("day");
- 
+
 
   const adjustTime = (
     field: "startHour" | "startMinute" | "endHour" | "endMinute",
@@ -414,7 +414,7 @@ const EditLessonsForm = ({ onCancel, row }: EditLessonFormProps) => {
             )}
           />
 
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col md:flex-row md:items-center justify-between">
             <FormField
               control={form.control}
               name="startHour"
@@ -423,7 +423,7 @@ const EditLessonsForm = ({ onCancel, row }: EditLessonFormProps) => {
                   <FormControl>
                     <div className="flex gap-2 items-center justify-between">
                       <FormLabel>زمان شروع کلاس</FormLabel>
-                      <div className="flex gap-2 justify-center  items-center">
+                      <div className="flex md:gap-2 justify-center  items-center">
                         {/* دقیقه شروع */}
                         <div className="flex flex-col items-center justify-center">
                           <Button
@@ -435,7 +435,7 @@ const EditLessonsForm = ({ onCancel, row }: EditLessonFormProps) => {
                           </Button>
                           <Input
                             value={form.watch("startMinute")}
-                            className="w-12 text-center"
+                            className="w-10 md:w-12 text-center"
                             readOnly
                           />
                           <Button
@@ -457,7 +457,7 @@ const EditLessonsForm = ({ onCancel, row }: EditLessonFormProps) => {
                           </Button>
                           <Input
                             value={field.value}
-                            className="w-12 text-center"
+                            className="w-10 md:w-12 text-center"
                             readOnly
                           />
                           <Button
@@ -484,7 +484,7 @@ const EditLessonsForm = ({ onCancel, row }: EditLessonFormProps) => {
                   <FormControl>
                     <div className="flex gap-2 items-center justify-between">
                       <FormLabel>زمان پایان کلاس</FormLabel>
-                      <div className="flex gap-2 justify-center  items-center">
+                      <div className="flex md:gap-2 justify-center  items-center">
                         {/* دقیقه پایان */}
                         <div className="flex flex-col items-center justify-center">
                           <Button
@@ -496,7 +496,7 @@ const EditLessonsForm = ({ onCancel, row }: EditLessonFormProps) => {
                           </Button>
                           <Input
                             value={form.watch("endMinute")}
-                            className="w-12 text-center"
+                            className="w-10 md:w-12 text-center"
                             readOnly
                           />
                           <Button
@@ -518,7 +518,7 @@ const EditLessonsForm = ({ onCancel, row }: EditLessonFormProps) => {
                           </Button>
                           <Input
                             value={field.value}
-                            className="w-12 text-center"
+                            className="w-10 md:w-12 text-center"
                             readOnly
                           />
                           <Button

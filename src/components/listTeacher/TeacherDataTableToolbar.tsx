@@ -4,19 +4,34 @@ import { Table } from "@tanstack/react-table";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { incomeType, categories } from "./data";
-import { DataTableFacetedFilter } from "./data-table-faceted-filter";
 import { TrashIcon, X } from "lucide-react";
-import { DataTableViewOptions } from "./data-table-view-options";
+import { TeacherDataTableViewOptions } from "./TeacherDataTableViewOptions";
+import { DataTableFacetedFilter } from "../tableComponent/data-table-faceted-filter";
+import { useUserAuth } from "@/hooks/useUserAuth";
+import useGetSubjects from "@/hooks/useGetSubjects";
+import useGetClassDetails from "@/hooks/useGetClassDetails";
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
 }
 
-export function DataTableToolbar<TData>({
+export function TeacherDataTableToolbar<TData>({
   table,
 }: DataTableToolbarProps<TData>) {
   const isFiltered = table.getState().columnFilters.length > 0;
+
+  const { userData } = useUserAuth(["admin", "teacher", "student", "parent"]);
+  const { subjectData } = useGetSubjects(userData);
+  const { ClassData } = useGetClassDetails(userData);
+
+  const subjectName = subjectData?.map((subject) => ({
+    value: subject?.name,
+    label: subject?.name,
+  }));
+  const className = ClassData?.map((Class) => ({
+    value: Class?.name,
+    label: Class?.name,
+  }));
 
   return (
     <div className="flex flex-wrap items-center justify-between">
@@ -29,18 +44,18 @@ export function DataTableToolbar<TData>({
           }}
           className="h-8 w-full md:w-[150px] lg:w-[250px]"
         />
-        {table.getColumn("category") && (
+        {table.getColumn("subject") && (
           <DataTableFacetedFilter
-            column={table.getColumn("category")}
-            title="درس ها"
-            options={categories}
+            column={table.getColumn("subject")}
+            title="حوزه تدریس"
+            options={subjectName || []}
           />
         )}
-        {table.getColumn("type") && (
+        {table.getColumn("classes") && (
           <DataTableFacetedFilter
-            column={table.getColumn("type")}
+            column={table.getColumn("classes")}
             title="کلاس ها"
-            options={incomeType}
+            options={className || []}
           />
         )}
         {isFiltered && (
@@ -62,7 +77,7 @@ export function DataTableToolbar<TData>({
             حذف کردن ({table.getFilteredSelectedRowModel().rows.length})
           </Button>
         ) : null}
-        <DataTableViewOptions table={table} />
+        <TeacherDataTableViewOptions table={table} />
       </div>
     </div>
   );

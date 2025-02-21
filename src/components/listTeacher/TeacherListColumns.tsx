@@ -1,13 +1,13 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { TrendingUp, TrendingDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Checkbox } from "@/components/ui/checkbox";
-import { DataTableColumnHeader } from "./data-table-column-header";
-import { Expense } from "./schema";
-import { DataTableRowActions } from "./data-table-row-actions";
+import { TeacherDataTableRowActions } from "./TeacherDataTableRowActions";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { Badge } from "../ui/badge";
+import { TeacherDataListSchema } from "@/lib/schemas";
+import { DataTableColumnHeader } from "../tableComponent/data-table-column-header";
 
 interface Label {
   name: string;
@@ -15,7 +15,7 @@ interface Label {
   img: string;
 }
 
-export const columns: ColumnDef<Expense>[] = [
+export const TeacherListColumns: ColumnDef<TeacherDataListSchema>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -43,7 +43,7 @@ export const columns: ColumnDef<Expense>[] = [
   {
     accessorKey: "label",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="نام" />
+      <DataTableColumnHeader column={column} title="مشخصات" />
     ),
     cell: ({ row }) => (
       <div className="w-[150px] capitalize  flex gap-2 items-center">
@@ -79,7 +79,7 @@ export const columns: ColumnDef<Expense>[] = [
     },
   },
   {
-    accessorKey: "note",
+    accessorKey: "phone",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="شماره تماس" />
     ),
@@ -87,21 +87,21 @@ export const columns: ColumnDef<Expense>[] = [
       return (
         <div className="flex space-x-2">
           <span className="max-w-[500px] truncate font-medium capitalize">
-            {row.getValue("note")}
+            {row.getValue("phone")}
           </span>
         </div>
       );
     },
   },
   {
-    accessorKey: "category",
+    accessorKey: "subject",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="درس" />
+      <DataTableColumnHeader column={column} title="حوزه تدریس" />
     ),
     cell: ({ row }) => {
       return (
         <div className="flex w-[100px] items-center">
-          <span className="capitalize"> {row.getValue("category")}</span>
+          <span className="capitalize"> {row.getValue("subject")}</span>
         </div>
       );
     },
@@ -110,31 +110,39 @@ export const columns: ColumnDef<Expense>[] = [
     },
   },
   {
-    accessorKey: "type",
+    accessorKey: "classes",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="کلاس" />
+      <DataTableColumnHeader column={column} title="کلاس ها" />
     ),
     cell: ({ row }) => {
-      const type = row.getValue("type");
+      const classesValue = row.getValue("classes");
+      const classesArray =
+        typeof classesValue === "string"
+          ? classesValue.split(",").map((cls: string) => cls.trim())
+          : [];
       return (
-        <div className="flex w-[100px] items-center">
-          {type === "income" ? (
-            <TrendingUp size={20} className="mr-2 text-green-500" />
-          ) : (
-            <TrendingDown size={20} className="mr-2 text-red-500" />
-          )}
-          <span className="capitalize"> {row.getValue("type")}</span>
+        <div className="flex w-[150px] lg:w-[250px] xl:w-full items-center gap-1 flex-wrap">
+          {classesArray.map((cls, index) => (
+            <Badge key={index} variant="outline" className="capitalize text-xs">
+              {cls}
+            </Badge>
+          ))}
         </div>
       );
     },
-    filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id));
+    filterFn: (row, id, filterValues) => {
+      const classesValue = row.getValue(id);
+      if (typeof classesValue !== "string") return false;
+      const classesArray = classesValue
+        .split(",")
+        .map((cls: string) => cls.trim());
+      return classesArray.some((cls) => filterValues.includes(cls));
     },
   },
   {
-    accessorKey: "amount",
+    accessorKey: "eventOnGoing",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="حضور" />
+      <DataTableColumnHeader column={column} title="رویداد های پیش رو" />
     ),
     cell: ({ row }) => {
       return (
@@ -142,13 +150,14 @@ export const columns: ColumnDef<Expense>[] = [
           <span
             className={cn(
               "capitalize",
-              Number(row.getValue("amount")) > 97
+              Number(row.getValue("eventOnGoing")) >= 0
                 ? "text-green-500"
-                : Number(row.getValue("amount")) > 95 ? "text-orange-400" : "text-red-500"
+                : Number(row.getValue("eventOnGoing")) > 5
+                ? "text-orange-400"
+                : "text-red-500"
             )}
           >
-            {" "}
-            {row.getValue("amount")} %
+            {row.getValue("eventOnGoing")}
           </span>
         </div>
       );
@@ -158,31 +167,7 @@ export const columns: ColumnDef<Expense>[] = [
     },
   },
   {
-    accessorKey: "date",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="اخرین بروزرسانی" />
-    ),
-    cell: ({ row }) => {
-      const date = new Date(row.getValue("date"));
-      const formattedDate = date.toLocaleDateString("fa", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-      });
-      return (
-        <div className="flex w-[100px] items-center">
-          <span className="capitalize">{formattedDate}</span>
-        </div>
-      );
-    },
-    filterFn: (row, id, value) => {
-      const rowDate = new Date(row.getValue(id));
-      const [startDate, endDate] = value;
-      return rowDate >= startDate && rowDate <= endDate;
-    },
-  },
-  {
     id: "actions",
-    cell: ({ row }) => <DataTableRowActions row={row} />,
+    cell: ({ row }) => <TeacherDataTableRowActions row={row} />,
   },
 ];

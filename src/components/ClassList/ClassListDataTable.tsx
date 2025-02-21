@@ -65,7 +65,7 @@ export function ClassListDataTable<TData, TValue>({
         ...prevState,
         grade: false,
         capacity: false,
-        studentCount: false,
+        studentCount: true,
         supervisor: false,
       }));
     } else {

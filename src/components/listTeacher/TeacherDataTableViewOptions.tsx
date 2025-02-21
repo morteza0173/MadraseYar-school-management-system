@@ -17,7 +17,7 @@ interface DataTableViewOptionsProps<TData> {
   table: Table<TData>;
 }
 
-export function DataTableViewOptions<TData>({
+export function TeacherDataTableViewOptions<TData>({
   table,
 }: DataTableViewOptionsProps<TData>) {
   return (
@@ -26,6 +26,7 @@ export function DataTableViewOptions<TData>({
         variant="outline"
         size="sm"
         className="ml-auto h-8 lg:flex w-full md:w-auto"
+        disabled
       >
         <CirclePlus className="ml-2 h-4 w-4" />
         افزودن

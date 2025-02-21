@@ -67,6 +67,9 @@ export const LessonListColumns: ColumnDef<LessonsListSchema>[] = [
         </div>
       );
     },
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
   },
   {
     accessorKey: "day",
@@ -144,6 +147,9 @@ export const LessonListColumns: ColumnDef<LessonsListSchema>[] = [
           </span>
         </div>
       );
+    },
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
     },
   },
   {

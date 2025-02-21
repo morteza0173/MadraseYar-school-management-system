@@ -102,7 +102,7 @@ const TeacherSchema = z.object({
 });
 
 export const lessonsListSchema = z.object({
-  lessonId:z.number(),
+  lessonId: z.number(),
   lessonName: z.string(),
   subjectName: z.string(),
   teacher: TeacherSchema,
@@ -113,3 +113,20 @@ export const lessonsListSchema = z.object({
 });
 
 export type LessonsListSchema = z.infer<typeof lessonsListSchema>;
+
+const TeacherLabel = z.object({
+  name: z.string(),
+  email: z.string().optional(),
+  img: z.string().optional(),
+});
+
+export const teacherDataListSchema = z.object({
+  id: z.string(),
+  label: TeacherLabel,
+  phone: z.string().optional(),
+  subject: z.string().optional(),
+  classes: z.string(),
+  eventOnGoing: z.number(),
+});
+
+export type TeacherDataListSchema = z.infer<typeof teacherDataListSchema>;

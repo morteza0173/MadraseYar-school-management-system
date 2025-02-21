@@ -12,6 +12,7 @@ import useGetClassDetails from "@/hooks/useGetClassDetails";
 import useGetStudents from "@/hooks/useGetStudents";
 import useGetTeacher from "@/hooks/useGetTeacher";
 import { useUserAuth } from "@/hooks/useUserAuth";
+import { BookOpenText, CalendarDays, GraduationCap, User } from "lucide-react";
 
 const AdminPage = () => {
   const { userData } = useUserAuth(["admin"]);
@@ -38,21 +39,25 @@ const AdminPage = () => {
             type="دانش آموزان"
             Number={studentData?.length}
             pending={isStudentPending}
+            icon={<GraduationCap size={25} strokeWidth={1} />}
           />
           <UserCard
             type="معلمان"
             Number={teacherData?.length}
             pending={isTeacherPending}
-          />
-          <UserCard
-            type="مدیریت"
-            Number={adminData?.length}
-            pending={isAdminPending}
+            icon={<User size={25} strokeWidth={1} />}
           />
           <UserCard
             type="تعداد کلاس ها"
             Number={ClassData?.length}
             pending={isClassPending}
+            icon={<BookOpenText size={25} strokeWidth={1} />}
+          />
+          <UserCard
+            type="رویداد های پیش رو"
+            Number={adminData?.length}
+            pending={isAdminPending}
+            icon={<CalendarDays size={25} strokeWidth={1} />}
           />
         </div>
         {/* MIDDLE CHARTS */}

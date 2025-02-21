@@ -9,7 +9,13 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
 const chartData = [
   { date: "1403-10-22", running: 2400, swimming: 100 },
   { date: "1403-10-23", running: 2480, swimming: 20 },
@@ -22,11 +28,11 @@ const chartData = [
 const chartConfig = {
   running: {
     label: "حاضرین",
-    color: "#C3EBFA",
+    color: "#bae6fd",
   },
   swimming: {
     label: "غایبین",
-    color: "#FAE27C",
+    color: "#fed7aa",
   },
 } satisfies ChartConfig;
 
@@ -35,7 +41,7 @@ export function Barchart() {
     <Card className="border-none ring-0 h-[400px] xl:h-[450px]">
       <CardContent className="h-full flex flex-col justify-between p-0">
         <div className="flex items-center justify-between py-2 p-4">
-          <p>حضور و غیاب</p>
+          <p className="text-sm md:text-base font-bold">حضور و غیاب</p>
           <div className="flex gap-4">
             <Select>
               <SelectTrigger className="w-[80px]" dir="rtl">
@@ -65,9 +71,9 @@ export function Barchart() {
           </div>
         </div>
         <div className="flex gap-2 items-center px-4">
-          <div className="h-3 w-3 bg-Sky rounded-full" />
+          <div className="h-3 w-3 bg-sky-200 rounded-full" />
           <p className="text-xs text-gray-700">حاضرین</p>
-          <div className="h-3 w-3 bg-Yellow rounded-full mr-4" />
+          <div className="h-3 w-3 bg-orange-200 rounded-full mr-4" />
           <p className="text-xs text-gray-700">غایبین</p>
         </div>
         <ChartContainer config={chartConfig} className="h-[80%]">
