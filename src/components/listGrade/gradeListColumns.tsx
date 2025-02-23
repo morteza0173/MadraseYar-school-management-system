@@ -12,8 +12,8 @@ export const gradeListColumns: ColumnDef<GradeListSchema>[] = [
       <DataTableColumnHeader column={column} title="سال تحصیلی" />
     ),
     cell: ({ row }) => (
-      <div className="w-[150px] capitalize  flex gap-2 items-center">
-        <span className="max-w-[500px] truncate font-medium capitalize">
+      <div className="capitalize  flex gap-2 items-center">
+        <span className=" truncate font-medium capitalize">
           {row.getValue("level")}
         </span>
       </div>
@@ -34,7 +34,7 @@ export const gradeListColumns: ColumnDef<GradeListSchema>[] = [
     cell: ({ row }) => {
       return (
         <div className="flex space-x-2">
-          <span className="max-w-[500px] truncate font-medium capitalize">
+          <span className="truncate font-medium capitalize">
             {row.getValue("students")}
           </span>
         </div>
@@ -49,7 +49,7 @@ export const gradeListColumns: ColumnDef<GradeListSchema>[] = [
     cell: ({ row }) => {
       return (
         <div className="flex space-x-2">
-          <span className="max-w-[500px] truncate font-medium capitalize">
+          <span className="truncate font-medium capitalize">
             {row.getValue("classes")}
           </span>
         </div>

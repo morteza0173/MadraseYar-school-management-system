@@ -64,7 +64,7 @@ export function ClassListDataTable<TData, TValue>({
       setColumnVisibility((prevState) => ({
         ...prevState,
         grade: false,
-        capacity: false,
+        capacity: true,
         studentCount: true,
         supervisor: false,
       }));

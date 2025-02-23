@@ -1,4 +1,3 @@
-
 import { Column } from "@tanstack/react-table";
 
 import { cn } from "@/lib/utils";
@@ -36,7 +35,7 @@ export function DataTableColumnHeader<TData, TValue>({
             size="sm"
             className="-mr-3 h-8 data-[state=open]:bg-accent"
           >
-            <span>{title}</span>
+            <span className="text-[0.65rem] md:text-xs">{title}</span>
             {column.getIsSorted() === "desc" ? (
               <ArrowDown className="mr-2 h-4 w-4" />
             ) : column.getIsSorted() === "asc" ? (

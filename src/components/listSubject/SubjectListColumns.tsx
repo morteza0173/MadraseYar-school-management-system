@@ -13,7 +13,7 @@ export const SubjectListColumns: ColumnDef<SubjectListSchema>[] = [
       <DataTableColumnHeader column={column} title="نام حوزه تدریس" />
     ),
     cell: ({ row }) => (
-      <div className="w-[150px] capitalize  flex gap-2 items-center">
+      <div className="capitalize  flex gap-2 items-center">
         <span className="max-w-[500px] truncate font-medium capitalize">
           {row.getValue("name")}
         </span>

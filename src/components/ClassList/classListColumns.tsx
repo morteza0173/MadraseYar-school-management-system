@@ -14,7 +14,7 @@ export const classListColumns: ColumnDef<ClassListSchema>[] = [
       <DataTableColumnHeader column={column} title="نام کلاس" />
     ),
     cell: ({ row }) => (
-      <div className="w-[150px] capitalize  flex gap-2 items-center">
+      <div className="capitalize  flex gap-2 items-center">
         <span className="max-w-[500px] truncate font-medium capitalize">
           {row.getValue("name")}
         </span>

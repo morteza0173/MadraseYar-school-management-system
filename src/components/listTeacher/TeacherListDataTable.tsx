@@ -48,7 +48,9 @@ export function TeacherListDataTable<TData, TValue>({
         // در حالت موبایل ستون‌های خاصی مخفی شوند
         setColumnVisibility({
           phone: false,
-          classes: false,
+          classes: true,
+          subject: false,
+          eventOnGoing: false,
         });
       } else {
         // در حالت دسکتاپ ستون‌ها نمایش داده شوند
