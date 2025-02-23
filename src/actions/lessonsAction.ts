@@ -40,11 +40,13 @@ export async function getLessonsData(userId: string) {
             hour: "2-digit",
             minute: "2-digit",
             hour12: false,
+            timeZone: "Asia/Tehran",
           }),
           endTime: new Date(lesson.endTime).toLocaleTimeString("en", {
             hour: "2-digit",
             minute: "2-digit",
             hour12: false,
+            timeZone: "Asia/Tehran",
           }),
           teacher: {
             id: lesson.teacher.id,
@@ -82,11 +84,13 @@ export async function getLessonsData(userId: string) {
             hour: "2-digit",
             minute: "2-digit",
             hour12: false,
+            timeZone: "Asia/Tehran",
           }),
           endTime: new Date(lesson.endTime).toLocaleTimeString("en", {
             hour: "2-digit",
             minute: "2-digit",
             hour12: false,
+            timeZone: "Asia/Tehran",
           }),
           teacher: {
             id: lesson.teacher.id,
@@ -124,11 +128,13 @@ export async function getLessonsData(userId: string) {
         hour: "2-digit",
         minute: "2-digit",
         hour12: false,
+        timeZone: "Asia/Tehran",
       }),
       endTime: new Date(lesson.endTime).toLocaleTimeString("en", {
         hour: "2-digit",
         minute: "2-digit",
         hour12: false,
+        timeZone: "Asia/Tehran",
       }),
       teacher: {
         id: lesson.teacher.id,
@@ -170,11 +176,13 @@ export async function getLessonsData(userId: string) {
           hour: "2-digit",
           minute: "2-digit",
           hour12: false,
+          timeZone: "Asia/Tehran",
         }),
         endTime: new Date(lesson.endTime).toLocaleTimeString("en", {
           hour: "2-digit",
           minute: "2-digit",
           hour12: false,
+          timeZone: "Asia/Tehran",
         }),
         teacher: {
           id: lesson.teacher.id,
