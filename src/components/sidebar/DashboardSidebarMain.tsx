@@ -37,6 +37,7 @@ export function DashboardSidebarMain({
       title: string;
       url: string;
       disabled?: boolean;
+      visible: string[];
     }[];
   }[];
   userInfo: getUserInfoProps | undefined;
@@ -102,20 +103,26 @@ export function DashboardSidebarMain({
                     </CollapsibleTrigger>
                     <CollapsibleContent>
                       <SidebarMenuSub className="border-l-0 border-r border-orange-200">
-                        {item.items?.map((subItem) => (
-                          <SidebarMenuSubItem key={subItem.title}>
-                            <SidebarMenuSubButton
-                              asChild
-                              aria-disabled={subItem.disabled}
-                              isActive={pathname === subItem.url}
-                              className="data-[active=true]:bg-orange-100 hover:bg-orange-50 data-[state=open]:hover:bg-orange-50 active:bg-orange-100 w-full"
-                            >
-                              <Link href={subItem.url}>
-                                <span>{subItem.title}</span>
-                              </Link>
-                            </SidebarMenuSubButton>
-                          </SidebarMenuSubItem>
-                        ))}
+                        {item.items?.map((subItem) => {
+                          if (userInfo?.role) {
+                            if (subItem.visible.includes(userInfo.role)) {
+                              return (
+                                <SidebarMenuSubItem key={subItem.title}>
+                                  <SidebarMenuSubButton
+                                    asChild
+                                    aria-disabled={subItem.disabled}
+                                    isActive={pathname === subItem.url}
+                                    className="data-[active=true]:bg-orange-100 hover:bg-orange-50 data-[state=open]:hover:bg-orange-50 active:bg-orange-100 w-full"
+                                  >
+                                    <Link href={subItem.url}>
+                                      <span>{subItem.title}</span>
+                                    </Link>
+                                  </SidebarMenuSubButton>
+                                </SidebarMenuSubItem>
+                              );
+                            }
+                          }
+                        })}
                       </SidebarMenuSub>
                     </CollapsibleContent>
                   </SidebarMenuItem>

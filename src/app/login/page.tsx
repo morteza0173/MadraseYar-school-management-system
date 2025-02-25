@@ -1,4 +1,4 @@
-import { Adminlogin } from "@/actions/loginAction";
+import { Adminlogin, Teacherlogin } from "@/actions/loginAction";
 import SubmitButton from "@/components/SubmitButton";
 import {
   Card,
@@ -135,6 +135,7 @@ export default function LoginPage() {
               description="معلم محترم، با ورود به سیستم می‌توانید وضعیت آموزشی
                     دانش‌آموزان را پیگیری کرده و از آخرین فعالیت‌ها و تکالیف
                     آن‌ها مطلع شوید."
+              loginAction={Teacherlogin}
             />
             <CardContentUsers
               value="admin"

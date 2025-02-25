@@ -15,7 +15,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { gradeListProps } from "@/actions/gradeActions";
 import { useState } from "react";
 import { toast } from "sonner";
 import {
@@ -26,7 +25,6 @@ import {
   Search,
   TriangleAlert,
 } from "lucide-react";
-import { teacherListProps } from "@/actions/dashboardAction";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import {
   Command,
@@ -41,37 +39,30 @@ import { AddClassFormSchema } from "@/lib/schemas";
 import {
   useMutation,
   useQueryClient,
-  UseQueryResult,
 } from "@tanstack/react-query";
+import useGetTeacher from "@/hooks/useGetTeacher";
+import useGetGradeData from "@/hooks/useGetGradeData";
 
 interface AddClassFormProps {
-  teacherList: teacherListProps[] | null;
-  gradeList: gradeListProps[] | null;
+
   onCancel: () => void;
-  isTeacherPending: boolean;
-  isTeacherError: boolean;
-  teacherRefetch: UseQueryResult<teacherListProps[]>["refetch"];
-  isGradePending: boolean;
-  isGradeError: boolean;
-  gradeRefetch: UseQueryResult<gradeListProps[]>["refetch"];
+
 }
 
 const AddClassForm = ({
   onCancel,
-  teacherList,
-  gradeList,
-  isTeacherPending,
-  isTeacherError,
-  teacherRefetch,
-  isGradePending,
-  isGradeError,
-  gradeRefetch,
 }: AddClassFormProps) => {
+
+  const { isTeacherError, isTeacherPending, teacherData, teacherRefetch } =
+    useGetTeacher();
+
+  const { gradeData, gradeRefetch, isGradeError, isGradePending } =
+    useGetGradeData();
 
   const [openTeacherList, setOpenTeacherList] = useState(false);
   const [supervisorValue, setSupervisorValue] = useState("");
   const [searchTeacher, setSearchTeacher] = useState("");
-  const filteredTeacherList = teacherList?.filter((teacher) => {
+  const filteredTeacherList = teacherData?.filter((teacher) => {
     if (!searchTeacher) return true;
 
     const fullName = `${teacher.name} ${teacher.surname}`.toLowerCase();
@@ -177,7 +168,7 @@ const AddClassForm = ({
                             className="w-[250px] justify-between "
                           >
                             {supervisorValue
-                              ? teacherList?.find(
+                              ? teacherData?.find(
                                   (teacher) => teacher.id === supervisorValue
                                 )?.name
                               : "یک معلم از لیست انتخاب کنید"}
@@ -293,7 +284,7 @@ const AddClassForm = ({
                             className="w-[250px] justify-between "
                           >
                             {gradeValue
-                              ? gradeList?.find(
+                              ? gradeData?.find(
                                   (grade) => grade.id === Number(gradeValue)
                                 )?.level
                               : "سال تحصیلی را از لیست انتخاب کنید"}
@@ -331,7 +322,7 @@ const AddClassForm = ({
                                 </div>
                               </CommandEmpty>
                               <CommandGroup>
-                                {gradeList?.map((grade) => (
+                                {gradeData?.map((grade) => (
                                   <CommandItem
                                     key={grade.id}
                                     className="z-[60] pointer-events-auto overflow-auto"

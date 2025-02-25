@@ -16,55 +16,86 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { ImageIcon, Loader2Icon } from "lucide-react";
-import { TeacherFormSchemas } from "@/lib/schemas";
+import {
+  TeacherDataListSchema,
+  TeacherEditFormSchemas,
+} from "@/lib/schemas";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import { Textarea } from "../ui/textarea";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import Image from "next/image";
-import { useRef } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { AddTeacherData } from "@/actions/teacherAction";
+import { useEffect, useRef } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {EditTeacherData, getTeacherInfo } from "@/actions/teacherAction";
 import { toast } from "sonner";
-const AddTeacherForm = ({ onCancel }: { onCancel: () => void }) => {
+
+type Row<T> = {
+  original: T;
+};
+
+interface EditTeacherFormProps {
+  onCancel: () => void;
+  row: Row<TeacherDataListSchema>;
+}
+
+const EditTeacherForm = ({ onCancel, row }: EditTeacherFormProps) => {
+  const { data: teacherInfo, isPending: teacherInfoPending } = useQuery({
+    queryKey: ["teacherInfo", row.original.id],
+    queryFn: async () => getTeacherInfo(row.original.id),
+  });
   const inputRef = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
 
   const { mutate, isPending } = useMutation({
-    mutationFn: async (data: FormData) => AddTeacherData(data),
+    mutationFn: async (data: FormData) => EditTeacherData(data),
     onSuccess: (data) => {
-      toast.success(data.message || "معلم با موفقیت اضافه شد");
+      toast.success(data.message || "معلم با موفقیت ویرایش شد");
       queryClient.invalidateQueries({ queryKey: ["teacherData"] });
-      onCancel()
+      onCancel();
     },
     onError: (error) => {
-      toast.error(error.message || "خطا در اضافه کردن معلم");
+      toast.error(error.message || "خطا در ویرایش کردن معلم");
     },
   });
 
-  const form = useForm<z.infer<typeof TeacherFormSchemas>>({
-    resolver: zodResolver(TeacherFormSchemas),
+  const form = useForm<z.infer<typeof TeacherEditFormSchemas>>({
+    resolver: zodResolver(TeacherEditFormSchemas),
     defaultValues: {
-      name: "",
-      surname: "",
-      username: "",
-      phone: "",
-      password: "",
-      address: "",
-      image: undefined,
+      name: "در حال دریافت ...",
+      surname: "در حال دریافت ...",
+      username: "در حال دریافت ...",
+      phone: row.original.phone,
+      address: "در حال دریافت ...",
+      image: row.original.label.img,
     },
   });
 
-  const onSubmit = async (data: z.infer<typeof TeacherFormSchemas>) => {
+  useEffect(() => {
+    if (teacherInfo) {
+      form.reset({
+        name: teacherInfo.name,
+        surname: teacherInfo.surname,
+        username: teacherInfo.username,
+        phone: row.original.phone,
+        address: teacherInfo.address,
+        image: row.original.label.img,
+        sex: teacherInfo.sex,
+      });
+    }
+  }, [teacherInfo, form, row]);
+
+  const onSubmit = async (data: z.infer<typeof TeacherEditFormSchemas>) => {
+    const imagePrevUrl = row.original.label.img;
+    const teacherId = row.original.id;
     const formData = new FormData();
+    formData.append("id", teacherId!);
+    formData.append("imagePrevUrl", imagePrevUrl!);
     formData.append("name", data.name);
     formData.append("surname", data.surname);
     formData.append("username", data.username);
     formData.append("phone", data.phone);
-    formData.append("password", data.password);
     formData.append("address", data.address);
     formData.append("image", data.image);
-    formData.append("address", data.address);
-    formData.append("email", data.email);
     formData.append("sex", data.sex);
 
     mutate(formData);
@@ -91,6 +122,7 @@ const AddTeacherForm = ({ onCancel }: { onCancel: () => void }) => {
                   <FormControl>
                     <Input
                       className="focus-visible:ring-orange-300 "
+                      disabled={teacherInfoPending}
                       type="text"
                       {...field}
                     />
@@ -109,6 +141,7 @@ const AddTeacherForm = ({ onCancel }: { onCancel: () => void }) => {
                   <FormControl>
                     <Input
                       className="focus-visible:ring-orange-300"
+                      disabled={teacherInfoPending}
                       type="text"
                       {...field}
                     />
@@ -129,97 +162,10 @@ const AddTeacherForm = ({ onCancel }: { onCancel: () => void }) => {
                   <FormControl>
                     <Input
                       className="focus-visible:ring-orange-300"
+                      disabled={teacherInfoPending}
                       type="text"
                       {...field}
                     />
-                  </FormControl>
-                  {/* <FormDescription></FormDescription> */}
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem className="flex-1">
-                  <FormLabel>رمز عبور</FormLabel>
-                  <FormControl>
-                    <Input
-                      className="focus-visible:ring-orange-300"
-                      type="password"
-                      {...field}
-                    />
-                  </FormControl>
-                  {/* <FormDescription></FormDescription> */}
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem className="flex-1">
-                <FormLabel>ایمیل</FormLabel>
-                <FormControl>
-                  <Input
-                    className="focus-visible:ring-orange-300"
-                    type="email"
-                    {...field}
-                  />
-                </FormControl>
-                {/* <FormDescription></FormDescription> */}
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="address"
-            render={({ field }) => (
-              <FormItem className="flex-1">
-                <FormLabel>ادرس</FormLabel>
-                <FormControl>
-                  <Textarea
-                    className="focus-visible:ring-orange-300"
-                    placeholder="ادرس خود را وارد کنید ..."
-                    {...field}
-                  />
-                </FormControl>
-                {/* <FormDescription></FormDescription> */}
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <div className="flex flex-row gap-4">
-            <FormField
-              control={form.control}
-              name="sex"
-              render={({ field }) => (
-                <FormItem className="flex-1">
-                  <FormLabel>جنسیت</FormLabel>
-                  <FormControl>
-                    <RadioGroup
-                      dir="rtl"
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                      className="flex flex-row gap-2 h-9 justify-around"
-                    >
-                      <FormItem className="flex items-center">
-                        <FormControl>
-                          <RadioGroupItem value="MALE" />
-                        </FormControl>
-                        <FormLabel className="m-2">مرد</FormLabel>
-                      </FormItem>
-                      <FormItem className="flex items-center">
-                        <FormControl>
-                          <RadioGroupItem value="FEMALE" />
-                        </FormControl>
-                        <FormLabel className="m-2">زن</FormLabel>
-                      </FormItem>
-                    </RadioGroup>
                   </FormControl>
                   {/* <FormDescription></FormDescription> */}
                   <FormMessage />
@@ -240,6 +186,60 @@ const AddTeacherForm = ({ onCancel }: { onCancel: () => void }) => {
                     />
                   </FormControl>
                   <FormDescription>با 09 شروع میشود</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+          <FormField
+            control={form.control}
+            name="address"
+            render={({ field }) => (
+              <FormItem className="flex-1">
+                <FormLabel>ادرس</FormLabel>
+                <FormControl>
+                  <Textarea
+                    className="focus-visible:ring-orange-300"
+                    placeholder="ادرس خود را وارد کنید ..."
+                    disabled={teacherInfoPending}
+                    {...field}
+                  />
+                </FormControl>
+                {/* <FormDescription></FormDescription> */}
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <div className="flex flex-row gap-4">
+            <FormField
+              control={form.control}
+              name="sex"
+              render={({ field }) => (
+                <FormItem className="flex-1">
+                  <FormLabel>جنسیت</FormLabel>
+                  <FormControl>
+                    <RadioGroup
+                      dir="rtl"
+                      onValueChange={field.onChange}
+                      value={field.value}
+                      className="flex flex-row gap-2 h-9 justify-around"
+                      disabled={teacherInfoPending}
+                    >
+                      <FormItem className="flex items-center">
+                        <FormControl>
+                          <RadioGroupItem value="MALE" />
+                        </FormControl>
+                        <FormLabel className="m-2">مرد</FormLabel>
+                      </FormItem>
+                      <FormItem className="flex items-center">
+                        <FormControl>
+                          <RadioGroupItem value="FEMALE" />
+                        </FormControl>
+                        <FormLabel className="m-2">زن</FormLabel>
+                      </FormItem>
+                    </RadioGroup>
+                  </FormControl>
+                  {/* <FormDescription></FormDescription> */}
                   <FormMessage />
                 </FormItem>
               )}
@@ -347,4 +347,4 @@ const AddTeacherForm = ({ onCancel }: { onCancel: () => void }) => {
     </div>
   );
 };
-export default AddTeacherForm;
+export default EditTeacherForm;

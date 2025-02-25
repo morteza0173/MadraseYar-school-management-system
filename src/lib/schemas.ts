@@ -133,6 +133,7 @@ export type TeacherDataListSchema = z.infer<typeof teacherDataListSchema>;
 
 export const TeacherFormSchemas = z.object({
   name: z.string().min(1, "نام نمی‌تواند خالی باشد"),
+  email: z.string().min(1, "ایمیل نمی‌تواند خالی باشد"),
   surname: z.string().min(1, "نام خانوادگی نمی‌تواند خالی باشد"),
   username: z.string().min(1, "نام کاربری نمی‌تواند خالی باشد"),
   password: z.string().min(1, "پسورد حساب کاربری نمی‌تواند خالی باشد"),
@@ -157,4 +158,34 @@ export const TeacherFormSchemas = z.object({
     .refine((file) => file.size <= 1024 * 1024, {
       message: "حجم فایل نباید بیشتر از 1 مگابایت باشد.",
     }),
+});
+
+export const TeacherEditFormSchemas = z.object({
+  name: z.string().min(1, "نام نمی‌تواند خالی باشد"),
+  surname: z.string().min(1, "نام خانوادگی نمی‌تواند خالی باشد"),
+  username: z.string().min(1, "نام کاربری نمی‌تواند خالی باشد"),
+  address: z.string().min(1, "آدرس نمی‌تواند خالی باشد"),
+  sex: z.enum(["MALE", "FEMALE"], {
+    message: "جنسیت معلم را انتخاب کنید",
+  }),
+  phone: z.string().regex(/^09\d{9}$/, {
+    message: "شماره تلفن باید 11 رقم و با 09 شروع شود.",
+  }),
+  image: z.union([
+    z
+      .instanceof(File, { message: "لطفاً یک فایل معتبر انتخاب کنید." })
+      .refine(
+        (file) =>
+          ["image/jpeg", "image/png", "image/jpg", "image/svg"].includes(
+            file.type
+          ),
+        {
+          message: "فقط فایل‌های jpg یا png یا svg مجاز هستند.",
+        }
+      )
+      .refine((file) => file.size <= 1024 * 1024, {
+        message: "حجم فایل نباید بیشتر از 1 مگابایت باشد.",
+      }),
+    z.string(),
+  ]),
 });

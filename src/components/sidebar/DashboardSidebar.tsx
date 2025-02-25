@@ -46,7 +46,7 @@ const data = {
       items: [
         {
           title: "پایه ها",
-          visible: ["admin", "teacher"],
+          visible: ["admin"],
           url: "/list/grade",
         },
         {

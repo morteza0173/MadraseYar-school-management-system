@@ -11,37 +11,19 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { CirclePlus, SlidersHorizontal } from "lucide-react";
-import { teacherListProps } from "@/actions/dashboardAction";
-import { gradeListProps } from "@/actions/gradeActions";
+
 import { useState } from "react";
 import AddClassForm from "./AddClassForm";
 import ResponsiveModalForm from "../ResponsiveModalForm";
-import { UseQueryResult } from "@tanstack/react-query";
 import { useUserAuth } from "@/hooks/useUserAuth";
+import { CirclePlus, SlidersHorizontal } from "lucide-react";
 
 interface DataTableViewOptionsProps<TData> {
   table: Table<TData>;
-  teacherList: teacherListProps[] | null;
-  gradeList: gradeListProps[] | null;
-  isTeacherPending: boolean;
-  isTeacherError: boolean;
-  teacherRefetch: UseQueryResult<teacherListProps[]>["refetch"];
-  isGradePending: boolean;
-  isGradeError: boolean;
-  gradeRefetch: UseQueryResult<gradeListProps[]>["refetch"];
 }
 
 export function ClassListDataTableViewOptions<TData>({
   table,
-  teacherList,
-  gradeList,
-  isTeacherPending,
-  isTeacherError,
-  teacherRefetch,
-  isGradePending,
-  isGradeError,
-  gradeRefetch,
 }: DataTableViewOptionsProps<TData>) {
   const [isOpen, setIsOpen] = useState(false);
   const { userData } = useUserAuth(["admin", "teacher", "student", "parent"]);
@@ -60,14 +42,6 @@ export function ClassListDataTableViewOptions<TData>({
       >
         <AddClassForm
           onCancel={close}
-          teacherList={teacherList}
-          gradeList={gradeList}
-          isTeacherPending={isTeacherPending}
-          isTeacherError={isTeacherError}
-          teacherRefetch={teacherRefetch}
-          isGradePending={isGradePending}
-          isGradeError={isGradeError}
-          gradeRefetch={gradeRefetch}
         />
       </ResponsiveModalForm>
       {userData?.role === "admin" && (

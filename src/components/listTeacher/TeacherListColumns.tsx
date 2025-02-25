@@ -46,7 +46,7 @@ export const TeacherListColumns: ColumnDef<TeacherDataListSchema>[] = [
       <DataTableColumnHeader column={column} title="مشخصات" />
     ),
     cell: ({ row }) => (
-      <div className="w-[150px] capitalize  flex gap-2 items-center">
+      <div className="w-[150px] md:w-auto capitalize  flex gap-2 items-center">
         <div>
           {(row.getValue("label") as Label)?.img ? (
             <Avatar>

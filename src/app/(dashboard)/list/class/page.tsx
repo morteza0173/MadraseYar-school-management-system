@@ -2,8 +2,6 @@
 import { classListColumns } from "@/components/ClassList/classListColumns";
 import { ClassListDataTable } from "@/components/ClassList/ClassListDataTable";
 import useGetClassDetails from "@/hooks/useGetClassDetails";
-import useGetGradeData from "@/hooks/useGetGradeData";
-import useGetTeacher from "@/hooks/useGetTeacher";
 import { useUserAuth } from "@/hooks/useUserAuth";
 
 const ClassPage = () => {
@@ -12,11 +10,7 @@ const ClassPage = () => {
   const { ClassData, classRefetch, isClassError, isClassPending } =
     useGetClassDetails(userData);
 
-  const { isTeacherError, isTeacherPending, teacherData, teacherRefetch } =
-    useGetTeacher();
 
-  const { gradeData, gradeRefetch, isGradeError, isGradePending } =
-    useGetGradeData();
 
 
   return (
@@ -30,15 +24,7 @@ const ClassPage = () => {
         isClassPending={isClassPending}
         isClassError={isClassError}
         ClassRefetch={classRefetch}
-        isTeacherPending={isTeacherPending}
-        isTeacherError={isTeacherError}
-        teacherRefetch={teacherRefetch}
-        isGradePending={isGradePending}
-        isGradeError={isGradeError}
-        gradeRefetch={gradeRefetch}
         data={ClassData || []}
-        teacherList={teacherData || []}
-        gradeList={gradeData || []}
         columns={classListColumns}
       />
     </div>

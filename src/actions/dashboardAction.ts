@@ -9,12 +9,16 @@ export interface getUserInfoProps {
   id: string;
   role: string;
   name: string;
-  email: string;
+  address?: string;
+  email: string | null;
   username: string;
-  phone: string;
-  userId: string;
-  nationalCode: string;
+  surname?: string;
+  phone: string | null;
+  userId?: string;
+  nationalCode?: string;
   img: string | null;
+  sex?: $Enums.UserSex;
+  createdAt?: Date;
 }
 
 export interface teacherListProps {
@@ -28,10 +32,11 @@ export interface teacherListProps {
   surname: string;
   sex: $Enums.UserSex;
   createdAt: Date;
+  role: string;
 }
 
 export const getUserInfo = cache(
-  async (): Promise<getUserInfoProps | undefined> => {
+  async (): Promise<getUserInfoProps| undefined> => {
     const supabase = await createClient();
     const { data } = await supabase.auth.getUser();
     if (!data.user?.id) return;
@@ -55,6 +60,18 @@ export const getUserInfo = cache(
       if (!adminInfo) return;
 
       const userInfo = { ...adminInfo, ...userRole };
+      return userInfo;
+    }
+    if (userRole.role === "teacher") {
+      const teacherInfo = await prisma.teacher.findFirst({
+        where: {
+          id: data.user.id,
+        },
+      });
+
+      if (!teacherInfo) return;
+
+      const userInfo = { ...teacherInfo, ...userRole };
       return userInfo;
     }
 
