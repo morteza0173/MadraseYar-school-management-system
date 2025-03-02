@@ -7,7 +7,7 @@ import {
 } from "@/lib/supabaseClient";
 import { UserSex } from "@prisma/client";
 
-interface FormattedTeacher {
+export interface FormattedTeacher {
   id: string;
   label: {
     name: string;
@@ -17,7 +17,7 @@ interface FormattedTeacher {
   phone?: string | undefined;
   subject?: string | undefined;
   classes: string;
-  eventOnGoing: number;
+eventOnGoing: number;
 }
 
 export async function getTeacherData(userId: string) {

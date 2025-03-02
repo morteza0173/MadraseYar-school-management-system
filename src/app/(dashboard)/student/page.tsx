@@ -17,19 +17,19 @@ const StudentPage = () => {
           <div className="w-full flex flex-col md:flex-row lg:flex-col gap-1 xl:w-1/2">
             <div className="flex gap-1 w-full h-full ">
               <div className="w-full h-full">
-                <InfoCard name="غیبت ها" info="7" icon="attendance" />
+                <InfoCard name="غیبت ها" info={5} icon="attendance" />
               </div>
               <div className="w-full h-full">
-                <InfoCard name="تاخیرها" info="5" icon="warning" />
+                <InfoCard name="تاخیرها" info={5} icon="warning" />
               </div>
             </div>
             <div className="flex  w-full gap-1 h-full">
               <div className="w-full h-full">
-                <InfoCard name="اخرین نمره" info="17" icon="lastScore" />
+                <InfoCard name="اخرین نمره" info={17} icon="lastScore" />
               </div>
               <div className="w-full h-full">
                 {" "}
-                <InfoCard name="میانگین نمرات" info="16.32" icon="Score" />
+                <InfoCard name="میانگین نمرات" info={16.32} icon="Score" />
               </div>
             </div>
           </div>
