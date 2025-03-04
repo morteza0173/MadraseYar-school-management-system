@@ -42,7 +42,7 @@ const TeacherPage = () => {
     }
 
     if (teacherInfo && ClassData) {
-      const classes = teacherInfo.classes.split(",");
+      const classes = teacherInfo.classes.split(",").map((cls) => cls.trim());
       const classDetails = ClassData.filter((cls) =>
         classes.includes(cls.name)
       );

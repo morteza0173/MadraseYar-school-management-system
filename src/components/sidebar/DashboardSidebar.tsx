@@ -93,10 +93,9 @@ const data = {
           disabled: true,
         },
         {
-          title: "خانواده ها",
-          visible: ["admin", "teacher", "student", "parent"],
+          title: "والدین",
+          visible: ["admin", "teacher"],
           url: "/list/parent",
-          disabled: true,
         },
       ],
     },

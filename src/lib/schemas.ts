@@ -131,6 +131,19 @@ export const teacherDataListSchema = z.object({
 
 export type TeacherDataListSchema = z.infer<typeof teacherDataListSchema>;
 
+export const parentDataListSchema = z.object({
+  id: z.string(),
+  phone: z.string(),
+  address: z.string(),
+  name: z.string(),
+  surname: z.string(),
+  username: z.string(),
+  email:z.string() || null,
+  createdAt: z.date(),
+});
+
+export type ParentDataListSchema = z.infer<typeof parentDataListSchema>;
+
 export const TeacherFormSchemas = z.object({
   name: z.string().min(1, "نام نمی‌تواند خالی باشد"),
   email: z.string().min(1, "ایمیل نمی‌تواند خالی باشد"),
