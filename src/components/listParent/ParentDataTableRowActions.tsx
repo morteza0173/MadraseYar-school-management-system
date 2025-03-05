@@ -12,6 +12,10 @@ import {
 import { Ellipsis } from "lucide-react";
 import { useUserAuth } from "@/hooks/useUserAuth";
 import { ParentSingleType } from "@/actions/parentAction";
+import ResponsiveModalForm from "../ResponsiveModalForm";
+import { useState } from "react";
+import EditParentForm from "./EditParentForm";
+import DeleteParentForm from "./DeleteParentForm";
 
 interface DataTableRowActionsProps<TData extends ParentSingleType> {
   row: Row<TData>;
@@ -20,35 +24,34 @@ interface DataTableRowActionsProps<TData extends ParentSingleType> {
 export function ParentDataTableRowActions<TData extends ParentSingleType>({
   row,
 }: DataTableRowActionsProps<TData>) {
-  // const [isOpenDelete, setIsOpenDelete] = useState(false);
-  // const [isOpenEdit, setIsOpenEdit] = useState(false);
+  const [isOpenDelete, setIsOpenDelete] = useState(false);
+  const [isOpenEdit, setIsOpenEdit] = useState(false);
   const { userData } = useUserAuth(["admin", "teacher", "student", "parent"]);
-  console.log(row);
 
-  // const closeDelete = () => setIsOpenDelete(false);
-  // const openDelete = () => setIsOpenDelete(true);
-  // const closeEdit = () => setIsOpenEdit(false);
-  // const openEdit = () => setIsOpenEdit(true);
+  const closeDelete = () => setIsOpenDelete(false);
+  const openDelete = () => setIsOpenDelete(true);
+  const closeEdit = () => setIsOpenEdit(false);
+  const openEdit = () => setIsOpenEdit(true);
   return (
     <>
-      {/* <ResponsiveModalForm
+      <ResponsiveModalForm
         isOpen={isOpenEdit}
         setIsOpen={setIsOpenEdit}
         close={closeEdit}
-        title="ویرایش معلم"
-        discription="در این بخش میتوانید اطلاعات معلم را ویرایش کنید"
+        title="ویرایش والد"
+        discription="در این بخش میتوانید اطلاعات والد را ویرایش کنید"
       >
-        <EditTeacherForm onCancel={closeEdit} row={row} />
+        <EditParentForm onCancel={closeEdit} row={row} />
       </ResponsiveModalForm>
       <ResponsiveModalForm
         isOpen={isOpenDelete}
         setIsOpen={setIsOpenDelete}
         close={closeDelete}
-        title="حذف معلم"
-        discription="در این بخش میتوانید معلم را حذف کنید"
+        title="حذف والد"
+        discription="در این بخش میتوانید والد را حذف کنید"
       >
-        <DeleteTeacherForm onCancel={closeDelete} row={row} />
-      </ResponsiveModalForm> */}
+        <DeleteParentForm onCancel={closeDelete} row={row} />
+      </ResponsiveModalForm>
       <DropdownMenu dir="rtl" modal={false}>
         <DropdownMenuTrigger asChild>
           <Button
@@ -64,8 +67,8 @@ export function ParentDataTableRowActions<TData extends ParentSingleType>({
           <DropdownMenuItem disabled>ارسال پیام</DropdownMenuItem>
           {userData?.role === "admin" && (
             <>
-              <DropdownMenuItem disabled>ویرایش</DropdownMenuItem>
-              <DropdownMenuItem disabled>حذف</DropdownMenuItem>
+              <DropdownMenuItem onClick={openEdit}>ویرایش</DropdownMenuItem>
+              <DropdownMenuItem onClick={openDelete}>حذف</DropdownMenuItem>
             </>
           )}
         </DropdownMenuContent>

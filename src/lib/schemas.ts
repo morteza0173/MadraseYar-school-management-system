@@ -138,7 +138,7 @@ export const parentDataListSchema = z.object({
   name: z.string(),
   surname: z.string(),
   username: z.string(),
-  email:z.string() || null,
+  email: z.string() || null,
   createdAt: z.date(),
 });
 
@@ -201,4 +201,26 @@ export const TeacherEditFormSchemas = z.object({
       }),
     z.string(),
   ]),
+});
+
+export const ParentFormSchemas = z.object({
+  name: z.string().min(1, "نام نمی‌تواند خالی باشد"),
+  email: z.string().min(1, "ایمیل نمی‌تواند خالی باشد"),
+  surname: z.string().min(1, "نام خانوادگی نمی‌تواند خالی باشد"),
+  username: z.string().min(1, "نام کاربری نمی‌تواند خالی باشد"),
+  password: z.string().min(1, "پسورد حساب کاربری نمی‌تواند خالی باشد"),
+  address: z.string().min(1, "آدرس نمی‌تواند خالی باشد"),
+  phone: z.string().regex(/^09\d{9}$/, {
+    message: "شماره تلفن باید 11 رقم و با 09 شروع شود.",
+  }),
+});
+
+export const ParentEditFormSchemas = z.object({
+  name: z.string().min(1, "نام نمی‌تواند خالی باشد"),
+  surname: z.string().min(1, "نام خانوادگی نمی‌تواند خالی باشد"),
+  username: z.string().min(1, "نام کاربری نمی‌تواند خالی باشد"),
+  address: z.string().min(1, "آدرس نمی‌تواند خالی باشد"),
+  phone: z.string().regex(/^09\d{9}$/, {
+    message: "شماره تلفن باید 11 رقم و با 09 شروع شود.",
+  }),
 });
