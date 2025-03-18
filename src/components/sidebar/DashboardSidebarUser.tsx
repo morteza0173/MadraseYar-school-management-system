@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/sidebar";
 import { getUserInfoProps } from "@/actions/dashboardAction";
 import { Skeleton } from "../ui/skeleton";
+import { logout } from "@/actions/loginAction";
 
 export function DashboardSidebarUser({
   user,
@@ -29,6 +30,10 @@ export function DashboardSidebarUser({
   isUserPending: boolean;
 }) {
   const { isMobile } = useSidebar();
+
+  const handleLogout = async () => {
+    logout();
+  };
 
   if (isUserPending) {
     return (
@@ -111,7 +116,10 @@ export function DashboardSidebarUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="focus:bg-orange-50">
+            <DropdownMenuItem
+              className="focus:bg-orange-50 cursor-pointer"
+              onClick={handleLogout}
+            >
               <LogOut />
               خروج
             </DropdownMenuItem>

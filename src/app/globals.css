@@ -93,6 +93,8 @@ body {
   }
 }
 
+
+
 /* daypicker */
 .rdp-root {
   --rdp-day-width: 100% !important; /* The width of the day cells. */
@@ -210,8 +212,6 @@ html body[data-scroll-locked] {
   margin-right: 0 !important; /* جلوگیری از اضافه شدن مارجین راست */
   overflow: visible !important;
 }
-
-
 
 @layer base {
   * {

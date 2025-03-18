@@ -1,17 +1,16 @@
 import type { Metadata } from "next";
-// import localFont from "next/font/local";
-import { Vazirmatn } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import QueryProvider from "./QueryProvider";
 
-const vazirmatn = Vazirmatn({ style: "normal", subsets: ["latin"] });
+// const vazirmatn = Vazirmatn({ style: "normal", subsets: ["latin"] });
 
-// const geistSans = localFont({
-//   src: "./fonts/GeistVF.woff",
-//   variable: "--font-geist-sans",
-//   weight: "100 900",
-// });
+const yekanBakh = localFont({
+  src: "./fonts/YekanBakh-Regular.woff2",
+  variable: "--font-yekan-bakh",
+  weight: "400",
+});
 // const geistMono = localFont({
 //   src: "./fonts/GeistMonoVF.woff",
 //   variable: "--font-geist-mono",
@@ -30,7 +29,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" dir="rtl">
-      <body className={`${vazirmatn.className} antialiased`}>
+      <body className={`${yekanBakh.className} antialiased`}>
         <QueryProvider>
           {children}
           <Toaster closeButton richColors dir="rtl" position="bottom-left" />

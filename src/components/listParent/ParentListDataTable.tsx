@@ -1,6 +1,5 @@
 "use client";
 
-import * as React from "react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -29,6 +28,8 @@ import {
 import { Loader2, TriangleAlert } from "lucide-react";
 import { Button } from "../ui/button";
 import { DataTablePagination } from "../tableComponent/data-table-pagination";
+import { AnimatePresence, motion } from "motion/react";
+import { useEffect, useState } from "react";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -38,6 +39,9 @@ interface DataTableProps<TData, TValue> {
   parentDataRefetch: UseQueryResult<TData[]>["refetch"];
 }
 
+const MotionTableRow = motion.create(TableRow);
+
+
 export function ParentListDataTable<TData, TValue>({
   columns,
   data,
@@ -45,15 +49,22 @@ export function ParentListDataTable<TData, TValue>({
   isParentDataPending,
   parentDataRefetch,
 }: DataTableProps<TData, TValue>) {
-  const [rowSelection, setRowSelection] = React.useState({});
+  const [rowSelection, setRowSelection] = useState({});
   const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+    useState<VisibilityState>({});
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(
     []
   );
-  const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [sorting, setSorting] = useState<SortingState>([]);
 
-  React.useEffect(() => {
+const [hasMountedOnce, setHasMountedOnce] = useState(false);
+useEffect(() => {
+  if (!isParentDataPending) {
+    setHasMountedOnce(true);
+  }
+}, [isParentDataPending]);
+
+  useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth < 768) {
         // در حالت موبایل ستون‌های خاصی مخفی شوند
@@ -123,25 +134,44 @@ export function ParentListDataTable<TData, TValue>({
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                  className="even:bg-gray-100"
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell
-                      className="px-1 md:px-2 lg:px-4 py-2  text-xs md:text-sm"
-                      key={cell.id}
-                    >
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
+        <AnimatePresence>
+              {table.getRowModel().rows?.length ? (
+                table.getRowModel().rows.map((row) => (
+                  <MotionTableRow
+                    layout
+                    initial={
+                      hasMountedOnce
+                        ? { opacity: 0, height: 0, backgroundColor: "#bbf7d0" }
+                        : { opacity: 0, height: 0 }
+                    }
+                    animate={{
+                      opacity: 1,
+                      height: "auto",
+                      backgroundColor:
+                        row.index % 2 === 0 ? "#ffffff" : "#f3f4f6",
+                    }}
+                    exit={{ backgroundColor: "#fca5a5"}}
+                    transition={{
+                      opacity: { duration: 0.5 },
+                      height: { duration: 0.5 },
+                      backgroundColor: { duration: 1 },
+                    }}
+                    key={row.id}
+                    data-state={row.getIsSelected() && "selected"}
+                    className="even:bg-gray-100 odd:bg-[#ffffff]"
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell
+                        className="px-1 md:px-2 lg:px-4 py-2  text-xs md:text-sm"
+                        key={cell.id}
+                      >
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    ))}
+                  </MotionTableRow>
               ))
             ) : (
               <TableRow>
@@ -173,6 +203,7 @@ export function ParentListDataTable<TData, TValue>({
                 </TableCell>
               </TableRow>
             )}
+            </AnimatePresence>
           </TableBody>
         </Table>
       </div>

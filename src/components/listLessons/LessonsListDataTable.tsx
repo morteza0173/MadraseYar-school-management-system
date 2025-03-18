@@ -30,6 +30,7 @@ import {
 import { Loader2, TriangleAlert } from "lucide-react";
 import { Button } from "../ui/button";
 import { DataTablePagination } from "../tableComponent/data-table-pagination";
+import { AnimatePresence, motion } from "motion/react";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -38,6 +39,8 @@ interface DataTableProps<TData, TValue> {
   isLessonsError: boolean;
   LessonsRefetch: UseQueryResult<TData[]>["refetch"];
 }
+
+const MotionTableRow = motion.create(TableRow);
 
 export function LessonsListDataTable<TData, TValue>({
   columns,
@@ -51,6 +54,13 @@ export function LessonsListDataTable<TData, TValue>({
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [sorting, setSorting] = useState<SortingState>([]);
+
+  const [hasMountedOnce, setHasMountedOnce] = useState(false);
+  useEffect(() => {
+    if (!isLessonsPending) {
+      setHasMountedOnce(true);
+    }
+  }, [isLessonsPending]);
 
   useEffect(() => {
     if (isMobile) {
@@ -122,56 +132,76 @@ export function LessonsListDataTable<TData, TValue>({
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                  className="even:bg-gray-100"
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell
-                      className="px-1 md:px-2 lg:px-4 py-2  text-xs md:text-sm"
-                      key={cell.id}
-                    >
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
+            <AnimatePresence>
+              {table.getRowModel().rows?.length ? (
+                table.getRowModel().rows.map((row) => (
+                  <MotionTableRow
+                    layout
+                    initial={
+                      hasMountedOnce
+                        ? { opacity: 0, height: 0, backgroundColor: "#bbf7d0" }
+                        : { opacity: 0, height: 0 }
+                    }
+                    animate={{
+                      opacity: 1,
+                      height: "auto",
+                      backgroundColor:
+                        row.index % 2 === 0 ? "#ffffff" : "#f3f4f6",
+                    }}
+                    exit={{ backgroundColor: "#fca5a5"}}
+                    transition={{
+                      opacity: { duration: 0.5 },
+                      height: { duration: 0.5 },
+                      backgroundColor: { duration: 1 },
+                    }}
+                    key={row.id}
+                    data-state={row.getIsSelected() && "selected"}
+                    className="even:bg-gray-100 odd:bg-[#ffffff]"
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell
+                        className="px-1 md:px-2 lg:px-4 py-2  text-xs md:text-sm"
+                        key={cell.id}
+                      >
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    ))}
+                  </MotionTableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={columns.length}
+                    className="h-24 text-center"
+                  >
+                    <div className="flex items-center justify-center h-full w-full">
+                      {isLessonsPending ? (
+                        <div className="flex gap-2 items-center">
+                          <Loader2 className="animate-spin w-4 h-4" />
+                          <p>در حال دریافت اطلاعات</p>
+                        </div>
+                      ) : isLessonsError ? (
+                        <div className="flex gap-2 items-center">
+                          <TriangleAlert className="size-4" />
+                          <p>مشکلی در دریافت اطلاعات به وجود آمد</p>
+                          <Button
+                            variant="outline"
+                            onClick={() => LessonsRefetch()}
+                          >
+                            تلاش مجدد
+                          </Button>
+                        </div>
+                      ) : (
+                        "نتیجه‌ای یافت نشد"
                       )}
-                    </TableCell>
-                  ))}
+                    </div>
+                  </TableCell>
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  <div className="flex items-center justify-center h-full w-full">
-                    {isLessonsPending ? (
-                      <div className="flex gap-2 items-center">
-                        <Loader2 className="size-4 animate-spin" />
-                        <p>در حال دریافت اطلاعات</p>
-                      </div>
-                    ) : isLessonsError ? (
-                      <div className="flex gap-2 items-center">
-                        <TriangleAlert className="size-4" />
-                        <p>مشکلی در دریافت اطلاعات به وجود آمد</p>
-                        <Button
-                          variant="outline"
-                          onClick={() => LessonsRefetch()}
-                        >
-                          تلاش مجدد
-                        </Button>
-                      </div>
-                    ) : (
-                      "نتیجه‌ای یافت نشد"
-                    )}
-                  </div>
-                </TableCell>
-              </TableRow>
-            )}
+              )}
+            </AnimatePresence>
           </TableBody>
         </Table>
       </div>

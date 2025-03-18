@@ -10,6 +10,16 @@ import "react-day-picker/style.css";
 
 export type CalendarProps = React.ComponentProps<typeof DayPicker>;
 
+const customWeekdays = [
+  "یکشنبه",
+  "دوشنبه",
+  "سه‌شنبه",
+  "چهارشنبه",
+  "پنج‌شنبه",
+  "جمعه",
+  "شنبه",
+];
+
 function Calendar({
   className,
   showOutsideDays = true,
@@ -30,6 +40,11 @@ function Calendar({
     <DayPicker
       dir="rtl"
       today={new Date()}
+      formatters={{
+        formatWeekdayName(date) {
+          return customWeekdays[date.getDay()];
+        },
+      }}
       // modifiers={{
       //   eventDays: events,
       //   announcementDays: announcements,
@@ -61,7 +76,7 @@ function Calendar({
         outside:
           "day-outside text-muted-foreground opacity-50 aria-selected:bg-accent/50 aria-selected:text-muted-foreground aria-selected:opacity-30",
         weekdays: "text-muted-foreground",
-        weekday: "px-1 text-center",
+        weekday: "px-1 text-center text-xs font-semibold",
         day_button: cn(
           buttonVariants({ variant: "ghost" }),
           "h-9 w-full p-0 hover:bg-orange-100"

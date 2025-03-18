@@ -1,3 +1,6 @@
+"use client";
+
+import { getUserInfo } from "@/actions/dashboardAction";
 import { Adminlogin, Teacherlogin } from "@/actions/loginAction";
 import SubmitButton from "@/components/SubmitButton";
 import {
@@ -10,61 +13,100 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import Tab from "@/components/ui/tabMotion";
+import { useQuery } from "@tanstack/react-query";
 import { GraduationCap } from "lucide-react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useFormState } from "react-dom";
+import { toast } from "sonner";
+
+type LoginAction = (
+  prevState: { message: string },
+  formData: FormData
+) => Promise<{ message: string }>;
+
+const initialValue = {
+  message: "",
+};
 
 function CardContentUsers({
-  value,
   title,
   description,
   loginAction,
 }: {
-  value: string;
   title: string;
   description: string;
-  loginAction?: (formData: FormData) => Promise<void>;
+  loginAction: LoginAction;
 }) {
+  const [state, formAction] = useFormState(loginAction, initialValue);
+
+  useEffect(() => {
+    if (state.message) {
+      toast.error(state.message);
+    }
+  }, [state]);
+
   return (
-    <TabsContent value={value}>
-      <Card dir="rtl">
-        <CardHeader className="space-y-4">
-          <CardTitle>{title}</CardTitle>
-          <CardDescription>{description}</CardDescription>
-        </CardHeader>
-        <form action={loginAction}>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="user">
-                نام کاربری یا شماره موبایل و یا کدملی
-              </Label>
-              <Input
-                id="user"
-                name="user"
-                className="h-12"
-                defaultValue="morteza0173"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">پسورد</Label>
-              <Input
-                id="password"
-                name="password"
-                className="h-12"
-                defaultValue="morteza"
-              />
-            </div>
-          </CardContent>
-          <CardFooter>
-            <SubmitButton text="ورود" />
-          </CardFooter>
-        </form>
-      </Card>
-    </TabsContent>
+    <Card dir="rtl">
+      <CardHeader className="space-y-4">
+        <CardTitle>{title}</CardTitle>
+        <CardDescription>{description}</CardDescription>
+      </CardHeader>
+      <form action={formAction}>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="user">نام کاربری یا شماره موبایل و یا کدملی</Label>
+            <Input
+              id="user"
+              name="user"
+              className="h-12"
+              defaultValue="morteza0173"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="password">پسورد</Label>
+            <Input
+              id="password"
+              name="password"
+              className="h-12"
+              defaultValue="morteza"
+            />
+          </div>
+        </CardContent>
+        <CardFooter>
+          <SubmitButton text="ورود" />
+        </CardFooter>
+      </form>
+    </Card>
   );
 }
 
 export default function LoginPage() {
+  const [value, setValue] = useState("parent");
+  const router = useRouter();
+
+  const { data } = useQuery({
+    queryKey: ["userInfoForLogin"],
+    queryFn: () => getUserInfo(),
+  });
+  useEffect(() => {
+    if (data) {
+      if (data.role === "admin") {
+        router.push("/admin");
+      }
+      if (data.role === "teacher") {
+        router.push("/teacher");
+      }
+      if (data.role === "student") {
+        router.push("/student");
+      }
+      if (data.role === "parent") {
+        router.push("/parent");
+      }
+    }
+  }, [data, router]);
   return (
     <div className="flex w-full min-h-screen h-full bg-[#E5E5E5] relative lg:static">
       <div className="rounded-full w-80 h-80 bg-[#DCC920] opacity-30 absolute -top-40 -right-40 z-10 blur-3xl lg:hidden"></div>
@@ -88,64 +130,48 @@ export default function LoginPage() {
         </div>
 
         <div className="w-full flex justify-center my-10">
-          <Tabs defaultValue="parent" className="w-full px-2 md:w-96" dir="rtl">
-            <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger
-                className="data-[state=active]:bg-orange-200"
-                value="parent"
-              >
-                اولیا
-              </TabsTrigger>
-              <TabsTrigger
-                className="data-[state=active]:bg-orange-200"
-                value="student"
-              >
-                دانش آموز
-              </TabsTrigger>
-              <TabsTrigger
-                className="data-[state=active]:bg-orange-200"
-                value="teacher"
-              >
-                معلم
-              </TabsTrigger>
-              <TabsTrigger
-                className="data-[state=active]:bg-orange-200"
-                value="admin"
-              >
-                مدیر
-              </TabsTrigger>
-            </TabsList>
-            <CardContentUsers
-              value="parent"
-              title="ورود اولیای محترم"
-              description="اولیا گرامی، شما ستون اصلی پیشرفت دانش‌آموزان هستید. با ورود
+          <Tab value={value} onValueChange={setValue}>
+            <Tab.trigger value="parent">اولیا</Tab.trigger>
+            <Tab.trigger value="student">دانش آموز</Tab.trigger>
+            <Tab.trigger value="teacher">معلم</Tab.trigger>
+            <Tab.trigger value="admin">مدیر</Tab.trigger>
+            <Tab.content value="parent">
+              <CardContentUsers
+                title="ورود اولیای محترم"
+                description="اولیا گرامی، شما ستون اصلی پیشرفت دانش‌آموزان هستید. با ورود
                     به سیستم، می‌توانید از آخرین اخبار و گزارش‌های پیشرفت
                     فرزندتان مطلع شوید."
-            />
-            <CardContentUsers
-              value="student"
-              title="ورود دانش آموز گرامی"
-              description="دانش‌آموز عزیز، با ورود به سیستم می‌توانید از وضعیت درسی،
+                loginAction={Teacherlogin}
+              />
+            </Tab.content>
+            <Tab.content value="student">
+              <CardContentUsers
+                title="ورود دانش آموز گرامی"
+                description="دانش‌آموز عزیز، با ورود به سیستم می‌توانید از وضعیت درسی،
                     تکالیف و نمرات خود مطلع شوید و مسیر پیشرفت خود را بهتر
                     برنامه‌ریزی کنید."
-            />
-            <CardContentUsers
-              value="teacher"
-              title="ورود معلم عزیز"
-              description="معلم محترم، با ورود به سیستم می‌توانید وضعیت آموزشی
+                loginAction={Teacherlogin}
+              />
+            </Tab.content>
+            <Tab.content value="teacher">
+              <CardContentUsers
+                title="ورود معلم عزیز"
+                description="معلم محترم، با ورود به سیستم می‌توانید وضعیت آموزشی
                     دانش‌آموزان را پیگیری کرده و از آخرین فعالیت‌ها و تکالیف
                     آن‌ها مطلع شوید."
-              loginAction={Teacherlogin}
-            />
-            <CardContentUsers
-              value="admin"
-              title="ورود مدیر محترم"
-              description="مدیر محترم، با ورود به سیستم می‌توانید بر فعالیت‌های آموزشی،
+                loginAction={Teacherlogin}
+              />
+            </Tab.content>
+            <Tab.content value="admin">
+              <CardContentUsers
+                title="ورود مدیر محترم"
+                description="مدیر محترم، با ورود به سیستم می‌توانید بر فعالیت‌های آموزشی،
                     عملکرد معلمان و وضعیت دانش‌آموزان نظارت داشته باشید و
                     تصمیمات مؤثری برای بهبود کیفیت آموزشی اتخاذ کنید."
-              loginAction={Adminlogin}
-            />
-          </Tabs>
+                loginAction={Adminlogin}
+              />
+            </Tab.content>
+          </Tab>
         </div>
       </div>
 

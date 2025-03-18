@@ -39,7 +39,7 @@ const AdminPage = () => {
             type="دانش آموزان"
             Number={studentData?.length}
             pending={isStudentPending}
-            icon={<GraduationCap size={25} strokeWidth={1} />}
+            icon={<GraduationCap size={25} strokeWidth={1}/>}
           />
           <UserCard
             type="معلمان"
