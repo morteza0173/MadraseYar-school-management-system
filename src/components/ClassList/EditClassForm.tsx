@@ -62,7 +62,6 @@ interface EditeClassFormProps {
 }
 
 const EditClassForm = ({ onCancel, row }: EditeClassFormProps) => {
-
   const [openTeacherList, setOpenTeacherList] = useState(false);
   const [supervisorValue, setSupervisorValue] = useState("");
   const [searchTeacher, setSearchTeacher] = useState("");
@@ -71,7 +70,7 @@ const EditClassForm = ({ onCancel, row }: EditeClassFormProps) => {
   const [gradeValue, setGradeValue] = useState("");
 
   const queryClient = useQueryClient();
-  const {mutate,isPending} = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: async (data: FormData) => EditClass(data),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["classDetails"] });
@@ -129,7 +128,6 @@ const EditClassForm = ({ onCancel, row }: EditeClassFormProps) => {
   });
 
   const onSubmit = async (data: z.infer<typeof AddClassFormSchema>) => {
-
     const formData = new FormData();
     formData.set("classId", row.original.name);
     formData.set("className", data.className);

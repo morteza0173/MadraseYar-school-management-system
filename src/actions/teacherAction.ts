@@ -6,6 +6,7 @@ import {
   createClientWithServiceRole,
 } from "@/lib/supabaseClient";
 import { UserSex } from "@prisma/client";
+import { revalidateTag } from "next/cache";
 
 export interface FormattedTeacher {
   id: string;
@@ -17,177 +18,26 @@ export interface FormattedTeacher {
   phone?: string | undefined;
   subject?: string | undefined;
   classes: string;
-eventOnGoing: number;
+  eventOnGoing: number;
 }
 
 export async function getTeacherData(userId: string) {
-  const now = new Date();
-
-  // بررسی نقش ادمین و معلم
-  const admin = await prisma.admin.findUnique({ where: { id: userId } });
-  const teacherUser = await prisma.teacher.findUnique({
-    where: { id: userId },
-  });
-
-  const classes = await prisma.class.findMany({
-    select: { id: true, name: true },
-  });
-
-  if (admin || teacherUser) {
-    // دسترسی کامل برای ادمین و معلم
-    const teachers = await prisma.teacher.findMany({
-      include: {
-        subjects: true,
-        classes: true,
-        lessons: {
-          include: {
-            assignment: true,
-            exams: true,
-          },
-        },
-      },
-    });
-
-    const classMap = new Map(classes.map((cls) => [cls.id, cls.name]));
-
-    const formatted = teachers.map((t) => {
-      let upcomingAssignments = 0;
-      let upcomingExams = 0;
-
-      const classSet = new Set();
-
-      t.lessons.forEach((lesson) => {
-        if (lesson.classId && classMap.has(lesson.classId)) {
-          classSet.add(classMap.get(lesson.classId));
-        }
-
-        upcomingAssignments += lesson.assignment.filter(
-          (assignment) => new Date(assignment.DueDate) > now
-        ).length;
-        upcomingExams += lesson.exams.filter(
-          (exam) => new Date(exam.startTime) > now
-        ).length;
-      });
-
-      return {
-        id: t.id,
-        label: {
-          name: `${t.name} ${t.surname}`,
-          email: t.email || undefined,
-          img: t.img || undefined,
-        },
-        phone: t.phone || undefined,
-        subject: t.subjects[0]?.name || "ندارد",
-        classes: Array.from(classSet).join(" , "),
-        eventOnGoing: upcomingAssignments + upcomingExams,
-      };
-    });
-    return formatted;
-  }
-
-  // بررسی نقش دانش‌آموز
-  const student = await prisma.student.findUnique({
-    where: { id: userId },
-    include: {
-      class: {
-        include: {
-          lessons: {
-            include: {
-              subject: true,
-              teacher: true,
-              assignment: true,
-              exams: true,
-            },
-          },
-        },
-      },
+  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/teachers`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ userId }),
+    next: {
+      revalidate: 60 * 60 * 24 * 90,
+      tags: [`teachersList`, `teachersList-${userId}`],
     },
   });
-  if (student) {
-    // برای دانش‌آموز: تنها معلم‌های کلاس دانش‌آموز
-    const lessons = student.class.lessons;
-    const teacherMap: Record<string, FormattedTeacher> = {};
 
-    lessons.forEach((lesson) => {
-      const t = lesson.teacher;
-      if (!teacherMap[t.id]) {
-        teacherMap[t.id] = {
-          id: t.id,
-          label: {
-            name: `${t.name} ${t.surname}`,
-            email: t.email || undefined,
-            img: t.img || undefined,
-          },
-          phone: t.phone || undefined,
-          subject: lesson.subject?.name || "ندارد",
-          classes: student.class.name,
-          eventOnGoing: 0,
-        };
-      }
-      teacherMap[t.id].eventOnGoing +=
-        lesson.assignment.filter(
-          (assignment) => new Date(assignment.DueDate) > now
-        ).length +
-        lesson.exams.filter((exam) => new Date(exam.startTime) > now).length;
-    });
-    return Object.values(teacherMap);
-  }
+  if (!res.ok) throw new Error("دریافت اطلاعات لیست معلم ها با خطا مواجه شد");
 
-  // بررسی نقش والد (خانوار)
-  const parent = await prisma.parent.findUnique({
-    where: { id: userId },
-    include: {
-      students: {
-        include: {
-          class: {
-            include: {
-              lessons: {
-                include: {
-                  subject: true,
-                  teacher: true,
-                  assignment: true,
-                  exams: true,
-                },
-              },
-            },
-          },
-        },
-      },
-    },
-  });
-  if (parent) {
-    // برای خانوار: تنها معلم‌های فرزندان
-    const teacherMap: Record<string, FormattedTeacher> = {};
-
-    parent.students.forEach((student) => {
-      student.class.lessons.forEach((lesson) => {
-        const t = lesson.teacher;
-        if (!teacherMap[t.id]) {
-          teacherMap[t.id] = {
-            id: t.id,
-            label: {
-              name: `${t.name} ${t.surname}`,
-              email: t.email || undefined,
-              img: t.img || undefined,
-            },
-            phone: t.phone || undefined,
-            subject: lesson.subject?.name || "ندارد",
-            classes: student.class.name,
-            eventOnGoing: 0,
-          };
-        }
-        teacherMap[t.id].eventOnGoing +=
-          lesson.assignment.filter(
-            (assignment) => new Date(assignment.DueDate) > now
-          ).length +
-          lesson.exams.filter((exam) => new Date(exam.startTime) > now).length;
-      });
-    });
-    return Object.values(teacherMap);
-  }
-
-  // در صورت عدم تطابق نقش، آرایه خالی برگردانده می‌شود
-  return [];
+  const result: FormattedTeacher[] = await res.json();
+  return result;
 }
 
 export async function AddTeacherData(formData: FormData) {
@@ -255,6 +105,7 @@ export async function AddTeacherData(formData: FormData) {
         },
       });
     });
+    await revalidateTag("teachersList");
 
     return { message: "معلم با موفقیت ثبت شد" };
   } catch {
@@ -336,6 +187,7 @@ export async function EditTeacherData(formData: FormData) {
         username,
       },
     });
+    await revalidateTag("teachersList");
 
     return { message: "معلم با موفقیت بروزرسانی شد" };
   } catch {
@@ -392,6 +244,7 @@ export async function DeleteTeacherData(formData: FormData) {
         where: { id: String(id) },
       });
     });
+    await revalidateTag("teachersList");
 
     return { message: "معلم با موفقیت حذف شد" };
   } catch {

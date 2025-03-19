@@ -69,7 +69,7 @@ export function DashboardSidebarUser({
                   <AvatarImage src={user.img} alt={user.name} />
                 ) : (
                   <AvatarFallback className="rounded-lg">
-                    {user.name.charAt(0)}
+                    {user.name?.charAt(0)}
                   </AvatarFallback>
                 )}
               </Avatar>
@@ -98,7 +98,7 @@ export function DashboardSidebarUser({
                     <AvatarImage src={user.img} alt={user.name} />
                   ) : (
                     <AvatarFallback className="rounded-lg">
-                      {user.name.charAt(0)}
+                      {user.name?.charAt(0)}
                     </AvatarFallback>
                   )}
                 </Avatar>

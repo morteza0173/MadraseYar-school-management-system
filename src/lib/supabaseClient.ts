@@ -28,8 +28,6 @@ export async function createClient() {
   );
 }
 
-
-
 export async function createClientWithServiceRole() {
   const cookieStore = await cookies();
 

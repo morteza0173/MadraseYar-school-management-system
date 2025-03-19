@@ -2,214 +2,47 @@
 
 import { prisma } from "@/lib/db";
 import { Prisma } from "@prisma/client";
+import { revalidateTag } from "next/cache";
+
+type teacher = {
+  id: string;
+  name: string;
+};
+
+export interface getLessonsDataProps {
+  lessonId: number;
+  lessonName: string;
+  subjectName: string;
+  className: string;
+  day: string;
+  startTime: string;
+  endTime: string;
+  teacher: teacher;
+}
 
 export async function getLessonsData(userId: string) {
-  const dayTranslations: Record<string, string> = {
-    SATURDAY: "شنبه",
-    SUNDAY: "یکشنبه",
-    MONDAY: "دوشنبه",
-    TUESDAY: "سه‌شنبه",
-    WEDNESDAY: "چهارشنبه",
-  };
-
-  // بررسی نقش ادمین
-  const admin = await prisma.admin.findUnique({ where: { id: userId } });
-
-  if (admin) {
-    return await prisma.lesson
-      .findMany({
-        select: {
-          id: true,
-          name: true,
-          day: true,
-          startTime: true,
-          endTime: true,
-          subject: { select: { name: true } },
-          class: { select: { name: true } },
-          teacher: { select: { id: true, name: true, surname: true } },
-        },
-      })
-      .then((lessons) =>
-        lessons.map((lesson) => ({
-          lessonId: lesson.id,
-          lessonName: lesson.name,
-          subjectName: lesson.subject.name,
-          className: lesson.class.name,
-          day: dayTranslations[lesson.day],
-          startTime: new Date(lesson.startTime).toLocaleTimeString("en", {
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: false,
-            timeZone: "Asia/Tehran",
-          }),
-          endTime: new Date(lesson.endTime).toLocaleTimeString("en", {
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: false,
-            timeZone: "Asia/Tehran",
-          }),
-          teacher: {
-            id: lesson.teacher.id,
-            name: `${lesson.teacher.name} ${lesson.teacher.surname}`,
-          },
-        }))
-      );
-  }
-
-  // بررسی نقش معلم
-  const teacher = await prisma.teacher.findUnique({ where: { id: userId } });
-  if (teacher) {
-    return await prisma.lesson
-      .findMany({
-        where: { teacherId: userId },
-        select: {
-          id: true,
-          name: true,
-          day: true,
-          startTime: true,
-          endTime: true,
-          subject: { select: { name: true } },
-          class: { select: { name: true } },
-          teacher: { select: { id: true, name: true, surname: true } },
-        },
-      })
-      .then((lessons) =>
-        lessons.map((lesson) => ({
-          lessonId: lesson.id,
-          lessonName: lesson.name,
-          subjectName: lesson.subject.name,
-          className: lesson.class.name,
-          day: dayTranslations[lesson.day],
-          startTime: new Date(lesson.startTime).toLocaleTimeString("en", {
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: false,
-            timeZone: "Asia/Tehran",
-          }),
-          endTime: new Date(lesson.endTime).toLocaleTimeString("en", {
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: false,
-            timeZone: "Asia/Tehran",
-          }),
-          teacher: {
-            id: lesson.teacher.id,
-            name: `${lesson.teacher.name} ${lesson.teacher.surname}`,
-          },
-        }))
-      );
-  }
-
-  // بررسی نقش دانش‌آموز
-  const student = await prisma.student.findUnique({
-    where: { id: userId },
-    include: {
-      class: {
-        include: {
-          lessons: {
-            include: {
-              subject: true,
-              teacher: true,
-            },
-          },
-        },
-      },
+  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/lessons`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ userId }),
+    next: {
+      revalidate: 60 * 60 * 24 * 90,
+      tags: [`lessons`, `lessons-${userId}`],
     },
   });
 
-  if (student) {
-    return student.class.lessons.map((lesson) => ({
-      lessonId: lesson.id,
-      lessonName: lesson.name,
-      subjectName: lesson.subject.name,
-      className: student.class.name,
-      day: dayTranslations[lesson.day],
-      startTime: new Date(lesson.startTime).toLocaleTimeString("en", {
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: false,
-        timeZone: "Asia/Tehran",
-      }),
-      endTime: new Date(lesson.endTime).toLocaleTimeString("en", {
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: false,
-        timeZone: "Asia/Tehran",
-      }),
-      teacher: {
-        id: lesson.teacher.id,
-        name: `${lesson.teacher.name} ${lesson.teacher.surname}`,
-      },
-    }));
-  }
+  if (!res.ok) throw new Error("دریافت اطلاعات درس ها با خطا مواجه شد");
 
-  // بررسی نقش والد
-  const parent = await prisma.parent.findUnique({
-    where: { id: userId },
-    include: {
-      students: {
-        include: {
-          class: {
-            include: {
-              lessons: {
-                include: {
-                  subject: true,
-                  teacher: true,
-                },
-              },
-            },
-          },
-        },
-      },
-    },
-  });
-
-  if (parent) {
-    const lessons = parent.students.flatMap((student) =>
-      student.class.lessons.map((lesson) => ({
-        lessonId: lesson.id,
-        lessonName: lesson.name,
-        subjectName: lesson.subject.name,
-        className: student.class.name,
-        day: dayTranslations[lesson.day],
-        startTime: new Date(lesson.startTime).toLocaleTimeString("en", {
-          hour: "2-digit",
-          minute: "2-digit",
-          hour12: false,
-          timeZone: "Asia/Tehran",
-        }),
-        endTime: new Date(lesson.endTime).toLocaleTimeString("en", {
-          hour: "2-digit",
-          minute: "2-digit",
-          hour12: false,
-          timeZone: "Asia/Tehran",
-        }),
-        teacher: {
-          id: lesson.teacher.id,
-          name: `${lesson.teacher.name} ${lesson.teacher.surname}`,
-        },
-      }))
-    );
-
-    // حذف درس‌های تکراری بر اساس نام سابجکت و کلاس
-    const uniqueLessons = Array.from(
-      new Map(
-        lessons.map((lesson) => [
-          `${lesson.subjectName}-${lesson.className}`,
-          lesson,
-        ])
-      ).values()
-    );
-
-    return uniqueLessons;
-  }
-
-  throw new Error("کاربر نقش مشخصی ندارد");
+  const result: getLessonsDataProps[] = await res.json();
+  return result;
 }
 
 export async function AddLesson(data: Prisma.LessonCreateInput) {
   try {
     await prisma.lesson.create({ data });
+    revalidateTag("lessons");
     return {
       message: "درس جدید با موفقیت ایجاد شد و به برنامه هفتگی افزوده شد",
     };
@@ -230,6 +63,8 @@ export async function EditLesson({
       where: { id },
       data,
     });
+    revalidateTag("lessons");
+
     return {
       message: "درس با موفقیت ویرایش شد",
     };
@@ -245,6 +80,8 @@ export async function DeleteLesson(formData: FormData) {
     await prisma.lesson.delete({
       where: { id: idNumber },
     });
+    revalidateTag("lessons");
+
     return {
       message: "درس با موفقیت حذف شد",
     };
@@ -258,6 +95,8 @@ export async function DeleteLessons(ids: number[]) {
     await prisma.lesson.deleteMany({
       where: { id: { in: ids } },
     });
+    revalidateTag("lessons");
+
     return {
       message: "درس‌ها با موفقیت حذف شدند",
     };

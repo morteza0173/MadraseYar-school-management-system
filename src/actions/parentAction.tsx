@@ -1,8 +1,10 @@
 "use server";
 import { prisma } from "@/lib/db";
 import { createClientWithServiceRole } from "@/lib/supabaseClient";
+import { revalidateTag } from "next/cache";
 
-export async function getParentData() {
+// call this function in apiRoute and we have type also
+export async function getParentDataApi() {
   const parentData = await prisma.parent.findMany({
     include: {
       students: {
@@ -20,8 +22,17 @@ export async function getParentData() {
   return parentData;
 }
 
-type ParentDataType = Awaited<ReturnType<typeof getParentData>>;
+type ParentDataType = Awaited<ReturnType<typeof getParentDataApi>>;
 export type ParentSingleType = ParentDataType[0];
+
+export async function getParentData() {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/parents`, {
+    next: { revalidate: 60 * 60 * 24 * 90, tags: ["parents"] },
+  });
+  if (!res.ok) throw new Error("دریافت اطلاعات والدین با خطا مواجه شد");
+  const result: ParentDataType = await res.json();
+  return result;
+}
 
 export async function AddParentData(formData: FormData) {
   const supabase = await createClientWithServiceRole();
@@ -70,6 +81,7 @@ export async function AddParentData(formData: FormData) {
         },
       });
     });
+    await revalidateTag("parents");
 
     return { message: "والد با موفقیت ثبت شد" };
   } catch {
@@ -97,6 +109,7 @@ export async function EditParentData(formData: FormData) {
         address,
       },
     });
+    await revalidateTag("parents");
 
     return { message: "والد با موفقیت ویرایش شد" };
   } catch {
@@ -129,6 +142,7 @@ export async function DeleteParentData(formData: FormData) {
         where: { id: String(id) },
       });
     });
+    await revalidateTag("parents");
 
     return { message: "والد با موفقیت حذف شد" };
   } catch {

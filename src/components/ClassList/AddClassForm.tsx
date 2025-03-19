@@ -36,23 +36,15 @@ import {
 import { cn } from "@/lib/utils";
 import { AddClass } from "@/actions/classAction";
 import { AddClassFormSchema } from "@/lib/schemas";
-import {
-  useMutation,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import useGetTeacher from "@/hooks/useGetTeacher";
 import useGetGradeData from "@/hooks/useGetGradeData";
 
 interface AddClassFormProps {
-
   onCancel: () => void;
-
 }
 
-const AddClassForm = ({
-  onCancel,
-}: AddClassFormProps) => {
-
+const AddClassForm = ({ onCancel }: AddClassFormProps) => {
   const { isTeacherError, isTeacherPending, teacherData, teacherRefetch } =
     useGetTeacher();
 
@@ -74,7 +66,7 @@ const AddClassForm = ({
 
   const queryClient = useQueryClient();
 
-  const {mutate , isPending} = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: async (data: FormData) => AddClass(data),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["classDetails"] });
@@ -97,7 +89,6 @@ const AddClassForm = ({
   });
 
   const onSubmit = async (data: z.infer<typeof AddClassFormSchema>) => {
-
     const formData = new FormData();
     formData.set("className", data.className);
     formData.set("capacity", data.capacity);

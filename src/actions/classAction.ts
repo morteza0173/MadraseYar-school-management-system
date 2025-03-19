@@ -2,85 +2,36 @@
 
 import { prisma } from "@/lib/db";
 import { getUserInfoProps } from "./dashboardAction";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
+
+export type getClassDetailsProps = {
+  name: string;
+  grade: number;
+  capacity: number;
+  studentCount: number;
+  supervisor: string;
+};
 
 export async function getClassDetails(user: getUserInfoProps) {
-  if (!user) {
-    throw new Error("کاربر یافت نشد!");
-  }
-
-  let classFilter = {};
-
-  if (user.role === "ADMIN") {
-  } else if (user.role === "TEACHER") {
-    const teacher = await prisma.teacher.findUnique({
-      where: { id: user.id },
-      select: { classes: { select: { id: true } } },
-    });
-
-    if (!teacher) return [];
-
-    classFilter = {
-      id: { in: teacher.classes.map((cls) => cls.id) },
-    };
-  } else if (user.role === "PARENT") {
-    const parent = await prisma.parent.findUnique({
-      where: { id: user.id },
-      select: {
-        students: {
-          select: { classId: true },
-        },
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_BASE_URL}/api/classDetails`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
       },
-    });
-
-    if (!parent) return [];
-
-    classFilter = {
-      id: { in: parent.students.map((student) => student.classId) },
-    };
-  } else if (user.role === "STUDENT") {
-    const student = await prisma.student.findUnique({
-      where: { id: user.id },
-      select: { classId: true },
-    });
-
-    if (!student) return [];
-
-    classFilter = { id: student.classId };
-  }
-
-  const classDetails = await prisma.class.findMany({
-    where: classFilter,
-    orderBy: { grade: { level: "asc" } },
-    select: {
-      name: true, // نام کلاس
-      grade: {
-        select: {
-          level: true, // سال تحصیلی
-        },
+      body: JSON.stringify({ user }),
+      next: {
+        revalidate: 60 * 60 * 24 * 90,
+        tags: [`classDetails`, `classDetails-${user.id}`],
       },
-      capacity: true, // ظرفیت کلاس
-      student: {
-        select: {
-          id: true,
-        },
-      },
-      supervisor: {
-        select: {
-          name: true, // نام مشاور کلاس
-          surname: true, // نام خانوادگی مشاور
-        },
-      },
-    },
-  });
+    }
+  );
 
-  return classDetails.map((cls) => ({
-    name: cls.name,
-    grade: cls.grade.level,
-    capacity: cls.capacity,
-    studentCount: cls.student.length, // تعداد دانش‌آموزان
-    supervisor: `${cls.supervisor.name} ${cls.supervisor.surname}`, // نام کامل مشاور
-  }));
+  if (!res.ok) throw new Error("دریافت اطلاعات کلاس‌ها با خطا مواجه شد");
+
+  const result: getClassDetailsProps[] = await res.json();
+  return result;
 }
 
 export type FormState = {
@@ -102,8 +53,9 @@ export async function AddClass(formData: FormData): Promise<FormState> {
         gradeId: grade,
       },
     });
+    await classDetailsRevalidateTag();
 
-    revalidatePath("/list/class");
+    await revalidatePath("/list/class");
     return { message: "کلاس جدید با موفقیت ساخته شد" };
   } catch (error) {
     console.error("Error creating class:", error);
@@ -130,8 +82,9 @@ export async function EditClass(formData: FormData): Promise<FormState> {
         gradeId: grade,
       },
     });
+    await classDetailsRevalidateTag();
 
-    revalidatePath("/list/class");
+    await revalidatePath("/list/class");
     return { message: "کلاس با موفقیت ویرایش شد" };
   } catch {
     throw new Error("مشکلی در ویرایش کلاس به وجود آمد");
@@ -174,10 +127,15 @@ export async function DeleteClass(formData: FormData): Promise<FormState> {
         where: { id: classId },
       });
     });
+    await classDetailsRevalidateTag();
 
-    revalidatePath("/list/class");
+    await revalidatePath("/list/class");
     return { message: "کلاس و دانش‌آموزان آن با موفقیت حذف شدند." };
   } catch {
     throw new Error("مشکلی در حذف کلاس به وجود آمد.");
   }
+}
+
+async function classDetailsRevalidateTag() {
+  await revalidateTag("classDetails");
 }

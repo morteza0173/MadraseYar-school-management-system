@@ -49,7 +49,7 @@ const Navbar = () => {
           </Avatar>
         ) : (
           <Avatar>
-            <AvatarFallback>{userData?.name.charAt(0)}</AvatarFallback>
+            <AvatarFallback>{userData?.name?.charAt(0)}</AvatarFallback>
           </Avatar>
         )}
       </div>

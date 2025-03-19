@@ -1,7 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/db";
-import { revalidatePath } from "next/cache";
+import { revalidateTag } from "next/cache";
 
 export interface gradeListProps {
   id: number;
@@ -11,32 +11,15 @@ export interface gradeListProps {
 }
 
 export async function GetGradeData() {
-  const grades = await prisma.grade.findMany({
-    select: {
-      id: true,
-      level: true,
-      students: {
-        select: {
-          id: true,
-        },
-      },
-      classes: {
-        select: {
-          id: true,
-        },
-      },
-    },
-    orderBy: {
-      level: "asc",
-    },
+  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/gradeList`, {
+    next: { revalidate: 60 * 60 * 24 * 90, tags: ["gradeListTag"] },
   });
 
-  return grades.map((grade) => ({
-    id: grade.id,
-    level: grade.level,
-    students: grade.students.length,
-    classes: grade.classes.length,
-  }));
+  if (!res.ok) throw new Error("خطا در گرفتن اطلاعات سال احصیلی");
+
+  const grades: gradeListProps[] = await res.json();
+
+  return grades;
 }
 
 export type FormState = {
@@ -58,7 +41,7 @@ export async function AddGrade(formData: FormData): Promise<FormState> {
       },
     });
 
-    revalidatePath("/list/grade");
+    await revalidateTag("gradeListTag");
     return { message: "سال تحصیلی با موفقیت افزوده شد" };
   } catch {
     throw new Error("خطایی در ایجاد سال تحصیلی جدید رخ داده است.");
@@ -96,8 +79,8 @@ export async function deleteGrade(formData: FormData): Promise<FormState> {
 
       await tx.grade.delete({ where: { id: gradeId } });
     });
+    await revalidateTag("gradeListTag");
 
-    revalidatePath("/list/grade");
 
     return { message: "با موفقیت حذف شد" };
   } catch {
@@ -126,8 +109,9 @@ export async function EditGrade(formData: FormData): Promise<FormState> {
         level: NumberGrade,
       },
     });
+    await revalidateTag("gradeListTag");
 
-    revalidatePath("/list/grade");
+
     return { message: "سال تحصیلی با موفقیت بروزرسانی شد" };
   } catch {
     throw new Error("خطایی در بروزرسانی سال تحصیلی جدید رخ داده است.");
