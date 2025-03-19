@@ -11,7 +11,7 @@ export interface gradeListProps {
 }
 
 export async function GetGradeData() {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/gradeList`, {
+  const res = await fetch(`/api/gradeList`, {
     next: { revalidate: 60 * 60 * 24 * 90, tags: ["gradeListTag"] },
   });
 
@@ -81,7 +81,6 @@ export async function deleteGrade(formData: FormData): Promise<FormState> {
     });
     await revalidateTag("gradeListTag");
 
-
     return { message: "با موفقیت حذف شد" };
   } catch {
     throw new Error("خطایی در حذف سال تحصیلی رخ داده است.");
@@ -110,7 +109,6 @@ export async function EditGrade(formData: FormData): Promise<FormState> {
       },
     });
     await revalidateTag("gradeListTag");
-
 
     return { message: "سال تحصیلی با موفقیت بروزرسانی شد" };
   } catch {
