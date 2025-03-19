@@ -11,7 +11,7 @@ export interface gradeListProps {
 }
 
 export async function GetGradeData() {
-  const res = await fetch(`/api/gradeList`, {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/gradeList`, {
     next: { revalidate: 60 * 60 * 24 * 90, tags: ["gradeListTag"] },
   });
 
