@@ -22,7 +22,7 @@ export interface FormattedTeacher {
 }
 
 export async function getTeacherData(userId: string) {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/teachers`, {
+  const res = await fetch(`/api/teachers`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
