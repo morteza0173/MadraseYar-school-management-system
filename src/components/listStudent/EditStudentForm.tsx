@@ -15,42 +15,84 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { ImageIcon, Loader2Icon } from "lucide-react";
 import {
-  TeacherDataListSchema,
-  TeacherEditFormSchemas,
-} from "@/lib/schemas";
+  Check,
+  ChevronsUpDown,
+  ImageIcon,
+  Loader2,
+  Loader2Icon,
+  TriangleAlert,
+} from "lucide-react";
+import { StudentDataListSchema, StudentEditFormSchemas } from "@/lib/schemas";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import { Textarea } from "../ui/textarea";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import Image from "next/image";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {EditTeacherData, getTeacherInfo } from "@/actions/teacherAction";
 import { toast } from "sonner";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandItem,
+  CommandList,
+} from "../ui/command";
+import { useUserAuth } from "@/hooks/useUserAuth";
+import useGetClassDetails from "@/hooks/useGetClassDetails";
+import useGetParentData from "@/hooks/useGetParentData";
+import { cn } from "@/lib/utils";
+import { EditStudentData, getStudentInfo } from "@/actions/studentAction";
 
 type Row<T> = {
   original: T;
 };
 
-interface EditTeacherFormProps {
+interface EditStudentFormProps {
   onCancel: () => void;
-  row: Row<TeacherDataListSchema>;
+  row: Row<StudentDataListSchema>;
 }
 
-const EditStudentForm = ({ onCancel, row }: EditTeacherFormProps) => {
-  const { data: teacherInfo, isPending: teacherInfoPending } = useQuery({
-    queryKey: ["teacherInfo", row.original.id],
-    queryFn: async () => getTeacherInfo(row.original.id),
+const EditStudentForm = ({ onCancel, row }: EditStudentFormProps) => {
+  const { userData } = useUserAuth(["admin", "teacher", "student", "parent"]);
+  const { ClassData, classRefetch, isClassError, isClassPending } =
+    useGetClassDetails(userData);
+  const { isParentError, isParentPending, parentData, parentRefetch } =
+    useGetParentData();
+  const {
+    data: studentInfo,
+    isPending: studentInfoPending,
+    isError: studentInfoError,
+  } = useQuery({
+    queryKey: ["studentInfo", row.original.id],
+    queryFn: async () => getStudentInfo(row.original.id),
   });
+
+  const [openParentList, setOpenParentList] = useState(false);
+  const [parentValue, setParentValue] = useState<
+    { id: string; name: string; surname: string } | undefined
+  >({
+    id: row.original.parent.id,
+    name: studentInfo?.parent?.name || "در حال دریافت ",
+    surname: studentInfo?.parent?.surname || "",
+  });
+
+  const [openClassList, setOpenClassList] = useState(false);
+  const [classValue, setClassValue] = useState<string | undefined>(
+    row.original.class.name
+  );
+
   const inputRef = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
 
   const { mutate, isPending } = useMutation({
-    mutationFn: async (data: FormData) => EditTeacherData(data),
+    mutationFn: async (data: FormData) => EditStudentData(data),
     onSuccess: (data) => {
       toast.success(data.message || "دانش‌آموز با موفقیت ویرایش شد");
       queryClient.invalidateQueries({ queryKey: ["studentData"] });
+      queryClient.invalidateQueries({ queryKey: ["studentInfo"] });
+
       onCancel();
     },
     onError: (error) => {
@@ -58,33 +100,47 @@ const EditStudentForm = ({ onCancel, row }: EditTeacherFormProps) => {
     },
   });
 
-  const form = useForm<z.infer<typeof TeacherEditFormSchemas>>({
-    resolver: zodResolver(TeacherEditFormSchemas),
+  const form = useForm<z.infer<typeof StudentEditFormSchemas>>({
+    resolver: zodResolver(StudentEditFormSchemas),
     defaultValues: {
       name: "در حال دریافت ...",
       surname: "در حال دریافت ...",
       username: "در حال دریافت ...",
       phone: row.original.phone,
       address: "در حال دریافت ...",
-      image: row.original.label.img,
+      image: row.original.label.img || "",
+      parent: row.original.parent.id,
+      classValue: row.original.class.name,
     },
   });
 
   useEffect(() => {
-    if (teacherInfo) {
+    if (!studentInfoPending && !studentInfoError) {
+      if (studentInfo.parent?.id) {
+        setParentValue({
+          id: row.original.parent.id,
+          name: studentInfo.parent?.name,
+          surname: studentInfo.parent?.surname,
+        });
+      }
+    }
+  }, [studentInfo, studentInfoPending, row.original.id, studentInfoError]);
+
+  useEffect(() => {
+    if (studentInfo) {
       form.reset({
-        name: teacherInfo.name,
-        surname: teacherInfo.surname,
-        username: teacherInfo.username,
+        name: studentInfo.name,
+        surname: studentInfo.surname,
+        username: studentInfo.username,
         phone: row.original.phone,
-        address: teacherInfo.address,
-        image: row.original.label.img,
-        sex: teacherInfo.sex,
+        address: studentInfo.address,
+        image: row.original.label.img || "",
+        sex: studentInfo.sex,
       });
     }
-  }, [teacherInfo, form, row]);
+  }, [studentInfo, form, row]);
 
-  const onSubmit = async (data: z.infer<typeof TeacherEditFormSchemas>) => {
+  const onSubmit = async (data: z.infer<typeof StudentEditFormSchemas>) => {
     const imagePrevUrl = row.original.label.img;
     const teacherId = row.original.id;
     const formData = new FormData();
@@ -93,10 +149,12 @@ const EditStudentForm = ({ onCancel, row }: EditTeacherFormProps) => {
     formData.append("name", data.name);
     formData.append("surname", data.surname);
     formData.append("username", data.username);
-    formData.append("phone", data.phone);
+    formData.append("phone", data.phone || "");
     formData.append("address", data.address);
     formData.append("image", data.image);
     formData.append("sex", data.sex);
+    formData.append("parent", data.parent);
+    formData.append("classValue", data.classValue);
 
     mutate(formData);
   };
@@ -122,7 +180,7 @@ const EditStudentForm = ({ onCancel, row }: EditTeacherFormProps) => {
                   <FormControl>
                     <Input
                       className="focus-visible:ring-orange-300 "
-                      disabled={teacherInfoPending}
+                      disabled={studentInfoPending}
                       type="text"
                       {...field}
                     />
@@ -141,7 +199,7 @@ const EditStudentForm = ({ onCancel, row }: EditTeacherFormProps) => {
                   <FormControl>
                     <Input
                       className="focus-visible:ring-orange-300"
-                      disabled={teacherInfoPending}
+                      disabled={studentInfoPending}
                       type="text"
                       {...field}
                     />
@@ -162,7 +220,7 @@ const EditStudentForm = ({ onCancel, row }: EditTeacherFormProps) => {
                   <FormControl>
                     <Input
                       className="focus-visible:ring-orange-300"
-                      disabled={teacherInfoPending}
+                      disabled={studentInfoPending}
                       type="text"
                       {...field}
                     />
@@ -201,7 +259,7 @@ const EditStudentForm = ({ onCancel, row }: EditTeacherFormProps) => {
                   <Textarea
                     className="focus-visible:ring-orange-300"
                     placeholder="ادرس خود را وارد کنید ..."
-                    disabled={teacherInfoPending}
+                    disabled={studentInfoPending}
                     {...field}
                   />
                 </FormControl>
@@ -223,7 +281,7 @@ const EditStudentForm = ({ onCancel, row }: EditTeacherFormProps) => {
                       onValueChange={field.onChange}
                       value={field.value}
                       className="flex flex-row gap-2 h-9 justify-around"
-                      disabled={teacherInfoPending}
+                      disabled={studentInfoPending}
                     >
                       <FormItem className="flex items-center">
                         <FormControl>
@@ -245,6 +303,208 @@ const EditStudentForm = ({ onCancel, row }: EditTeacherFormProps) => {
               )}
             />
           </div>
+          <FormField
+            control={form.control}
+            name="classValue"
+            render={({ field }) => (
+              <FormItem>
+                <div className="flex justify-between items-center">
+                  <FormLabel>انتخاب کلاس</FormLabel>
+                  <FormControl>
+                    <>
+                      <Popover
+                        modal
+                        open={openClassList}
+                        onOpenChange={setOpenClassList}
+                      >
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            role="combobox"
+                            aria-expanded={openClassList}
+                            className="w-[250px] justify-between "
+                          >
+                            {classValue
+                              ? ClassData?.find(
+                                  (Class) => Class.name === classValue
+                                )?.name
+                              : "کلاس را از لیست انتخاب کنید"}
+                            <ChevronsUpDown className="opacity-50" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[250px] p-0 ">
+                          <Command>
+                            <CommandList>
+                              <CommandEmpty>
+                                <div className="flex items-center justify-center h-full w-full">
+                                  {isClassPending ? (
+                                    <div className="flex gap-2 items-center">
+                                      <Loader2 className="size-4 animate-spin" />
+                                      <p>در حال دریافت اطلاعات</p>
+                                    </div>
+                                  ) : isClassError ? (
+                                    <div className="flex flex-col gap-4 items-center">
+                                      <div className="flex gap-2">
+                                        <TriangleAlert className="size-4" />
+                                        <p className="text-xs font-semibold">
+                                          اینترنت خود را ببرسی کنید
+                                        </p>
+                                      </div>
+                                      <Button
+                                        variant="outline"
+                                        onClick={() => classRefetch()}
+                                      >
+                                        تلاش مجدد
+                                      </Button>
+                                    </div>
+                                  ) : (
+                                    "نتیجه‌ای یافت نشد"
+                                  )}
+                                </div>
+                              </CommandEmpty>
+                              <CommandGroup>
+                                {ClassData?.map((Class) => (
+                                  <CommandItem
+                                    key={Class.name}
+                                    className="z-[60] pointer-events-auto overflow-auto"
+                                    value={String(Class.name)}
+                                    onSelect={(currentValue) => {
+                                      const selectedValue =
+                                        currentValue === String(classValue)
+                                          ? ""
+                                          : currentValue;
+                                      setClassValue(selectedValue);
+                                      field.onChange(selectedValue);
+                                      setOpenClassList(false);
+                                    }}
+                                  >
+                                    {Class.name}
+                                    <Check
+                                      className={cn(
+                                        "ml-auto",
+                                        classValue === Class.name
+                                          ? "opacity-100"
+                                          : "opacity-0"
+                                      )}
+                                    />
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
+                    </>
+                  </FormControl>
+                </div>
+                <FormDescription>کلاس را انتخاب کنید</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="parent"
+            render={({ field }) => (
+              <FormItem>
+                <div className="flex justify-between items-center">
+                  <FormLabel>انتخاب والد</FormLabel>
+                  <FormControl>
+                    <>
+                      <Popover
+                        modal
+                        open={openParentList}
+                        onOpenChange={setOpenParentList}
+                      >
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            role="combobox"
+                            aria-expanded={openParentList}
+                            className="w-[250px] justify-between "
+                          >
+                            {parentValue
+                              ? `${parentValue.name} ${parentValue.surname}`
+                              : "والد را از لیست انتخاب کنید"}
+                            <ChevronsUpDown className="opacity-50" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[250px] p-0 ">
+                          <Command>
+                            <CommandList>
+                              <CommandEmpty>
+                                <div className="flex items-center justify-center h-full w-full">
+                                  {isParentPending ? (
+                                    <div className="flex gap-2 items-center">
+                                      <Loader2 className="size-4 animate-spin" />
+                                      <p>در حال دریافت اطلاعات</p>
+                                    </div>
+                                  ) : isParentError ? (
+                                    <div className="flex flex-col gap-4 items-center">
+                                      <div className="flex gap-2">
+                                        <TriangleAlert className="size-4" />
+                                        <p className="text-xs font-semibold">
+                                          اینترنت خود را ببرسی کنید
+                                        </p>
+                                      </div>
+                                      <Button
+                                        variant="outline"
+                                        onClick={() => parentRefetch()}
+                                      >
+                                        تلاش مجدد
+                                      </Button>
+                                    </div>
+                                  ) : (
+                                    "نتیجه‌ای یافت نشد"
+                                  )}
+                                </div>
+                              </CommandEmpty>
+                              <CommandGroup>
+                                {parentData?.map((parent) => (
+                                  <CommandItem
+                                    key={parent.id}
+                                    className="z-[60] pointer-events-auto overflow-auto"
+                                    value={String(parent.id)}
+                                    onSelect={(currentValue) => {
+                                      const selectedParent = parentData.find(
+                                        (parent) => parent.id === currentValue
+                                      );
+                                      const selectedValue = selectedParent
+                                        ? {
+                                            id: selectedParent.id,
+                                            name: selectedParent.name,
+                                            surname: selectedParent.surname,
+                                          }
+                                        : undefined;
+                                      setParentValue(selectedValue);
+                                      field.onChange(selectedValue?.id);
+                                      setOpenParentList(false);
+                                    }}
+                                  >
+                                    {parent.name} {parent.surname}
+                                    <Check
+                                      className={cn(
+                                        "ml-auto",
+                                        parentValue?.id === parent.id
+                                          ? "opacity-100"
+                                          : "opacity-0"
+                                      )}
+                                    />
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
+                    </>
+                  </FormControl>
+                </div>
+                <FormDescription>والد را انتخاب کنید</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <FormField
             control={form.control}
             name="image"
@@ -272,7 +532,7 @@ const EditStudentForm = ({ onCancel, row }: EditTeacherFormProps) => {
                     </Avatar>
                   )}
                   <div className="flex flex-col gap-y-1">
-                    <p>عکس معلم</p>
+                    <p>عکس دانش‌آموز</p>
                     <p className="text-xs text-muted-foreground">
                       JPG,PNG,SVG یا JPEG و حداکثر 1 مگابایت
                     </p>

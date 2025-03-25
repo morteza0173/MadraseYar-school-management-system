@@ -15,6 +15,8 @@ import { useState } from "react";
 import { useUserAuth } from "@/hooks/useUserAuth";
 
 import { UserSex } from "@prisma/client";
+import EditStudentForm from "./EditStudentForm";
+import DeleteStudentForm from "./DeleteStudentForm";
 
 type StudentData = {
   id: string;
@@ -66,8 +68,7 @@ export function StudentDataTableRowActions<TData extends StudentData>({
         title="ویرایش دانش‌آموز"
         discription="در این بخش میتوانید اطلاعات دانش‌آموز را ویرایش کنید"
       >
-        <h1>تست</h1>
-        {/* <EditTeacherForm onCancel={closeEdit} row={row} /> */}
+        <EditStudentForm onCancel={closeEdit} row={row} />
       </ResponsiveModalForm>
       <ResponsiveModalForm
         isOpen={isOpenDelete}
@@ -76,8 +77,7 @@ export function StudentDataTableRowActions<TData extends StudentData>({
         title="حذف دانش‌آموز"
         discription="در این بخش میتوانید دانش‌آموز را حذف کنید"
       >
-        <h1>تست</h1>
-        {/* <DeleteTeacherForm onCancel={closeDelete} row={row} /> */}
+        <DeleteStudentForm onCancel={closeDelete} row={row} />
       </ResponsiveModalForm>
       <DropdownMenu dir="rtl" modal={false}>
         <DropdownMenuTrigger asChild>

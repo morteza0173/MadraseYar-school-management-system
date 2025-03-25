@@ -5,22 +5,22 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Loader2Icon } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { TeacherDataListSchema } from "@/lib/schemas";
-import { DeleteTeacherData } from "@/actions/teacherAction";
+import { StudentDataListSchema } from "@/lib/schemas";
+import { DeleteStudentData } from "@/actions/studentAction";
 
 type Row<T> = {
   original: T;
 };
 
 interface DataTableRowActionsProps {
-  row: Row<TeacherDataListSchema>;
+  row: Row<StudentDataListSchema>;
   onCancel: () => void;
 }
 
 const DeleteStudentForm = ({ onCancel, row }: DataTableRowActionsProps) => {
   const queryClient = useQueryClient();
   const { mutate, isPending } = useMutation({
-    mutationFn: async (data: FormData) => DeleteTeacherData(data),
+    mutationFn: async (data: FormData) => DeleteStudentData(data),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["studentData"] });
       toast.success(data.message || "دانش‌آموز با موفقیت حذف شد");
@@ -34,8 +34,8 @@ const DeleteStudentForm = ({ onCancel, row }: DataTableRowActionsProps) => {
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData();
-    const teacherId = row.original.id;
-    formData.set("id", String(teacherId));
+    const studentId = row.original.id;
+    formData.set("id", String(studentId));
     mutate(formData);
   };
   return (

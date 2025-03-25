@@ -288,3 +288,39 @@ export const StudentFormSchemas = z.object({
   parent: z.string().nonempty("باید یک والد انتخاب کنید"),
   classValue: z.string().nonempty("باید یک کلاس انتخاب کنید"),
 });
+
+export const StudentEditFormSchemas = z.object({
+  name: z.string().min(1, "نام نمی‌تواند خالی باشد"),
+  surname: z.string().min(1, "نام خانوادگی نمی‌تواند خالی باشد"),
+  username: z.string().min(1, "نام کاربری نمی‌تواند خالی باشد"),
+  address: z.string().min(1, "آدرس نمی‌تواند خالی باشد"),
+  sex: z.enum(["MALE", "FEMALE"], {
+    message: "جنسیت دانش‌آموز را انتخاب کنید",
+  }),
+  phone: z
+    .string()
+
+    .regex(/^09\d{9}$/, {
+      message: "شماره تلفن باید 11 رقم و با 09 شروع شود.",
+    })
+    .optional(),
+  image: z.union([
+    z
+      .instanceof(File, { message: "لطفاً یک فایل معتبر انتخاب کنید." })
+      .refine(
+        (file) =>
+          ["image/jpeg", "image/png", "image/jpg", "image/svg"].includes(
+            file.type
+          ),
+        {
+          message: "فقط فایل‌های jpg یا png یا svg مجاز هستند.",
+        }
+      )
+      .refine((file) => file.size <= 1024 * 1024, {
+        message: "حجم فایل نباید بیشتر از 1 مگابایت باشد.",
+      }),
+    z.string(),
+  ]),
+  parent: z.string().nonempty("باید یک والد انتخاب کنید"),
+  classValue: z.string().nonempty("باید یک کلاس انتخاب کنید"),
+});
