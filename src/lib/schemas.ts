@@ -131,6 +131,35 @@ export const teacherDataListSchema = z.object({
 
 export type TeacherDataListSchema = z.infer<typeof teacherDataListSchema>;
 
+const StudentLabel = z.object({
+  name: z.string(),
+  email: z.string().optional(),
+  img: z.string().optional(),
+});
+
+export const studentDataListSchema = z.object({
+  id: z.string(),
+  label: StudentLabel,
+  phone: z.string().optional(),
+  subject: z.string().optional(),
+  address: z.string(),
+  sex: z.enum(["MALE", "FEMALE"]),
+  parent: z.object({
+    id: z.string(),
+    name: z.string(),
+  }),
+  class: z.object({
+    id: z.number(),
+    name: z.string(),
+  }),
+  grade: z.number(),
+  upcomingAssignments: z.number(),
+  upcomingExams: z.number(),
+  averageScore: z.number(),
+});
+
+export type StudentDataListSchema = z.infer<typeof studentDataListSchema>;
+
 export const parentDataListSchema = z.object({
   id: z.string(),
   phone: z.string(),
@@ -223,4 +252,39 @@ export const ParentEditFormSchemas = z.object({
   phone: z.string().regex(/^09\d{9}$/, {
     message: "شماره تلفن باید 11 رقم و با 09 شروع شود.",
   }),
+});
+
+export const StudentFormSchemas = z.object({
+  name: z.string().min(1, "نام نمی‌تواند خالی باشد"),
+  email: z.string().min(1, "ایمیل نمی‌تواند خالی باشد"),
+  surname: z.string().min(1, "نام خانوادگی نمی‌تواند خالی باشد"),
+  username: z.string().min(1, "نام کاربری نمی‌تواند خالی باشد"),
+  password: z.string().min(1, "پسورد حساب کاربری نمی‌تواند خالی باشد"),
+  address: z.string().min(1, "آدرس نمی‌تواند خالی باشد"),
+  sex: z.enum(["MALE", "FEMALE"], {
+    message: "جنسیت دانش‌آموز را انتخاب کنید",
+  }),
+  phone: z
+    .string()
+
+    .regex(/^09\d{9}$/, {
+      message: "شماره تلفن باید 11 رقم و با 09 شروع شود.",
+    })
+    .optional(),
+  image: z
+    .instanceof(File, { message: "لطفاً یک فایل معتبر انتخاب کنید." })
+    .refine(
+      (file) =>
+        ["image/jpeg", "image/png", "image/jpg", "image/svg"].includes(
+          file.type
+        ),
+      {
+        message: "فقط فایل‌های jpg یا png یا svg مجاز هستند.",
+      }
+    )
+    .refine((file) => file.size <= 1024 * 1024, {
+      message: "حجم فایل نباید بیشتر از 1 مگابایت باشد.",
+    }),
+  parent: z.string().nonempty("باید یک والد انتخاب کنید"),
+  classValue: z.string().nonempty("باید یک کلاس انتخاب کنید"),
 });

@@ -90,7 +90,6 @@ const data = {
           title: "دانش آموزان",
           visible: ["admin", "teacher", "student", "parent"],
           url: "/list/student",
-          disabled: true,
         },
         {
           title: "والدین",

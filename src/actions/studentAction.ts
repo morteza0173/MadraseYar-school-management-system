@@ -1,0 +1,393 @@
+"use server";
+
+import { prisma } from "@/lib/db";
+import { createClientWithServiceRole } from "@/lib/supabaseClient";
+import { UserSex } from "@prisma/client";
+
+export interface FormattedStudent {
+  id: string;
+  label: {
+    name: string;
+    email?: string | undefined;
+    img?: string | undefined;
+  };
+  phone?: string | undefined;
+  address: string;
+  sex: UserSex;
+  parent: {
+    id: string;
+    name: string;
+  };
+  class: {
+    id: number;
+    name: string;
+  };
+  grade: number;
+  upcomingAssignments: number;
+  upcomingExams: number;
+  averageScore: number;
+}
+
+export async function getStudentData(userId: string) {
+  const now = new Date();
+
+  // بررسی نقش ادمین
+  const admin = await prisma.admin.findUnique({ where: { id: userId } });
+  if (admin) {
+    // دسترسی کامل برای ادمین
+    const students = await prisma.student.findMany({
+      include: {
+        class: {
+          include: {
+            grade: true,
+          },
+        },
+        parent: true,
+        results: {
+          include: {
+            assignment: true,
+            exam: true,
+          },
+        },
+      },
+    });
+
+    return students.map((s) => {
+      const upcomingAssignments = s.results.filter(
+        (result) =>
+          result.assignment && new Date(result.assignment.DueDate) > now
+      ).length;
+      const upcomingExams = s.results.filter(
+        (result) => result.exam && new Date(result.exam.startTime) > now
+      ).length;
+      const averageScore =
+        s.results.reduce((acc, result) => acc + result.score, 0) /
+        s.results.length;
+
+      return {
+        id: s.id,
+        label: {
+          name: `${s.name} ${s.surname}`,
+          email: s.email || undefined,
+          img: s.img || undefined,
+        },
+        phone: s.phone || undefined,
+        address: s.address,
+        sex: s.sex,
+        parent: {
+          id: s.parent.id,
+          name: `${s.parent.name} ${s.parent.surname}`,
+        },
+        class: {
+          id: s.class.id,
+          name: s.class.name,
+        },
+        grade: s.class.grade.level,
+        upcomingAssignments,
+        upcomingExams,
+        averageScore,
+      };
+    });
+  }
+
+  // بررسی نقش معلم
+  const teacher = await prisma.teacher.findUnique({
+    where: { id: userId },
+    include: {
+      classes: {
+        include: {
+          student: {
+            include: {
+              class: {
+                include: {
+                  grade: true,
+                },
+              },
+              parent: true,
+              results: {
+                include: {
+                  assignment: true,
+                  exam: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+
+  if (teacher) {
+    // دسترسی معلم به دانش‌آموزان کلاس‌های خودش
+    const students = teacher.classes.flatMap((cls) => cls.student);
+
+    return students.map((s) => {
+      const upcomingAssignments = s.results.filter(
+        (result) =>
+          result.assignment && new Date(result.assignment.DueDate) > now
+      ).length;
+      const upcomingExams = s.results.filter(
+        (result) => result.exam && new Date(result.exam.startTime) > now
+      ).length;
+      const averageScore =
+        s.results.reduce((acc, result) => acc + result.score, 0) /
+        s.results.length;
+
+      return {
+        id: s.id,
+        label: {
+          name: `${s.name} ${s.surname}`,
+          email: s.email || undefined,
+          img: s.img || undefined,
+        },
+        phone: s.phone || undefined,
+        address: s.address,
+        sex: s.sex,
+        parent: {
+          id: s.parent.id,
+          name: `${s.parent.name} ${s.parent.surname}`,
+        },
+        class: {
+          id: s.class.id,
+          name: s.class.name,
+        },
+        grade: s.class.grade.level,
+        upcomingAssignments,
+        upcomingExams,
+        averageScore,
+      };
+    });
+  }
+
+  // بررسی نقش دانش‌آموز
+  const student = await prisma.student.findUnique({
+    where: { id: userId },
+    include: {
+      class: {
+        include: {
+          student: {
+            include: {
+              class: {
+                include: {
+                  grade: true,
+                },
+              },
+              parent: true,
+              results: {
+                include: {
+                  assignment: true,
+                  exam: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+  if (student) {
+    // دسترسی دانش‌آموز به هم‌کلاسی‌های خودش
+    const classmates = student.class.student;
+
+    return classmates.map((s) => {
+      const upcomingAssignments = s.results.filter(
+        (result) =>
+          result.assignment && new Date(result.assignment.DueDate) > now
+      ).length;
+      const upcomingExams = s.results.filter(
+        (result) => result.exam && new Date(result.exam.startTime) > now
+      ).length;
+      const averageScore =
+        s.results.reduce((acc, result) => acc + result.score, 0) /
+        s.results.length;
+
+      return {
+        id: s.id,
+        label: {
+          name: `${s.name} ${s.surname}`,
+          email: s.email || undefined,
+          img: s.img || undefined,
+        },
+        phone: s.phone || undefined,
+        address: s.address,
+        sex: s.sex,
+        parent: {
+          id: s.parent.id,
+          name: `${s.parent.name} ${s.parent.surname}`,
+        },
+        class: {
+          id: s.class.id,
+          name: s.class.name,
+        },
+        grade: s.class.grade.level,
+        upcomingAssignments,
+        upcomingExams,
+        averageScore,
+      };
+    });
+  }
+
+  // بررسی نقش والد
+  const parent = await prisma.parent.findUnique({
+    where: { id: userId },
+    include: {
+      students: {
+        include: {
+          class: {
+            include: {
+              student: {
+                include: {
+                  class: {
+                    include: {
+                      grade: true,
+                    },
+                  },
+                  parent: true,
+                  results: {
+                    include: {
+                      assignment: true,
+                      exam: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+  if (parent) {
+    // دسترسی والد به دانش‌آموزان خودش و هم‌کلاسی‌های آن‌ها
+    const students = parent.students.flatMap((s) => s.class.student);
+
+    return students.map((s) => {
+      const upcomingAssignments = s.results.filter(
+        (result) =>
+          result.assignment && new Date(result.assignment.DueDate) > now
+      ).length;
+      const upcomingExams = s.results.filter(
+        (result) => result.exam && new Date(result.exam.startTime) > now
+      ).length;
+      const averageScore =
+        s.results.reduce((acc, result) => acc + result.score, 0) /
+        s.results.length;
+
+      return {
+        id: s.id,
+        label: {
+          name: `${s.name} ${s.surname}`,
+          email: s.email || undefined,
+          img: s.img || undefined,
+        },
+        phone: s.phone || undefined,
+        address: s.address,
+        sex: s.sex,
+        parent: {
+          id: s.parent.id,
+          name: `${s.parent.name} ${s.parent.surname}`,
+        },
+        class: {
+          id: s.class.id,
+          name: s.class.name,
+        },
+        grade: s.class.grade.level,
+        upcomingAssignments,
+        upcomingExams,
+        averageScore,
+      };
+    });
+  }
+
+  // در صورت عدم تطابق نقش، آرایه خالی برگردانده می‌شود
+  return [];
+}
+
+export async function AddStudentData(formData: FormData) {
+  const supabase = await createClientWithServiceRole();
+
+  const address = formData.get("address") as string;
+  const image = formData.get("image") as File;
+  const name = formData.get("name") as string;
+  const password = formData.get("password") as string;
+  const phone = formData.get("phone") as string;
+  const sex = formData.get("sex") as UserSex;
+  const surname = formData.get("surname") as string;
+  const username = formData.get("username") as string;
+  const email = formData.get("email") as string;
+  const parentId = formData.get("parent") as string;
+  const className = formData.get("classValue") as string;
+
+  try {
+    const classData = await prisma.class.findUnique({
+      where: { name: className },
+      include: { grade: true },
+    });
+
+    if (!classData) {
+      throw new Error(`کلاس با نام ${className} یافت نشد`);
+    }
+
+    const classId = classData.id;
+    const gradeId = classData.grade.id;
+
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.admin.createUser({
+      email,
+      password,
+      email_confirm: true,
+    });
+
+    if (authError) {
+      throw new Error(`خطا در ساخت حساب کاربری: ${authError.message}`);
+    }
+
+    const userId = user?.id;
+
+    const { error: uploadError } = await supabase.storage
+      .from("profile-images")
+      .upload(`${userId}/${image?.name}`, image);
+
+    if (uploadError) {
+      throw new Error(`خطا در آپلود عکس: ${uploadError.message}`);
+    }
+
+    const {
+      data: { publicUrl },
+    } = supabase.storage
+      .from("profile-images")
+      .getPublicUrl(`${userId}/${image.name}`);
+
+    await prisma.$transaction(async (prisma) => {
+      await prisma.users.create({
+        data: {
+          id: userId!,
+          role: "student",
+        },
+      });
+
+      await prisma.student.create({
+        data: {
+          id: userId!,
+          username,
+          name,
+          surname,
+          email,
+          phone,
+          address,
+          img: publicUrl,
+          sex,
+          parentId,
+          classId,
+          gradeId,
+        },
+      });
+    });
+
+    return { message: "دانش‌آموز با موفقیت ثبت شد" };
+  } catch {
+    throw new Error(`خطا در ثبت دانش‌آموز`);
+  }
+}
