@@ -107,8 +107,7 @@ const data = {
         {
           title: "اعلامیه ها",
           visible: ["admin", "teacher", "student", "parent"],
-          url: "/list/Assignment",
-          disabled: true,
+          url: "/list/announcement",
         },
         {
           title: "رویداد ها",

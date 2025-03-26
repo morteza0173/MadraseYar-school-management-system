@@ -160,6 +160,18 @@ export const studentDataListSchema = z.object({
 
 export type StudentDataListSchema = z.infer<typeof studentDataListSchema>;
 
+export const announcementDataListSchema = z.object({
+  id: z.number(),
+  title: z.string(),
+  description: z.string(),
+  date: z.date(),
+  className: z.string(),
+});
+
+export type AnnouncementDataListSchema = z.infer<
+  typeof announcementDataListSchema
+>;
+
 export const parentDataListSchema = z.object({
   id: z.string(),
   phone: z.string(),

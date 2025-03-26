@@ -20,20 +20,20 @@ import {
 import { Button } from "./ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 const chartData = [
-  { date: "1403-10-22", desktop: 16.3 },
-  { date: "1403-10-23", desktop: 17.2 },
-  { date: "1403-10-24", desktop: 15.5 },
-  { date: "1403-10-25", desktop: 15.7 },
-  { date: "1403-10-26", desktop: 15.6 },
-  { date: "1403-10-27", desktop: 14.8 },
-  { date: "1403-10-28", desktop: 15.6 },
-  { date: "1403-10-29", desktop: 16.7 },
-  { date: "1403-10-30", desktop: 17.2 },
-  { date: "1403-11-01", desktop: 16.5 },
+  { date: "1403-10-22", result: 16.3 },
+  { date: "1403-10-23", result: 17.2 },
+  { date: "1403-10-24", result: 15.5 },
+  { date: "1403-10-25", result: 15.7 },
+  { date: "1403-10-26", result: 15.6 },
+  { date: "1403-10-27", result: 14.8 },
+  { date: "1403-10-28", result: 15.6 },
+  { date: "1403-10-29", result: 16.7 },
+  { date: "1403-10-30", result: 17.2 },
+  { date: "1403-11-01", result: 16.5 },
 ];
 
 const chartConfig = {
-  desktop: {
+  result: {
     label: "نمره",
     color: "#fb923c ",
   },
@@ -99,12 +99,12 @@ export function LineChartLable() {
               content={<ChartTooltipContent indicator="line" />}
             />
             <Line
-              dataKey="desktop"
+              dataKey="result"
               type="natural"
-              stroke="var(--color-desktop)"
+              stroke="var(--color-result)"
               strokeWidth={lineStroke}
               dot={{
-                fill: "var(--color-desktop)",
+                fill: "var(--color-result)",
               }}
               activeDot={{
                 r: 6,

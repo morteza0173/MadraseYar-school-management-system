@@ -159,6 +159,7 @@ model Result {
   assignment Assignment? @relation(fields: [assignmentId],references: [id])
   studentId String
   student Student @relation(fields: [studentId],references: [id])
+  createdAt DateTime @default(now()) 
 }
 
 model Attendance {

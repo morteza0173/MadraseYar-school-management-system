@@ -8,6 +8,7 @@ import { LineChartLable } from "@/components/LineChartLable";
 import { RadialChart } from "@/components/RadialChart";
 import UserCard from "@/components/UserCard";
 import useGetAdmins from "@/hooks/useGetAdmins";
+import useGetAnnouncementsData from "@/hooks/useGetAnnouncementsData";
 import useGetClassDetails from "@/hooks/useGetClassDetails";
 import useGetStudents from "@/hooks/useGetStudents";
 import useGetTeacher from "@/hooks/useGetTeacher";
@@ -21,13 +22,18 @@ const AdminPage = () => {
   const { teacherData, isTeacherPending } = useGetTeacher();
   const { adminData, isAdminPending } = useGetAdmins();
   const { ClassData, isClassPending } = useGetClassDetails(userData);
+   const {
+     isAnnouncementsPending,
+     announcementsData,
+   } = useGetAnnouncementsData(userData);
 
-  // const [students, teacher, admins, events] = await Promise.all([
-  //   getStudents(),
-  //   getTeacher(),
-  //   getAdmins(),
-  //   getEvents(),
-  // ]);
+
+ const maleCount =
+   studentData?.filter((student) => student.sex === "MALE").length || 0;
+ const femaleCount =
+   studentData?.filter((student) => student.sex === "FEMALE").length || 0;
+
+
 
   return (
     <div className="p-4 flex gap-4 flex-col lg:flex-row  justify-center">
@@ -39,7 +45,7 @@ const AdminPage = () => {
             type="دانش آموزان"
             Number={studentData?.length}
             pending={isStudentPending}
-            icon={<GraduationCap size={25} strokeWidth={1}/>}
+            icon={<GraduationCap size={25} strokeWidth={1} />}
           />
           <UserCard
             type="معلمان"
@@ -64,7 +70,11 @@ const AdminPage = () => {
         <div className="flex gap-4 flex-col mt-4 xl:flex-row w-auto justify-center">
           {/* count Chart */}
           <div className="w-full xl:w-[33%] h-[300px] xl:h-[450px]">
-            <RadialChart />
+            <RadialChart
+              maleCount={maleCount}
+              femaleCount={femaleCount}
+              isStudentPending={isStudentPending}
+            />
           </div>
           {/* chart hozor */}
           <div className="w-full xl:w-[64%] h-[450px] xl:h-[450px]">
@@ -89,7 +99,10 @@ const AdminPage = () => {
           </div>
         </div>
         <div className="mt-4">
-          <Announcements />
+          <Announcements
+            announcementsData={announcementsData}
+            isAnnouncementsPending={isAnnouncementsPending}
+          />
         </div>
       </div>
     </div>
