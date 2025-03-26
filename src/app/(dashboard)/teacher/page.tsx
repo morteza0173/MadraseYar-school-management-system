@@ -1,5 +1,4 @@
 "use client";
-import { Announcements } from "@/components/Announcements";
 import InfoCard from "@/components/InfoCard";
 import { EventCard } from "@/components/EventCard";
 import TeacherCard from "@/components/TeacherCard";
@@ -105,7 +104,7 @@ const TeacherPage = () => {
           </div>
         </div>
         <div className="mt-4">
-          <Announcements />
+          {/* <Announcements /> */}
         </div>
       </div>
     </div>

@@ -1,4 +1,3 @@
-import { Announcements } from "@/components/Announcements";
 import InfoCard from "@/components/InfoCard";
 import { EventCard } from "@/components/EventCard";
 import StudentCard from "@/components/StudentCard";
@@ -49,7 +48,7 @@ const StudentPage = () => {
           </div>
         </div>
         <div className="mt-4">
-          <Announcements />
+          {/* <Announcements /> */}
         </div>
       </div>
     </div>
