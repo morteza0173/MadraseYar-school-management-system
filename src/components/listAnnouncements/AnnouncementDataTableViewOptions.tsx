@@ -15,6 +15,7 @@ import { CirclePlus, SlidersHorizontal } from "lucide-react";
 import { useUserAuth } from "@/hooks/useUserAuth";
 import { useState } from "react";
 import ResponsiveModalForm from "../ResponsiveModalForm";
+import AddAnnouncementForm from "./AddAnnouncementForm";
 
 interface DataTableViewOptionsProps<TData> {
   table: Table<TData>;
@@ -38,8 +39,7 @@ export function AnnouncementDataTableViewOptions<TData>({
         title="اعلامیه جدید"
         discription="اعلامیه جدید را اضافه کنید"
       >
-        <h1>در حال توسعه</h1>
-        {/* <AddStudentForm onCancel={close} /> */}
+        <AddAnnouncementForm onCancel={close} />
       </ResponsiveModalForm>
       {(userData?.role === "admin" || userData?.role === "teacher") && (
         <Button

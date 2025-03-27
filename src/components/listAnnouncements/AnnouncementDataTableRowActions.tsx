@@ -13,6 +13,8 @@ import { Ellipsis } from "lucide-react";
 import ResponsiveModalForm from "../ResponsiveModalForm";
 import { useState } from "react";
 import { useUserAuth } from "@/hooks/useUserAuth";
+import EditAnnouncementForm from "./EditAnnouncementForm";
+import DeleteAnnouncementForm from "./DeleteAnnouncementForm";
 
 type AnnouncementData = {
   id: number;
@@ -48,8 +50,7 @@ export function AnnouncementDataTableRowActions<
         title="ویرایش اعلامیه"
         discription="در این بخش میتوانید اعلامیه را ویرایش کنید"
       >
-        <h1>در حال توسعه</h1>
-        {/* <EditStudentForm onCancel={closeEdit} row={row} /> */}
+        <EditAnnouncementForm onCancel={closeEdit} row={row} />
       </ResponsiveModalForm>
       <ResponsiveModalForm
         isOpen={isOpenDelete}
@@ -58,8 +59,7 @@ export function AnnouncementDataTableRowActions<
         title="حذف اعلامیه"
         discription="در این بخش میتوانید اعلامیه را حذف کنید"
       >
-        <h1>در حال توسعه</h1>
-        {/* <DeleteStudentForm onCancel={closeDelete} row={row} /> */}
+        <DeleteAnnouncementForm onCancel={closeDelete} row={row} />
       </ResponsiveModalForm>
       <DropdownMenu dir="rtl" modal={false}>
         <DropdownMenuTrigger asChild>

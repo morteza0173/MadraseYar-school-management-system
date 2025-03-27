@@ -53,12 +53,12 @@ export function AnnouncementListDataTable<TData, TValue>({
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [sorting, setSorting] = useState<SortingState>([]);
 
-  const [hasMountedOnce, setHasMountedOnce] = useState(false);
-  useEffect(() => {
-    if (!isAnnouncementsPending) {
-      setHasMountedOnce(true);
-    }
-  }, [isAnnouncementsPending]);
+  // const [hasMountedOnce, setHasMountedOnce] = useState(false);
+  // useEffect(() => {
+  //   if (!isAnnouncementsPending) {
+  //     setHasMountedOnce(true);
+  //   }
+  // }, [isAnnouncementsPending]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -135,18 +135,20 @@ export function AnnouncementListDataTable<TData, TValue>({
                 table.getRowModel().rows.map((row) => (
                   <MotionTableRow
                     layout
-                    initial={
-                      hasMountedOnce
-                        ? { opacity: 0, height: 0, backgroundColor: "#bbf7d0" }
-                        : { opacity: 0, height: 0 }
-                    }
-                    animate={{
-                      opacity: 1,
-                      height: "auto",
-                      backgroundColor:
-                        row.index % 2 === 0 ? "#ffffff" : "#f3f4f6",
-                    }}
-                    exit={{ backgroundColor: "#fca5a5" }}
+                    // initial={
+                    //   hasMountedOnce
+                    //     ? { opacity: 0, height: 0, backgroundColor: "#bbf7d0" }
+                    //     : { opacity: 0, height: 0 }
+                    // }
+                    initial={{ opacity: 0, height: 0 }}
+                    // animate={{
+                    //   opacity: 1,
+                    //   height: "auto",
+                    //   backgroundColor:
+                    //     row.index % 2 === 0 ? "#ffffff" : "#f3f4f6",
+                    // }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    // exit={{ backgroundColor: "#fca5a5" }}
                     transition={{
                       opacity: { duration: 0.5 },
                       height: { duration: 0.5 },

@@ -336,3 +336,12 @@ export const StudentEditFormSchemas = z.object({
   parent: z.string().nonempty("باید یک والد انتخاب کنید"),
   classValue: z.string().nonempty("باید یک کلاس انتخاب کنید"),
 });
+
+export const announcementFormSchemas = z.object({
+  title: z
+    .string()
+    .min(1, "نمیتواند خالی باشد")
+    .max(20, "نام نمی‌تواند بیشتر از 20 حرف باشد"),
+  description: z.string().min(1, "توضیحات نمی‌تواند خالی باشد"),
+  className: z.string().optional(),
+});
