@@ -172,6 +172,17 @@ export type AnnouncementDataListSchema = z.infer<
   typeof announcementDataListSchema
 >;
 
+export const eventDataListSchema = z.object({
+  id: z.number(),
+  title: z.string(),
+  description: z.string(),
+  startTime: z.date(),
+  endTime: z.date(),
+  className: z.string(),
+});
+
+export type EventDataListSchema = z.infer<typeof eventDataListSchema>;
+
 export const parentDataListSchema = z.object({
   id: z.string(),
   phone: z.string(),
@@ -345,3 +356,27 @@ export const announcementFormSchemas = z.object({
   description: z.string().min(1, "توضیحات نمی‌تواند خالی باشد"),
   className: z.string().optional(),
 });
+
+export const eventFormSchemas = z.object({
+  title: z
+    .string()
+    .min(1, "نمیتواند خالی باشد")
+    .max(20, "نام نمی‌تواند بیشتر از 20 حرف باشد"),
+  description: z.string().min(1, "توضیحات نمی‌تواند خالی باشد"),
+  startTime: z
+    .string({ required_error: "لطفا تاریخ را انتخاب کنید" })
+    .min(1, "لطفا تاریخ را انتخاب کنید"),
+  className: z.string().optional(),
+});
+
+
+export const eventEditFormSchemas = eventFormSchemas.extend({
+  startTime: z.union([
+    z.date({ required_error: "لطفا تاریخ را انتخاب کنید" }),
+    z
+      .string({ required_error: "لطفا تاریخ را انتخاب کنید" })
+      .min(1, "لطفا تاریخ را انتخاب کنید"),
+  ]),
+});
+
+export type EventEditFormSchemas = z.infer<typeof eventEditFormSchemas>;

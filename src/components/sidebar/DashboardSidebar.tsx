@@ -112,8 +112,7 @@ const data = {
         {
           title: "رویداد ها",
           visible: ["admin", "teacher", "student", "parent"],
-          url: "/list/exam",
-          disabled: true,
+          url: "/list/event",
         },
       ],
     },

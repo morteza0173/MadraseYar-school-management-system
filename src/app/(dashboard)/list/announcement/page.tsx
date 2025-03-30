@@ -5,7 +5,7 @@ import { AnnouncementListDataTable } from "@/components/listAnnouncements/Announ
 import useGetAnnouncementsData from "@/hooks/useGetAnnouncementsData";
 import { useUserAuth } from "@/hooks/useUserAuth";
 
-const StudentDataPage = () => {
+const AnnouncementDataPage = () => {
   const { userData } = useUserAuth(["admin", "teacher", "strudent", "parent"]);
   const {
     isAnnouncementsPending,
@@ -31,4 +31,4 @@ const StudentDataPage = () => {
     </div>
   );
 };
-export default StudentDataPage;
+export default AnnouncementDataPage;
