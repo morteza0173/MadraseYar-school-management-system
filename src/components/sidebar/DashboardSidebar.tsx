@@ -125,8 +125,7 @@ const data = {
         {
           title: "امتحانات",
           visible: ["admin", "teacher", "student", "parent"],
-          url: "/list/Assignment",
-          disabled: true,
+          url: "/list/exam",
         },
         {
           title: "تکالیف",

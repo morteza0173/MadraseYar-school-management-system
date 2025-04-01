@@ -10,10 +10,10 @@ export async function getEvents(user: getUserInfoProps) {
 
   let eventFilter = {};
 
-  if (user.role === "ADMIN") {
+  if (user.role === "admin") {
     // ادمین همه رویدادها را می‌بیند
     eventFilter = {};
-  } else if (user.role === "TEACHER") {
+  } else if (user.role === "teacher") {
     // معلم فقط رویدادهای عمومی و مرتبط با کلاس‌های خودش را می‌بیند
     const teacher = await prisma.teacher.findUnique({
       where: { id: user.id },
@@ -36,7 +36,7 @@ export async function getEvents(user: getUserInfoProps) {
         { classId: { in: classIds } }, // رویدادهای مرتبط با کلاس‌های معلم
       ],
     };
-  } else if (user.role === "STUDENT") {
+  } else if (user.role === "student") {
     // دانش‌آموز فقط رویدادهای عمومی و مرتبط با کلاس خودش را می‌بیند
     const student = await prisma.student.findUnique({
       where: { id: user.id },
@@ -51,7 +51,7 @@ export async function getEvents(user: getUserInfoProps) {
         { classId: student.classId }, // رویدادهای مرتبط با کلاس دانش‌آموز
       ],
     };
-  } else if (user.role === "PARENT") {
+  } else if (user.role === "parent") {
     // والدین فقط رویدادهای عمومی و مرتبط با کلاس دانش‌آموزان خود را می‌بینند
     const parent = await prisma.parent.findUnique({
       where: { id: user.id },

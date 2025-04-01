@@ -183,6 +183,19 @@ export const eventDataListSchema = z.object({
 
 export type EventDataListSchema = z.infer<typeof eventDataListSchema>;
 
+export const examDataListSchema = z.object({
+  id: z.number(),
+  title: z.string(),
+  startTime: z.date(),
+  endTime: z.date(),
+  lessonName: z.string(),
+  className: z.string(),
+  lessonId: z.number().optional(),
+  classId: z.number().optional(),
+});
+
+export type ExamDataListSchema = z.infer<typeof examDataListSchema>;
+
 export const parentDataListSchema = z.object({
   id: z.string(),
   phone: z.string(),
@@ -369,7 +382,6 @@ export const eventFormSchemas = z.object({
   className: z.string().optional(),
 });
 
-
 export const eventEditFormSchemas = eventFormSchemas.extend({
   startTime: z.union([
     z.date({ required_error: "لطفا تاریخ را انتخاب کنید" }),
@@ -380,3 +392,22 @@ export const eventEditFormSchemas = eventFormSchemas.extend({
 });
 
 export type EventEditFormSchemas = z.infer<typeof eventEditFormSchemas>;
+
+export const examFormSchemas = z.object({
+  title: z.string().min(1, "نمیتواند خالی باشد"),
+  startTime: z
+    .string({ required_error: "لطفا تاریخ را انتخاب کنید" })
+    .min(1, "لطفا تاریخ را انتخاب کنید"),
+  lessonId: z.string().optional(),
+});
+
+export const examEditFormSchemas = examFormSchemas.extend({
+  startTime: z.union([
+    z.date({ required_error: "لطفا تاریخ را انتخاب کنید" }),
+    z
+      .string({ required_error: "لطفا تاریخ را انتخاب کنید" })
+      .min(1, "لطفا تاریخ را انتخاب کنید"),
+  ]),
+});
+
+export type ExamEditFormSchemas = z.infer<typeof examEditFormSchemas>;

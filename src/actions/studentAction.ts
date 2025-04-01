@@ -82,7 +82,7 @@ export async function getStudentData(userId: string) {
           name: `${s.parent.name} ${s.parent.surname}`,
         },
         class: {
-          id: s.class.id,
+          id: s.classId,
           name: s.class.name,
         },
         grade: s.class.grade.level,
@@ -97,20 +97,25 @@ export async function getStudentData(userId: string) {
   const teacher = await prisma.teacher.findUnique({
     where: { id: userId },
     include: {
-      classes: {
+      lessons: {
         include: {
-          student: {
+          class: {
             include: {
-              class: {
+              grade: true,
+              student: {
                 include: {
-                  grade: true,
-                },
-              },
-              parent: true,
-              results: {
-                include: {
-                  assignment: true,
-                  exam: true,
+                  class: {
+                    include: {
+                      grade: true,
+                    },
+                  },
+                  parent: true,
+                  results: {
+                    include: {
+                      assignment: true,
+                      exam: true,
+                    },
+                  },
                 },
               },
             },
@@ -121,8 +126,7 @@ export async function getStudentData(userId: string) {
   });
 
   if (teacher) {
-    // دسترسی معلم به دانش‌آموزان کلاس‌های خودش
-    const students = teacher.classes.flatMap((cls) => cls.student);
+    const students = teacher.lessons.flatMap((lesson) => lesson.class.student);
 
     return students.map((s) => {
       const upcomingAssignments = s.results.filter(

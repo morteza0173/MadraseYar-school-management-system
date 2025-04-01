@@ -10,23 +10,30 @@ export async function getAnnouncements(user: getUserInfoProps) {
 
   let announcementFilter = {};
 
-  if (user.role === "ADMIN") {
+  if (user.role === "admin") {
     announcementFilter = {};
-  } else if (user.role === "TEACHER") {
+  } else if (user.role === "teacher") {
     const teacher = await prisma.teacher.findUnique({
       where: { id: user.id },
-      select: { classes: { select: { id: true } } },
+      include: {
+        lessons: {
+          include: {
+            class: true,
+          },
+        },
+      },
     });
 
     if (!teacher) return [];
 
+    const classIds = teacher.lessons
+      .filter((lesson) => lesson.class !== null)
+      .map((lesson) => lesson.class.id);
+
     announcementFilter = {
-      OR: [
-        { classId: { in: teacher.classes.map((cls) => cls.id) } },
-        { classId: null },
-      ],
+      OR: [{ classId: { in: classIds } }, { classId: null }],
     };
-  } else if (user.role === "STUDENT") {
+  } else if (user.role === "student") {
     const student = await prisma.student.findUnique({
       where: { id: user.id },
       select: { classId: true },
@@ -37,7 +44,7 @@ export async function getAnnouncements(user: getUserInfoProps) {
     announcementFilter = {
       OR: [{ classId: student.classId }, { classId: null }],
     };
-  } else if (user.role === "PARENT") {
+  } else if (user.role === "parent") {
     const parent = await prisma.parent.findUnique({
       where: { id: user.id },
       select: {
@@ -150,8 +157,6 @@ export async function EditAnnouncementData(formData: FormData) {
   }
 }
 
-
-
 export async function DeleteAnnouncementData(formData: FormData) {
   const id = parseInt(formData.get("id") as string, 10); // شناسه اعلامیه
 
@@ -167,7 +172,7 @@ export async function DeleteAnnouncementData(formData: FormData) {
     return {
       message: "اعلامیه با موفقیت حذف شد",
     };
-  } catch  {
+  } catch {
     return { message: "خطا در حذف اعلامیه" };
   }
 }

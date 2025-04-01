@@ -64,7 +64,6 @@ export default function WeeklyCalendarTeacher() {
 
   useEffect(() => {
     if (lessonsData) {
-      console.log(lessonsData);
 
       const transformedLessons = lessonsData?.map((lesson) => ({
         title: lesson.lessonName,
@@ -82,7 +81,6 @@ export default function WeeklyCalendarTeacher() {
           description: lesson.className,
         },
       }));
-      console.log(transformedLessons);
 
       setTransformedLessons(transformedLessons);
     }

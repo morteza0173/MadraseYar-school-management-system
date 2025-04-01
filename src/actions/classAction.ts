@@ -11,19 +11,29 @@ export async function getClassDetails(user: getUserInfoProps) {
 
   let classFilter = {};
 
-  if (user.role === "ADMIN") {
-  } else if (user.role === "TEACHER") {
+  if (user.role === "admin") {
+  } else if (user.role === "teacher") {
     const teacher = await prisma.teacher.findUnique({
       where: { id: user.id },
-      select: { classes: { select: { id: true } } },
+      include: {
+        lessons: {
+          include: {
+            class: true,
+          },
+        },
+      },
     });
 
     if (!teacher) return [];
 
+    const classIds = teacher.lessons
+      .filter((lesson) => lesson.class !== null)
+      .map((lesson) => lesson.class.id);
+
     classFilter = {
-      id: { in: teacher.classes.map((cls) => cls.id) },
+      id: { in: classIds },
     };
-  } else if (user.role === "PARENT") {
+  } else if (user.role === "parent") {
     const parent = await prisma.parent.findUnique({
       where: { id: user.id },
       select: {
@@ -38,7 +48,7 @@ export async function getClassDetails(user: getUserInfoProps) {
     classFilter = {
       id: { in: parent.students.map((student) => student.classId) },
     };
-  } else if (user.role === "STUDENT") {
+  } else if (user.role === "student") {
     const student = await prisma.student.findUnique({
       where: { id: user.id },
       select: { classId: true },
