@@ -130,8 +130,7 @@ const data = {
         {
           title: "تکالیف",
           visible: ["admin", "teacher", "student", "parent"],
-          url: "/list/exam",
-          disabled: true,
+          url: "/list/assignment",
         },
         {
           title: "نمرات",

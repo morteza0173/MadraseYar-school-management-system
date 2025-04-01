@@ -46,8 +46,7 @@ const AddExamForm = ({ onCancel }: { onCancel: () => void }) => {
   const { lessonsData, isLessonsPending, isLessonsError, lessonsRefetch } =
     useGetLessonsData(userData);
 
-  const { ClassData } =
-    useGetClassDetails(userData);
+  const { ClassData } = useGetClassDetails(userData);
 
   const [openLessonList, setOpenLessonList] = useState(false);
   const [lessonValue, setLessonValue] = useState<number | undefined>(undefined);
@@ -81,7 +80,7 @@ const AddExamForm = ({ onCancel }: { onCancel: () => void }) => {
     const formData = new FormData();
     formData.append("title", data.title);
     formData.append("startTime", data.startTime);
-    formData.append("lessonId", data.lessonId || "");
+    formData.append("lessonId", data.lessonId);
 
     mutate(formData);
   };

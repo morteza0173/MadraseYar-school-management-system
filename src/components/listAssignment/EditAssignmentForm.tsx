@@ -22,7 +22,7 @@ import {
   Loader2Icon,
   TriangleAlert,
 } from "lucide-react";
-import { examEditFormSchemas } from "@/lib/schemas";
+import { assignmentEditFormSchemas } from "@/lib/schemas";
 
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -40,7 +40,7 @@ import useGetClassDetails from "@/hooks/useGetClassDetails";
 import { cn } from "@/lib/utils";
 import { Calendar } from "../ui/calendar";
 import useGetLessonsData from "@/hooks/useGetLessonsData";
-import { EditExamData } from "@/actions/examAction";
+import { EditAssignmentData } from "@/actions/assignmentAction";
 
 type Row<T> = {
   original: T;
@@ -49,8 +49,8 @@ type Row<T> = {
 type examProps = {
   id: number;
   title: string;
-  startTime: Date;
-  endTime: Date;
+  startDate: Date;
+  dueDate: Date;
   className: string;
   lessonName: string;
   lessonId?: number | undefined;
@@ -62,7 +62,7 @@ interface EditStudentFormProps {
   row: Row<examProps>;
 }
 
-const EditExamForm = ({ onCancel, row }: EditStudentFormProps) => {
+const EditAssignmentForm = ({ onCancel, row }: EditStudentFormProps) => {
   const { userData } = useUserAuth(["admin", "teacher", "student", "parent"]);
   const { lessonsData, isLessonsPending, isLessonsError, lessonsRefetch } =
     useGetLessonsData(userData);
@@ -77,32 +77,32 @@ const EditExamForm = ({ onCancel, row }: EditStudentFormProps) => {
   const queryClient = useQueryClient();
 
   const { mutate, isPending } = useMutation({
-    mutationFn: async (data: FormData) => EditExamData(data),
+    mutationFn: async (data: FormData) => EditAssignmentData(data),
     onSuccess: (data) => {
-      toast.success(data.message || "امتحان با موفقیت ویرایش شد");
-      queryClient.invalidateQueries({ queryKey: ["exams"] });
+      toast.success(data.message || "تکلیف با موفقیت ویرایش شد");
+      queryClient.invalidateQueries({ queryKey: ["assignments"] });
 
       onCancel();
     },
     onError: (error) => {
-      toast.error(error.message || "خطا در ویرایش کردن امتحان");
+      toast.error(error.message || "خطا در ویرایش کردن تکلیف");
     },
   });
 
-  const form = useForm<z.infer<typeof examEditFormSchemas>>({
-    resolver: zodResolver(examEditFormSchemas),
+  const form = useForm<z.infer<typeof assignmentEditFormSchemas>>({
+    resolver: zodResolver(assignmentEditFormSchemas),
     defaultValues: {
       title: row.original.title,
-      startTime: row.original.startTime,
+      dueDate: row.original.dueDate,
       lessonId: String(row.original.lessonId),
     },
   });
 
-  const onSubmit = async (data: z.infer<typeof examEditFormSchemas>) => {
+  const onSubmit = async (data: z.infer<typeof assignmentEditFormSchemas>) => {
     const formData = new FormData();
     formData.append("id", row.original.id.toString());
     formData.append("title", data.title);
-    formData.append("startTime", data.startTime.toString());
+    formData.append("dueDate", data.dueDate.toString());
     formData.append("lessonId", data.lessonId.toString());
 
     mutate(formData);
@@ -135,10 +135,10 @@ const EditExamForm = ({ onCancel, row }: EditStudentFormProps) => {
 
           <FormField
             control={form.control}
-            name="startTime"
+            name="dueDate"
             render={({ field }) => (
               <FormItem className="flex-1">
-                <FormLabel>تاریخ رویداد</FormLabel>
+                <FormLabel>تاریخ تحویل تکلیف</FormLabel>
                 <FormControl>
                   <Popover modal={true}>
                     <PopoverTrigger asChild>
@@ -333,4 +333,4 @@ const EditExamForm = ({ onCancel, row }: EditStudentFormProps) => {
     </div>
   );
 };
-export default EditExamForm;
+export default EditAssignmentForm;

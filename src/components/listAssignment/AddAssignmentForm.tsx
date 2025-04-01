@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -22,11 +21,10 @@ import {
   Loader2Icon,
   TriangleAlert,
 } from "lucide-react";
-import { examEditFormSchemas } from "@/lib/schemas";
-
-import { useState } from "react";
+import { assignmentFormSchemas } from "@/lib/schemas";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { useUserAuth } from "@/hooks/useUserAuth";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import {
   Command,
@@ -35,34 +33,14 @@ import {
   CommandItem,
   CommandList,
 } from "../ui/command";
-import { useUserAuth } from "@/hooks/useUserAuth";
-import useGetClassDetails from "@/hooks/useGetClassDetails";
 import { cn } from "@/lib/utils";
+import { useState } from "react";
 import { Calendar } from "../ui/calendar";
 import useGetLessonsData from "@/hooks/useGetLessonsData";
-import { EditExamData } from "@/actions/examAction";
+import useGetClassDetails from "@/hooks/useGetClassDetails";
+import { AddAssignmentData } from "@/actions/assignmentAction";
 
-type Row<T> = {
-  original: T;
-};
-
-type examProps = {
-  id: number;
-  title: string;
-  startTime: Date;
-  endTime: Date;
-  className: string;
-  lessonName: string;
-  lessonId?: number | undefined;
-  classId?: number | undefined;
-};
-
-interface EditStudentFormProps {
-  onCancel: () => void;
-  row: Row<examProps>;
-}
-
-const EditExamForm = ({ onCancel, row }: EditStudentFormProps) => {
+const AddAssignmentForm = ({ onCancel }: { onCancel: () => void }) => {
   const { userData } = useUserAuth(["admin", "teacher", "student", "parent"]);
   const { lessonsData, isLessonsPending, isLessonsError, lessonsRefetch } =
     useGetLessonsData(userData);
@@ -70,40 +48,38 @@ const EditExamForm = ({ onCancel, row }: EditStudentFormProps) => {
   const { ClassData } = useGetClassDetails(userData);
 
   const [openLessonList, setOpenLessonList] = useState(false);
-  const [lessonValue, setLessonValue] = useState<number | undefined>(
-    row.original.lessonId
-  );
+  const [lessonValue, setLessonValue] = useState<number | undefined>(undefined);
 
   const queryClient = useQueryClient();
 
   const { mutate, isPending } = useMutation({
-    mutationFn: async (data: FormData) => EditExamData(data),
+    mutationFn: async (data: FormData) => AddAssignmentData(data),
     onSuccess: (data) => {
-      toast.success(data.message || "امتحان با موفقیت ویرایش شد");
-      queryClient.invalidateQueries({ queryKey: ["exams"] });
-
+      toast.success(data.message || "تکلیف با موفقیت اضافه شد");
+      queryClient.invalidateQueries({ queryKey: ["assignments"] });
       onCancel();
     },
     onError: (error) => {
-      toast.error(error.message || "خطا در ویرایش کردن امتحان");
+      toast.error(error.message || "خطا در اضافه کردن تکلیف");
     },
   });
 
-  const form = useForm<z.infer<typeof examEditFormSchemas>>({
-    resolver: zodResolver(examEditFormSchemas),
+  const form = useForm<z.infer<typeof assignmentFormSchemas>>({
+    resolver: zodResolver(assignmentFormSchemas),
     defaultValues: {
-      title: row.original.title,
-      startTime: row.original.startTime,
-      lessonId: String(row.original.lessonId),
+      title: "",
+      lessonId: "",
+      dueDate: "",
     },
   });
 
-  const onSubmit = async (data: z.infer<typeof examEditFormSchemas>) => {
+  const onSubmit = async (data: z.infer<typeof assignmentFormSchemas>) => {
+    console.log(data);
+
     const formData = new FormData();
-    formData.append("id", row.original.id.toString());
     formData.append("title", data.title);
-    formData.append("startTime", data.startTime.toString());
-    formData.append("lessonId", data.lessonId.toString());
+    formData.append("dueDate", data.dueDate);
+    formData.append("lessonId", data.lessonId);
 
     mutate(formData);
   };
@@ -126,19 +102,18 @@ const EditExamForm = ({ onCancel, row }: EditStudentFormProps) => {
                       {...field}
                     />
                   </FormControl>
-                  <FormDescription>حداکثر 20 حرف</FormDescription>
+                  {/* <FormDescription>  </FormDescription> */}
                   <FormMessage />
                 </FormItem>
               )}
             />
           </div>
-
           <FormField
             control={form.control}
-            name="startTime"
+            name="dueDate"
             render={({ field }) => (
               <FormItem className="flex-1">
-                <FormLabel>تاریخ رویداد</FormLabel>
+                <FormLabel>تاریخ تحویل تکلیف</FormLabel>
                 <FormControl>
                   <Popover modal={true}>
                     <PopoverTrigger asChild>
@@ -333,4 +308,4 @@ const EditExamForm = ({ onCancel, row }: EditStudentFormProps) => {
     </div>
   );
 };
-export default EditExamForm;
+export default AddAssignmentForm;
