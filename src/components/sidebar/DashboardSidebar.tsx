@@ -135,8 +135,7 @@ const data = {
         {
           title: "نمرات",
           visible: ["admin", "teacher", "student", "parent"],
-          url: "/list/exam",
-          disabled: true,
+          url: "/list/result",
         },
       ],
     },

@@ -15,6 +15,7 @@ import { useState } from "react";
 import { useUserAuth } from "@/hooks/useUserAuth";
 import EditAssignmentForm from "./EditAssignmentForm";
 import DeleteAssignmentForm from "./DeleteExamForm";
+import { useRouter } from "next/navigation";
 
 type AnnouncementData = {
   id: number;
@@ -34,6 +35,7 @@ interface DataTableRowActionsProps<TData extends AnnouncementData> {
 export function ExamDataTableRowActions<TData extends AnnouncementData>({
   row,
 }: DataTableRowActionsProps<TData>) {
+  const router = useRouter();
   const [isOpenDelete, setIsOpenDelete] = useState(false);
   const [isOpenEdit, setIsOpenEdit] = useState(false);
   const { userData } = useUserAuth(["admin", "teacher", "student", "parent"]);
@@ -75,6 +77,16 @@ export function ExamDataTableRowActions<TData extends AnnouncementData>({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-[160px]">
+          <DropdownMenuItem
+            onClick={() => {
+              sessionStorage.setItem("previousPath", window.location.pathname);
+              router.push(`/list/result/تکلیف/${row.original.id}`);
+            }}
+            className="cursor-pointer"
+          >
+            جزئیات
+          </DropdownMenuItem>
+
           {(userData?.role === "admin" || userData?.role === "teacher") && (
             <>
               <DropdownMenuItem onClick={openEdit}>ویرایش</DropdownMenuItem>
