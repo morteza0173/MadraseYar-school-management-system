@@ -1,3 +1,4 @@
+"use client";
 import { getUserInfoProps } from "@/actions/dashboardAction";
 import { getAnnouncements } from "@/actions/announcementAction";
 import { useQuery } from "@tanstack/react-query";

@@ -1,18 +1,23 @@
 "use client";
 
 import { Calendar } from "@/components/ui/calendar";
-import { useState } from "react";
+import { Dispatch, SetStateAction } from "react";
 
+interface DatePickerProps {
+  daypickerValue: Date | undefined;
+  setDaypickerValue: Dispatch<SetStateAction<Date | undefined>>;
+}
 
-export const DatePicker = ()=>{
-  const [date, setDate] = useState<Date | undefined>(new Date());
-
+export const DatePicker: React.FC<DatePickerProps> = ({
+  daypickerValue,
+  setDaypickerValue,
+}) => {
   return (
     <Calendar
       mode="single"
-      selected={date}
-      onSelect={setDate}
+      selected={daypickerValue}
+      onSelect={setDaypickerValue}
       className="rounded-md border"
     />
   );
-}
+};

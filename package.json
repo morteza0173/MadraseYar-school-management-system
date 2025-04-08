@@ -38,6 +38,7 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.0.0",
     "date-fns": "^3.6.0",
+    "jalaali-js": "^1.2.8",
     "lucide-react": "^0.471.0",
     "motion": "^12.5.0",
     "next": "14.2.23",
@@ -55,6 +56,7 @@
   },
   "devDependencies": {
     "@tanstack/eslint-plugin-query": "^5.66.1",
+    "@types/jalaali-js": "^1.2.0",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

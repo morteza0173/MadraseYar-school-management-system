@@ -1,3 +1,4 @@
+"use client";
 import { getUserInfo } from "@/actions/dashboardAction";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";

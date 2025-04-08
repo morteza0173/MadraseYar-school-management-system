@@ -1,10 +1,22 @@
+"use client";
 import InfoCard from "@/components/InfoCard";
 import { EventCard } from "@/components/EventCard";
 import StudentCard from "@/components/StudentCard";
 import WeeklyCalendar from "@/components/WeeklyCalendar";
 import { DatePicker } from "@/components/ClanderDatePicker";
+import { Announcements } from "@/components/Announcements";
+import { useUserAuth } from "@/hooks/useUserAuth";
+import useGetAnnouncementsData from "@/hooks/useGetAnnouncementsData";
+import { useState } from "react";
 
 const StudentPage = () => {
+  const { userData } = useUserAuth(["student"]);
+  const { isAnnouncementsPending, announcementsData } =
+    useGetAnnouncementsData(userData);
+  const [daypickerValue, setDaypickerValue] = useState<Date | undefined>(
+    new Date()
+  );
+
   return (
     <div className="p-4 flex gap-4 flex-col lg:flex-row  justify-center">
       {/* RIGHT */}
@@ -27,7 +39,6 @@ const StudentPage = () => {
                 <InfoCard name="اخرین نمره" info={17} icon="lastScore" />
               </div>
               <div className="w-full h-full">
-                {" "}
                 <InfoCard name="میانگین نمرات" info={16.32} icon="Score" />
               </div>
             </div>
@@ -41,14 +52,20 @@ const StudentPage = () => {
         <div className="w-full flex flex-col md:flex-row lg:flex-col gap-4">
           {/* datepicker */}
           <div className="md:h-[380px] lg:h-auto  mt-10 lg:mt-0">
-            <DatePicker />
+            <DatePicker
+              setDaypickerValue={setDaypickerValue}
+              daypickerValue={daypickerValue}
+            />
           </div>
           <div className="w-full h-auto md:mt-10 lg:mt-0">
-            <EventCard />
+            <EventCard daypickerValue={daypickerValue} />
           </div>
         </div>
         <div className="mt-4">
-          {/* <Announcements /> */}
+          <Announcements
+            announcementsData={announcementsData}
+            isAnnouncementsPending={isAnnouncementsPending}
+          />
         </div>
       </div>
     </div>

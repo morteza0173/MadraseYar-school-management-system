@@ -7,8 +7,20 @@ import { DayPicker } from "react-day-picker/persian";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 import "react-day-picker/style.css";
+import { useUserAuth } from "@/hooks/useUserAuth";
+import useGetEventData from "@/hooks/useGetEventData";
+import useGetExamData from "@/hooks/useGetExamData";
+import useGetAssignmentData from "@/hooks/useGetAssignmentData";
+import jalaali from "jalaali-js";
 
 export type CalendarProps = React.ComponentProps<typeof DayPicker>;
+type CombinedDataItem = {
+  id: number;
+  title: string;
+  startTime?: Date;
+  dueDate?: Date;
+  type: "event" | "exam" | "assignment";
+};
 
 const customWeekdays = [
   "یکشنبه",
@@ -25,48 +37,127 @@ function Calendar({
   showOutsideDays = true,
   ...props
 }: CalendarProps) {
+  const { userData } = useUserAuth(["admin", "teacher", "student", "parent"]);
+  const { eventsData } = useGetEventData(userData);
+  const { examsData } = useGetExamData(userData);
+  const { assignmentsData } = useGetAssignmentData(userData);
+
+  const combinedData = React.useMemo(() => {
+    const allData: CombinedDataItem[] = [
+      ...(eventsData?.map((event) => ({
+        id: event.id,
+        title: event.title,
+        startTime: event.startTime,
+        type: "event" as const,
+      })) || []),
+      ...(examsData?.map((exam) => ({
+        id: exam.id,
+        title: exam.title,
+        startTime: exam.startTime,
+        type: "exam" as const,
+      })) || []),
+      ...(assignmentsData?.map((assignment) => ({
+        id: assignment.id,
+        title: assignment.title,
+        dueDate: assignment.dueDate,
+        type: "assignment" as const,
+      })) || []),
+    ];
+
+    const groupedByDate = allData.reduce(
+      (acc: Record<string, CombinedDataItem[]>, item) => {
+        const dateKey = new Date(
+          item.startTime || item.dueDate!
+        ).toDateString();
+        if (!acc[dateKey]) {
+          acc[dateKey] = [];
+        }
+        acc[dateKey].push(item);
+        return acc;
+      },
+      {}
+    );
+
+    return groupedByDate;
+  }, [eventsData, examsData, assignmentsData]);
+
   const disabledDays = (date: Date) => {
-    const day = date.getDay(); // 0 = Sunday, 1 = Monday, ..., 5 = Friday, 6 = Saturday
-    return day === 4 || day === 5; // پنج‌شنبه (5) و جمعه (6)
+    const day = date.getDay();
+    return day === 4 || day === 5;
   };
-  const modifiers = {
-    friday: (date: Date) => date.getDay() === 4, // پنج‌شنبه
-    saturday: (date: Date) => date.getDay() === 5, // جمعه
+  const modifiers = React.useMemo(() => {
+    const daysWithEvents = Object.keys(combinedData).map(
+      (date) => new Date(date)
+    );
+
+    return {
+      friday: (date: Date) => date.getDay() === 4,
+      saturday: (date: Date) => date.getDay() === 5,
+      hasEvents: (date: Date) =>
+        daysWithEvents.some((d) => d.toDateString() === date.toDateString()),
+    };
+  }, [combinedData]);
+
+  const renderDayContent = (day: Date) => {
+    const dateKey = day.toDateString();
+    const events = combinedData[dateKey] || [];
+
+    const jalaaliDate = jalaali.toJalaali(day);
+    const dayInJalaali = jalaaliDate.jd;
+
+    if (events.length === 0) {
+      return <span>{dayInJalaali}</span>;
+    }
+
+    const maxDots = 3;
+    const eventDots = events.slice(0, maxDots).map((event, index) => {
+      const color =
+        event.type === "exam"
+          ? "bg-blue-500"
+          : event.type === "assignment"
+          ? "bg-green-500"
+          : "bg-red-500";
+      return (
+        <div
+          key={index}
+          className={`absolute w-1 h-1 rounded-full ${color}`}
+          style={{ top: `${index * 6}px`, left: "0" }}
+        ></div>
+      );
+    });
+
+    return (
+      <div className="relative">
+        <span>{dayInJalaali}</span>
+        <div className="absolute -top-1 -right-2 flex flex-col items-center">
+          {eventDots}
+          {events.length > maxDots && (
+            <span className="absolute text-xs text-gray-500 top-4">
+              +{events.length - maxDots}
+            </span>
+          )}
+        </div>
+      </div>
+    );
   };
-  // const events = [new Date(2025, 0, 25), new Date(2025, 0, 30)];
-  // const announcements = [new Date(2025, 0, 25), new Date(2025, 0, 31)]; // اعلامیه‌ها
 
   return (
     <DayPicker
       dir="rtl"
       today={new Date()}
       formatters={{
+        // @ts-expect-error formatDay need string for output but not working
+        formatDay: renderDayContent as (date: Date) => React.JSX.Element,
         formatWeekdayName(date) {
           return customWeekdays[date.getDay()];
         },
       }}
-      // modifiers={{
-      //   eventDays: events,
-      //   announcementDays: announcements,
-      //   both: events.filter((event) =>
-      //     announcements.some(
-      //       (announcement) => event.getTime() === announcement.getTime()
-      //     )
-      //   ),
-      // }}
-      // modifiersStyles={{
-      //   eventDays: { border: "2px solid red" },
-      //   announcementDays: { border: "2px solid blue" }, // استایل اعلامیه‌ها
-      //   both: { position: "relative" }, // اگر هم اونت و هم اعلامیه باشد
-      // }}
-      // modifiersClassNames={{
-      //   both: "half-border",
-      // }}
       disabled={disabledDays}
       modifiers={modifiers}
       modifiersClassNames={{
-        friday: "text-red-500", // تغییر رنگ پنج‌شنبه
-        saturday: "text-red-500", // تغییر رنگ جمعه
+        friday: "text-red-500",
+        saturday: "text-red-500",
+        hasEvents: "relative",
       }}
       showOutsideDays={showOutsideDays}
       className={cn("p-2 font-IranSans w-full", className)}
@@ -76,10 +167,10 @@ function Calendar({
         outside:
           "day-outside text-muted-foreground opacity-50 aria-selected:bg-accent/50 aria-selected:text-muted-foreground aria-selected:opacity-30",
         weekdays: "text-muted-foreground",
-        weekday: "px-1 text-center text-xs font-semibold",
+        weekday: "px-1 text-center text-[0.6rem] font-semibold",
         day_button: cn(
           buttonVariants({ variant: "ghost" }),
-          "h-9 w-full p-0 hover:bg-orange-100"
+          "h-9 w-full p-0 hover:bg-orange-100 aspect-square"
         ),
         day: "",
         selected:

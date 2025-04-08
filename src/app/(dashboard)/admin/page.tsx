@@ -14,6 +14,7 @@ import useGetStudents from "@/hooks/useGetStudents";
 import useGetTeacher from "@/hooks/useGetTeacher";
 import { useUserAuth } from "@/hooks/useUserAuth";
 import { BookOpenText, CalendarDays, GraduationCap, User } from "lucide-react";
+import { useState } from "react";
 
 const AdminPage = () => {
   const { userData } = useUserAuth(["admin"]);
@@ -22,23 +23,22 @@ const AdminPage = () => {
   const { teacherData, isTeacherPending } = useGetTeacher();
   const { adminData, isAdminPending } = useGetAdmins();
   const { ClassData, isClassPending } = useGetClassDetails(userData);
-   const {
-     isAnnouncementsPending,
-     announcementsData,
-   } = useGetAnnouncementsData(userData);
+  const { isAnnouncementsPending, announcementsData } =
+    useGetAnnouncementsData(userData);
 
+  const [daypickerValue, setDaypickerValue] = useState<Date | undefined>(
+    new Date()
+  );
 
- const maleCount =
-   studentData?.filter((student) => student.sex === "MALE").length || 0;
- const femaleCount =
-   studentData?.filter((student) => student.sex === "FEMALE").length || 0;
-
-
+  const maleCount =
+    studentData?.filter((student) => student.sex === "MALE").length || 0;
+  const femaleCount =
+    studentData?.filter((student) => student.sex === "FEMALE").length || 0;
 
   return (
-    <div className="p-4 flex gap-4 flex-col lg:flex-row  justify-center">
+    <div className="p-4 flex gap-4 flex-col xl:flex-row  justify-center">
       {/* RIGHT */}
-      <div className="w-full lg:w-2/3 max-w-[1060px]">
+      <div className="w-full xl:w-2/3 max-w-[1060px] gap-2">
         {/* USERCARD */}
         <div className="flex gap-4 justify-between flex-wrap">
           <UserCard
@@ -83,19 +83,20 @@ const AdminPage = () => {
         </div>
 
         {/* BOTTOM CHARTS */}
-        <div className="-my-8 xl:my-4">
+        <div className="-mt-8 xl:mt-4">
           <LineChartLable />
         </div>
       </div>
       {/* LEFT */}
-      <div className="w-full lg:w-1/3 h-full xl:max-w-[530px]">
+      <div className="w-full xl:w-1/3 h-full xl:max-w-[530px]">
         <div className="w-full flex flex-col md:flex-row lg:flex-col gap-4">
           {/* datepicker */}
-          <div className="md:h-[380px] lg:h-auto  mt-10 lg:mt-0">
-            <DatePicker />
-          </div>
-          <div className="w-full h-auto md:mt-10 lg:mt-0">
-            <EventCard />
+          <DatePicker
+            setDaypickerValue={setDaypickerValue}
+            daypickerValue={daypickerValue}
+          />
+          <div className="w-full h-auto">
+            <EventCard daypickerValue={daypickerValue} />
           </div>
         </div>
         <div className="mt-4">

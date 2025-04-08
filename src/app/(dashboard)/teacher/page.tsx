@@ -9,11 +9,15 @@ import { useEffect, useState } from "react";
 import { FormattedTeacher } from "@/actions/teacherAction";
 import useGetClassDetails from "@/hooks/useGetClassDetails";
 import WeeklyCalendarTeacher from "@/components/WeeklyCalendarTeacher";
+import { Announcements } from "@/components/Announcements";
+import useGetAnnouncementsData from "@/hooks/useGetAnnouncementsData";
 
 const TeacherPage = () => {
   const { userData } = useUserAuth(["teacher"]);
   const { isTeacherDataError, teacherData } = useGetTeacherData(userData);
   const { ClassData, isClassError } = useGetClassDetails(userData);
+  const { isAnnouncementsPending, announcementsData } =
+    useGetAnnouncementsData(userData);
 
   const [teacherInfo, setTeacherInfo] = useState<
     FormattedTeacher | undefined
@@ -21,6 +25,9 @@ const TeacherPage = () => {
   const [totalStudents, setTotalStudents] = useState<number | null>(null);
 
   const [classCount, setClassCount] = useState<number | null>(null);
+  const [daypickerValue, setDaypickerValue] = useState<Date | undefined>(
+    new Date()
+  );
 
   useEffect(() => {
     const teacherInfoData = teacherData?.find(
@@ -55,9 +62,9 @@ const TeacherPage = () => {
   }, [teacherData, userData, ClassData, classCount, teacherInfo]);
 
   return (
-    <div className="p-4 flex gap-4 flex-col lg:flex-row  justify-center">
+    <div className="p-4 flex gap-4 flex-col xl:flex-row  justify-center">
       {/* RIGHT */}
-      <div className="w-full lg:w-2/3 max-w-[1060px] flex flex-col gap-4">
+      <div className="w-full xl:w-2/3 max-w-[1060px] flex flex-col gap-4">
         <div className="w-full flex flex-col xl:flex-row gap-2">
           <div className="w-full xl:w-1/2">
             <TeacherCard control="teacher" />
@@ -95,16 +102,22 @@ const TeacherPage = () => {
         <WeeklyCalendarTeacher />
       </div>
       {/* LEFT */}
-      <div className="w-full lg:w-1/3 h-full xl:max-w-[530px] ">
+      <div className="w-full xl:w-1/3 h-full xl:max-w-[530px] ">
         <div className="w-full flex flex-col md:flex-row lg:flex-col gap-4">
           {/* datepicker */}
-          <DatePicker />
+          <DatePicker
+            setDaypickerValue={setDaypickerValue}
+            daypickerValue={daypickerValue}
+          />
           <div className="w-full h-auto ">
-            <EventCard />
+            <EventCard daypickerValue={daypickerValue} />
           </div>
         </div>
         <div className="mt-4">
-          {/* <Announcements /> */}
+          <Announcements
+            announcementsData={announcementsData}
+            isAnnouncementsPending={isAnnouncementsPending}
+          />
         </div>
       </div>
     </div>
