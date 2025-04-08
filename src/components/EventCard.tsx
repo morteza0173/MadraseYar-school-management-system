@@ -7,6 +7,8 @@ import useGetAssignmentData from "@/hooks/useGetAssignmentData";
 import { Loader2 } from "lucide-react";
 import { useMemo } from "react";
 import { Badge } from "./ui/badge";
+import { Button } from "./ui/button";
+import { useRouter } from "next/navigation";
 
 type CombinedDataItem = {
   id: number;
@@ -139,6 +141,8 @@ export const EventCard = ({
 };
 
 const EventList = ({ item }: { item: CombinedDataItem }) => {
+  const router = useRouter();
+
   return (
     <>
       {item.type === "event" && (
@@ -175,6 +179,19 @@ const EventList = ({ item }: { item: CombinedDataItem }) => {
 
             <div className="flex items-center justify-between w-auto">
               <p className="text-xs">{item.lessonName}</p>
+              <Button
+                className="bg-blue-300 hover:bg-blue-200 h-6"
+                size="sm"
+                onClick={() => {
+                  sessionStorage.setItem(
+                    "previousPath",
+                    window.location.pathname
+                  );
+                  router.push(`/list/result/امتحان/${item.id}`);
+                }}
+              >
+                جزئیات امتحان
+              </Button>
             </div>
 
             <p className="text-xs text-gray-600">{item.title}</p>
@@ -195,6 +212,19 @@ const EventList = ({ item }: { item: CombinedDataItem }) => {
 
             <div className="flex items-center justify-between w-auto">
               <p className="text-xs">{item.lessonName}</p>
+              <Button
+                className="bg-green-400 hover:bg-green-300 h-6"
+                size="sm"
+                onClick={() => {
+                  sessionStorage.setItem(
+                    "previousPath",
+                    window.location.pathname
+                  );
+                  router.push(`/list/result/تکلیف/${item.id}`);
+                }}
+              >
+                جزئیات تکلیف
+              </Button>
             </div>
 
             <p className="text-xs text-gray-600">{item.title}</p>
