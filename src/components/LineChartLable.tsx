@@ -19,18 +19,10 @@ import {
 } from "@/components/ui/chart";
 import { Button } from "./ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
-const chartData = [
-  { date: "1403-10-22", result: 16.3 },
-  { date: "1403-10-23", result: 17.2 },
-  { date: "1403-10-24", result: 15.5 },
-  { date: "1403-10-25", result: 15.7 },
-  { date: "1403-10-26", result: 15.6 },
-  { date: "1403-10-27", result: 14.8 },
-  { date: "1403-10-28", result: 15.6 },
-  { date: "1403-10-29", result: 16.7 },
-  { date: "1403-10-30", result: 17.2 },
-  { date: "1403-11-01", result: 16.5 },
-];
+import { useUserAuth } from "@/hooks/useUserAuth";
+import useGetResultData from "@/hooks/useGetResultData";
+import { useMemo } from "react";
+import { toJalaali } from "jalaali-js";
 
 const chartConfig = {
   result: {
@@ -44,6 +36,100 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export function LineChartLable() {
+  const { userData } = useUserAuth(["admin", "teacher", "student", "parent"]);
+  const { resultsData, isResultsPending } = useGetResultData(userData);
+
+  const { chartData, yDomain } = useMemo(() => {
+    if (!resultsData || isResultsPending)
+      return { chartData: [], yDomain: [0, 20] };
+
+    const sortedResults = [...resultsData].sort(
+      (a, b) =>
+        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+    );
+
+    if (sortedResults.length === 0) {
+      return { chartData: [], yDomain: [0, 0] };
+    }
+
+    const today = new Date();
+    const tenDaysAgo = new Date();
+    tenDaysAgo.setDate(today.getDate() - 10);
+
+    const firstValidDate = new Date(sortedResults[0].createdAt);
+    const startDate = firstValidDate > tenDaysAgo ? firstValidDate : tenDaysAgo;
+
+    const dates: string[] = [];
+    for (let d = new Date(startDate); d <= today; d.setDate(d.getDate() + 1)) {
+      const jalaaliDate = toJalaali(
+        d.getFullYear(),
+        d.getMonth() + 1,
+        d.getDate()
+      );
+      dates.push(`${jalaaliDate.jy}-${jalaaliDate.jm}-${jalaaliDate.jd}`);
+    }
+
+    const filteredResults = sortedResults.filter((result) => {
+      const resultDate = new Date(result.createdAt);
+      return resultDate >= startDate && resultDate <= today;
+    });
+
+    const groupedData = filteredResults.reduce((acc, result) => {
+      const date = new Date(result.createdAt);
+      const jalaaliDate = toJalaali(
+        date.getFullYear(),
+        date.getMonth() + 1,
+        date.getDate()
+      );
+      const formattedDate = `${jalaaliDate.jy}-${jalaaliDate.jm}-${jalaaliDate.jd}`;
+      if (!acc[formattedDate]) acc[formattedDate] = [];
+      acc[formattedDate].push(result.score);
+      return acc;
+    }, {} as Record<string, number[]>);
+
+    const computedChartData: { date: string; result: number }[] = [];
+    let cumulativeScore = 0;
+    let totalScores = 0;
+
+    for (let i = 0; i < dates.length; i++) {
+      const date = dates[i];
+
+      if (groupedData[date]) {
+        const scores = groupedData[date];
+        scores.forEach((score) => {
+          cumulativeScore += score;
+          totalScores++;
+        });
+        const average = (cumulativeScore / totalScores).toFixed(2);
+        computedChartData.push({ date, result: Number(average) });
+      } else {
+        const previousResult = (() => {
+          for (let j = i - 1; j >= 0; j--) {
+            if (computedChartData[j]?.result !== undefined) {
+              return computedChartData[j].result;
+            }
+          }
+          return undefined;
+        })();
+
+        if (previousResult !== undefined) {
+          computedChartData.push({ date, result: previousResult });
+        }
+      }
+    }
+
+    if (computedChartData.length === 0) {
+      return { chartData: [], yDomain: [0, 0] };
+    }
+
+    const allScores = computedChartData.map((data) => data.result);
+    const minScore = Math.min(...allScores);
+    const maxScore = Math.max(...allScores);
+    const yDomain = [minScore - 0.5, maxScore + 0.5];
+
+    return { chartData: computedChartData, yDomain };
+  }, [resultsData, isResultsPending]);
+
   const isMobile = useIsMobile();
   const lineStroke = isMobile ? 0.5 : 2;
   const fontSize = isMobile ? 10 : 12;
@@ -90,7 +176,7 @@ export function LineChartLable() {
               tickLine={false}
               axisLine={false}
               tickMargin={50}
-              domain={[14, 18]}
+              domain={yDomain}
               tick={{ fontSize: 10, fill: "#555" }}
               tickFormatter={(value) => value.toFixed(1)}
             />
@@ -100,7 +186,7 @@ export function LineChartLable() {
             />
             <Line
               dataKey="result"
-              type="natural"
+              type="bump"
               stroke="var(--color-result)"
               strokeWidth={lineStroke}
               dot={{
