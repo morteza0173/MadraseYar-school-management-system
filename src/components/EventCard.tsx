@@ -77,8 +77,6 @@ export const EventCard = ({
     return groupedByDate;
   }, [eventsData, examsData, assignmentsData]);
 
-  console.log(combinedData);
-
   return (
     <Card>
       <CardContent className="px-0">
@@ -110,23 +108,41 @@ export const EventCard = ({
           </div>
         ) : daypickerValue ? (
           <div className="w-full h-[300px] overflow-y-scroll custom-scrollbar mt-4">
-            {Object.entries(combinedData).map(([date, items]) => {
-              const isSelectedDate =
-                new Date(date).toDateString() ===
-                daypickerValue?.toDateString();
+            {daypickerValue ? (
+              Object.keys(combinedData).includes(
+                daypickerValue.toDateString()
+              ) ? (
+                Object.entries(combinedData).map(([date, items]) => {
+                  const isSelectedDate =
+                    new Date(date).toDateString() ===
+                    daypickerValue.toDateString();
 
-              if (isSelectedDate) {
-                return (
-                  <div key={date}>
-                    {items.map((item) => (
-                      <EventList key={item.id} item={item} />
-                    ))}
-                  </div>
-                );
-              }
+                  if (isSelectedDate) {
+                    return (
+                      <div key={date}>
+                        {items.map((item) => (
+                          <EventList key={item.id} item={item} />
+                        ))}
+                      </div>
+                    );
+                  }
 
-              return null;
-            })}
+                  return null;
+                })
+              ) : (
+                <div className="flex items-center justify-center h-[300px]">
+                  <p className="text-xs text-gray-400">
+                    در این تاریخ رویدادی وجود ندارد
+                  </p>
+                </div>
+              )
+            ) : (
+              <div className="flex items-center justify-center h-[300px]">
+                <p className="text-xs text-gray-400">
+                  یک تاریخ برای نمایش رویداد ها انتخاب کنید
+                </p>
+              </div>
+            )}
           </div>
         ) : (
           <div className="flex items-center justify-center h-[300px]">

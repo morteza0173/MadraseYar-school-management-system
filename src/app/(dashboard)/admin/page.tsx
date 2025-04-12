@@ -1,10 +1,12 @@
 "use client";
 
 import { Announcements } from "@/components/Announcements";
+import { AvaregeScoreClassChart } from "@/components/AvaregeScoreClassChart";
 import { Barchart } from "@/components/BarChart";
 import { DatePicker } from "@/components/ClanderDatePicker";
 import { EventCard } from "@/components/EventCard";
 import { LineChartLable } from "@/components/LineChartLable";
+import { OverallClassPerformanceChart } from "@/components/OverallClassPerformanceChart";
 import { RadialChart } from "@/components/RadialChart";
 import UserCard from "@/components/UserCard";
 import useGetAdmins from "@/hooks/useGetAdmins";
@@ -83,7 +85,12 @@ const AdminPage = () => {
         </div>
 
         {/* BOTTOM CHARTS */}
-        <div className="-mt-8 xl:mt-4">
+
+        <div className="flex flex-col gap-4 -mt-8 xl:mt-4">
+          <OverallClassPerformanceChart />
+          <AvaregeScoreClassChart />
+        </div>
+        <div className="mt-4">
           <LineChartLable />
         </div>
       </div>

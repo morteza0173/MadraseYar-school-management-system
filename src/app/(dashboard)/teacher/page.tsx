@@ -1,7 +1,6 @@
 "use client";
 import InfoCard from "@/components/InfoCard";
 import { EventCard } from "@/components/EventCard";
-import TeacherCard from "@/components/TeacherCard";
 import { DatePicker } from "@/components/ClanderDatePicker";
 import { useUserAuth } from "@/hooks/useUserAuth";
 import useGetTeacherData from "@/hooks/useGetTeacherData";
@@ -11,6 +10,8 @@ import useGetClassDetails from "@/hooks/useGetClassDetails";
 import WeeklyCalendarTeacher from "@/components/WeeklyCalendarTeacher";
 import { Announcements } from "@/components/Announcements";
 import useGetAnnouncementsData from "@/hooks/useGetAnnouncementsData";
+import { OverallClassPerformanceChart } from "@/components/OverallClassPerformanceChart";
+import { AvaregeScoreClassChart } from "@/components/AvaregeScoreClassChart";
 
 const TeacherPage = () => {
   const { userData } = useUserAuth(["teacher"]);
@@ -66,10 +67,10 @@ const TeacherPage = () => {
       {/* RIGHT */}
       <div className="w-full xl:w-2/3 max-w-[1060px] flex flex-col gap-4">
         <div className="w-full flex flex-col xl:flex-row gap-2">
-          <div className="w-full xl:w-1/2">
+          {/* <div className="w-full xl:w-1/2">
             <TeacherCard control="teacher" />
-          </div>
-          <div className="w-full flex flex-col md:flex-row lg:flex-col gap-1 xl:w-1/2">
+          </div> */}
+          <div className="w-full flex flex-col md:flex-row lg:flex-row gap-1 ">
             <div className="flex gap-1 w-full h-full ">
               <div className="w-full h-full">
                 <InfoCard
@@ -97,6 +98,11 @@ const TeacherPage = () => {
               </div>
             </div>
           </div>
+        </div>
+
+        <div className="flex flex-col gap-4">
+          <OverallClassPerformanceChart />
+          <AvaregeScoreClassChart />
         </div>
 
         <WeeklyCalendarTeacher />
