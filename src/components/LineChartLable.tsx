@@ -125,7 +125,7 @@ export function LineChartLable() {
     const allScores = computedChartData.map((data) => data.result);
     const minScore = Math.min(...allScores);
     const maxScore = Math.max(...allScores);
-    const yDomain = [minScore - 0.5, maxScore + 0.5];
+    const yDomain = [Math.floor(minScore) , Math.ceil(maxScore) ];
 
     return { chartData: computedChartData, yDomain };
   }, [resultsData, isResultsPending]);

@@ -94,14 +94,14 @@ export function OverallClassPerformanceChart() {
   const chartData = [
     { browser: "top", visitors: scoreStats.top, fill: "var(--color-top)" },
     {
-      browser: "medium",
-      visitors: scoreStats.medium,
-      fill: "var(--color-medium)",
-    },
-    {
       browser: "good",
       visitors: scoreStats.good,
       fill: "var(--color-good)",
+    },
+    {
+      browser: "medium",
+      visitors: scoreStats.medium,
+      fill: "var(--color-medium)",
     },
     { browser: "low", visitors: scoreStats.low, fill: "var(--color-low)" },
   ];
@@ -111,19 +111,19 @@ export function OverallClassPerformanceChart() {
       label: "Visitors",
     },
     top: {
-      label: "سطح پیشرفته",
+      label: "نمره 18 تا 20",
       color: "#a855f7",
     },
-    medium: {
-      label: "سطح متوسط",
-      color: "#16a34a",
-    },
     good: {
-      label: "سطح ماهر",
+      label: "نمره 16 تا 17.99",
       color: "#60a5fa",
     },
+    medium: {
+      label: "نمره 12 تا 15.99",
+      color: "#16a34a",
+    },
     low: {
-      label: "پایین تر از انتظار",
+      label: "نمره 0 تا 11.99",
       color: "#f87171",
     },
   } satisfies ChartConfig;
@@ -131,14 +131,14 @@ export function OverallClassPerformanceChart() {
   return (
     <Card className="flex flex-col">
       <div className="flex justify-between items-center p-2">
-        <h2 className="font-bold">عملکرد کلی کلاس</h2>
+        <h2 className="font-bold text-sm md:text-base">عملکرد کلی کلاس</h2>
         <Popover modal open={openClassList} onOpenChange={setOpenClassList}>
           <PopoverTrigger asChild>
             <Button
               variant="outline"
               role="combobox"
               aria-expanded={openClassList}
-              className="w-[250px] justify-between "
+              className="md:w-[250px] justify-between "
             >
               {classValue
                 ? (() => {
@@ -229,33 +229,29 @@ export function OverallClassPerformanceChart() {
               <div className="flex gap-4 justify-around">
                 <div className="flex flex-col gap-4 items-center">
                   <div className="felx flex-col">
-                    <Badge className="bg-purple-500">
-                      سطح پیشرفته (18 تا 20)
-                    </Badge>
+                    <Badge className="bg-purple-500">نمره 18 تا 20</Badge>
                     <p className="text-center text-xs font-bold mt-2">
-                      {scoreStats.top}
+                      {scoreStats.top} نفر
                     </p>
                   </div>
                   <div className="felx flex-col">
-                    <Badge className="bg-green-600">سطح متوسط (12 تا 16)</Badge>
+                    <Badge className="bg-green-600">نمره 12 تا 16</Badge>
                     <p className="text-center text-xs font-bold mt-2">
-                      {scoreStats.medium}
+                      {scoreStats.medium} نفر
                     </p>
                   </div>
                 </div>
                 <div className="flex flex-col gap-4 items-center">
                   <div className="felx flex-col">
-                    <Badge className="bg-blue-400">سطح ماهر (16 تا 18)</Badge>
+                    <Badge className="bg-blue-400">نمره 16 تا 18</Badge>
                     <p className="text-center text-xs font-bold mt-2">
-                      {scoreStats.good}
+                      {scoreStats.good} نفر
                     </p>
                   </div>
                   <div className="felx flex-col">
-                    <Badge className="bg-red-400">
-                      پایین تر از انتظار (0 تا 12)
-                    </Badge>
+                    <Badge className="bg-red-400">نمره 0 تا 12</Badge>
                     <p className="text-center text-xs font-bold mt-2">
-                      {scoreStats.low}
+                      {scoreStats.low} نفر
                     </p>
                   </div>
                 </div>
@@ -265,7 +261,7 @@ export function OverallClassPerformanceChart() {
                 {top5Students.length === 0 && (
                   <p className="text-sm">دانش آموزی وجود ندارد</p>
                 )}
-                <div className="flex flex-wrap gap-4 p-1">
+                <div className="flex flex-wrap justify-center gap-4 p-1">
                   {top5Students.map((student, index) => (
                     <div
                       key={student.id}
