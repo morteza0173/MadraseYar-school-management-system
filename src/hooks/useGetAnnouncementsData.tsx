@@ -1,27 +1,25 @@
-"use client";
 import { getUserInfoProps } from "@/actions/dashboardAction";
-import { getAnnouncements } from "@/actions/announcementAction";
+import { AnnouncementsProps } from "@/db/queries/getAnnouncements";
 import { useQuery } from "@tanstack/react-query";
 
-const useGetAnnouncementsData = (userData: getUserInfoProps | undefined) => {
-  const userId = userData?.id;
-  const {
-    isPending: isAnnouncementsPending,
-    isError: isAnnouncementsError,
-    data: announcementsData,
-    refetch: announcementsRefetch,
-  } = useQuery({
-    queryKey: ["announcements", userId],
-    queryFn: async () => getAnnouncements(userData!),
-    enabled: !!userId,
+export function useGetAnnouncementsData(user: getUserInfoProps | undefined) {
+  return useQuery<AnnouncementsProps[]>({
+    queryKey: ["announcements", user?.id],
+    queryFn: async () => {
+      const res = await fetch("/api/announcement", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(user),
+      });
+
+      if (!res.ok) {
+        throw new Error("خطا در دریافت اطلاعیه‌ها");
+      }
+
+      return res.json();
+    },
+    enabled: !!user,
   });
-
-  return {
-    isAnnouncementsPending,
-    isAnnouncementsError,
-    announcementsData,
-    announcementsRefetch,
-  };
-};
-
-export default useGetAnnouncementsData;
+}

@@ -1,15 +1,18 @@
 "use client";
 
-
 import { ExamListColumns } from "@/components/listExam/ExamListColumns";
 import { ExamListDataTable } from "@/components/listExam/ExamListDataTable";
-import useGetExamData from "@/hooks/useGetExamData";
+import { useGetExamData } from "@/hooks/useGetExamData";
 import { useUserAuth } from "@/hooks/useUserAuth";
 
 const ExamDataPage = () => {
   const { userData } = useUserAuth(["admin", "teacher", "student", "parent"]);
-  const { isExamsPending, examsData, examsRefetch, isExamsError } =
-    useGetExamData(userData); // استفاده از هوک دریافت امتحانات
+  const {
+    isPending: isExamsPending,
+    data: examsData,
+    refetch: examsRefetch,
+    isError: isExamsError,
+  } = useGetExamData(userData); // استفاده از هوک دریافت امتحانات
 
   return (
     <div className="h-auto pb-10 flex-1 flex-col px-1 md:px-4 lg:px-8 md:flex">

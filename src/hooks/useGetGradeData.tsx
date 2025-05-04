@@ -1,16 +1,21 @@
-import { GetGradeData } from "@/actions/gradeActions";
+import { gradeListProps } from "@/db/queries/getGrade";
 import { useQuery } from "@tanstack/react-query";
 
-const useGetGradeData = () => {
-    const {
-      isPending: isGradePending,
-      isError: isGradeError,
-      data: gradeData,
-      refetch: gradeRefetch,
-    } = useQuery({
-      queryKey: ["grade"],
-      queryFn: async () => GetGradeData(),
-    });
-  return { isGradePending, isGradeError, gradeData, gradeRefetch };
-}
-export default useGetGradeData
+export const useGetGradeData = () => {
+  return useQuery<gradeListProps[]>({
+    queryKey: ["grade"],
+    queryFn: async () => {
+      const res = await fetch("/api/grade", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      if (!res.ok) {
+        throw new Error("خطا در دریافت سال تحصیلی");
+      }
+
+      return res.json();
+    },
+  });
+};

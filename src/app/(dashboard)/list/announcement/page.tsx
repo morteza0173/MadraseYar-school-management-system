@@ -2,16 +2,16 @@
 
 import { AnnouncementListColumns } from "@/components/listAnnouncements/AnnouncementListColumns";
 import { AnnouncementListDataTable } from "@/components/listAnnouncements/AnnouncementListDataTable";
-import useGetAnnouncementsData from "@/hooks/useGetAnnouncementsData";
+import { useGetAnnouncementsData } from "@/hooks/useGetAnnouncementsData";
 import { useUserAuth } from "@/hooks/useUserAuth";
 
 const AnnouncementDataPage = () => {
   const { userData } = useUserAuth(["admin", "teacher", "strudent", "parent"]);
   const {
-    isAnnouncementsPending,
-    announcementsData,
-    announcementsRefetch,
-    isAnnouncementsError,
+    data: announcementsData,
+    isPending: isAnnouncementsPending,
+    isError: isAnnouncementsError,
+    refetch: announcementsRefetch,
   } = useGetAnnouncementsData(userData);
 
   return (

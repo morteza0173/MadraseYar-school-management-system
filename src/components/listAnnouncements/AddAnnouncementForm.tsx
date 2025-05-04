@@ -26,7 +26,6 @@ import { announcementFormSchemas } from "@/lib/schemas";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useUserAuth } from "@/hooks/useUserAuth";
-import useGetClassDetails from "@/hooks/useGetClassDetails";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import {
   Command,
@@ -39,11 +38,16 @@ import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { Textarea } from "../ui/textarea";
 import { AddAnnouncementData } from "@/actions/announcementAction";
+import { useGetClassDetails } from "@/hooks/useGetClassDetails";
 
 const AddAnnouncementForm = ({ onCancel }: { onCancel: () => void }) => {
   const { userData } = useUserAuth(["admin", "teacher", "student", "parent"]);
-  const { ClassData, classRefetch, isClassError, isClassPending } =
-    useGetClassDetails(userData);
+  const {
+    data: ClassData,
+    refetch: classRefetch,
+    isError: isClassError,
+    isPending: isClassPending,
+  } = useGetClassDetails(userData);
 
   const [openClassList, setOpenClassList] = useState(false);
   const [classValue, setClassValue] = useState<string | undefined>(undefined);

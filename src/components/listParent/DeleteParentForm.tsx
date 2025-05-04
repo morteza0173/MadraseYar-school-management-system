@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Loader2Icon } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { DeleteParentData, ParentSingleType } from "@/actions/parentAction";
+import { DeleteParentData } from "@/actions/parentAction";
+import { ParentSingleType } from "@/db/queries/getParent";
 
 type Row<T> = {
   original: T;

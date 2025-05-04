@@ -2,14 +2,18 @@
 
 import { LessonListColumns } from "@/components/listLessons/LessonsListColumns";
 import { LessonsListDataTable } from "@/components/listLessons/LessonsListDataTable";
-import useGetLessonsData from "@/hooks/useGetLessonsData";
+import { useGetLessonsData } from "@/hooks/useGetLessonsData";
 import { useUserAuth } from "@/hooks/useUserAuth";
 
 const LessonPage = () => {
   const { userData } = useUserAuth(["admin", "teacher", "student", "parent"]);
 
-  const { isLessonsError, isLessonsPending, lessonsData, lessonsRefetch } =
-    useGetLessonsData(userData);
+  const {
+    isError: isLessonsError,
+    isPending: isLessonsPending,
+    data: lessonsData,
+    refetch: lessonsRefetch,
+  } = useGetLessonsData(userData);
 
   return (
     <div className="h-auto pb-10 flex-1 flex-col px-1 md:px-4 lg:px-8 md:flex">

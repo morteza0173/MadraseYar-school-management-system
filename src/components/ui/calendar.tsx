@@ -8,10 +8,10 @@ import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 import "react-day-picker/style.css";
 import { useUserAuth } from "@/hooks/useUserAuth";
-import useGetEventData from "@/hooks/useGetEventData";
-import useGetExamData from "@/hooks/useGetExamData";
-import useGetAssignmentData from "@/hooks/useGetAssignmentData";
 import jalaali from "jalaali-js";
+import { useGetAssignmentData } from "@/hooks/useGetAssignmentData";
+import { useGetEventData } from "@/hooks/useGetEventData";
+import { useGetExamData } from "@/hooks/useGetExamData";
 
 export type CalendarProps = React.ComponentProps<typeof DayPicker>;
 type CombinedDataItem = {
@@ -38,9 +38,9 @@ function Calendar({
   ...props
 }: CalendarProps) {
   const { userData } = useUserAuth(["admin", "teacher", "student", "parent"]);
-  const { eventsData } = useGetEventData(userData);
-  const { examsData } = useGetExamData(userData);
-  const { assignmentsData } = useGetAssignmentData(userData);
+  const { data: eventsData } = useGetEventData(userData);
+  const { data: examsData } = useGetExamData(userData);
+  const { data: assignmentsData } = useGetAssignmentData(userData);
 
   const combinedData = React.useMemo(() => {
     const allData: CombinedDataItem[] = [

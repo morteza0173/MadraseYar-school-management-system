@@ -1,13 +1,17 @@
 "use client";
 import { ParentListColumns } from "@/components/listParent/ParentListColumns";
 import { ParentListDataTable } from "@/components/listParent/ParentListDataTable";
-import useGetParentData from "@/hooks/useGetParentData";
+import { useGetParentData } from "@/hooks/useGetParentData";
 import { useUserAuth } from "@/hooks/useUserAuth";
 
 const ParentDataPage = () => {
   const { userData } = useUserAuth(["admin", "teacher"]);
-  const { parentRefetch, parentData, isParentError, isParentPending } =
-    useGetParentData();
+  const {
+    refetch: parentRefetch,
+    data: parentData,
+    isError: isParentError,
+    isPending: isParentPending,
+  } = useGetParentData();
 
   console.log(userData);
 

@@ -15,7 +15,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { gradeListProps } from "@/actions/gradeActions";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import {
@@ -43,9 +42,10 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import useGetTeacher from "@/hooks/useGetTeacher";
 import { Day, Prisma } from "@prisma/client";
 import { useUserAuth } from "@/hooks/useUserAuth";
-import useGetSubjects from "@/hooks/useGetSubjects";
-import useGetClassDetails from "@/hooks/useGetClassDetails";
 import { EditLesson } from "@/actions/lessonsAction";
+import { useGetClassDetails } from "@/hooks/useGetClassDetails";
+import { gradeListProps } from "@/db/queries/getGrade";
+import { useGetSubjects } from "@/hooks/useGetSubjects";
 
 const days = [
   { label: "شنبه", value: "SATURDAY" },
@@ -70,10 +70,18 @@ const EditLessonsForm = ({ onCancel, row }: EditLessonFormProps) => {
   const { userData } = useUserAuth(["admin", "teacher", "student", "parent"]);
   const { teacherData, isTeacherError, isTeacherPending, teacherRefetch } =
     useGetTeacher();
-  const { isSubjectError, isSubjectPending, subjectData, subjectRefetch } =
-    useGetSubjects(userData);
-  const { ClassData, classRefetch, isClassError, isClassPending } =
-    useGetClassDetails(userData);
+  const {
+    isError: isSubjectError,
+    isPending: isSubjectPending,
+    data: subjectData,
+    refetch: subjectRefetch,
+  } = useGetSubjects(userData);
+  const {
+    data: ClassData,
+    refetch: classRefetch,
+    isError: isClassError,
+    isPending: isClassPending,
+  } = useGetClassDetails(userData);
 
   const [openTeacherList, setOpenTeacherList] = useState(false);
   const [teacherValue, setTeacherValue] = useState("");
@@ -174,7 +182,6 @@ const EditLessonsForm = ({ onCancel, row }: EditLessonFormProps) => {
   );
 
   const selectedDay = form.watch("day");
-
 
   const adjustTime = (
     field: "startHour" | "startMinute" | "endHour" | "endMinute",

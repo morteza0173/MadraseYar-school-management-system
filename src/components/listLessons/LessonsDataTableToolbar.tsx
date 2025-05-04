@@ -6,14 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 import { TrashIcon, X } from "lucide-react";
-import useGetSubjects from "@/hooks/useGetSubjects";
 import { useUserAuth } from "@/hooks/useUserAuth";
-import useGetClassDetails from "@/hooks/useGetClassDetails";
 import { LessonsListDataTableViewOptions } from "./LessonsListDataTableViewOptions";
 import ResponsiveModalForm from "../ResponsiveModalForm";
 import { useState } from "react";
 import DeleteLessonsForm from "./DeleteLessonsForm";
 import { DataTableFacetedFilter } from "../tableComponent/data-table-faceted-filter";
+import { useGetClassDetails } from "@/hooks/useGetClassDetails";
+import { useGetSubjects } from "@/hooks/useGetSubjects";
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
@@ -25,8 +25,8 @@ export function LessonsDataTableToolbar<TData>({
   const [isOpenDelete, setIsOpenDelete] = useState(false);
 
   const { userData } = useUserAuth(["admin", "teacher", "student", "parent"]);
-  const { subjectData } = useGetSubjects(userData);
-  const { ClassData } = useGetClassDetails(userData);
+  const { data: subjectData } = useGetSubjects(userData);
+  const { data: ClassData } = useGetClassDetails(userData);
 
   const closeDelete = () => setIsOpenDelete(false);
   const openDelete = () => setIsOpenDelete(true);
@@ -39,8 +39,6 @@ export function LessonsDataTableToolbar<TData>({
     value: Class?.name,
     label: Class?.name,
   }));
-
-
 
   const selectedIds = table
     .getFilteredSelectedRowModel()

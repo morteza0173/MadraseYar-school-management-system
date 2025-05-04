@@ -8,8 +8,8 @@ import { TrashIcon, X } from "lucide-react";
 import { TeacherDataTableViewOptions } from "./TeacherDataTableViewOptions";
 import { DataTableFacetedFilter } from "../tableComponent/data-table-faceted-filter";
 import { useUserAuth } from "@/hooks/useUserAuth";
-import useGetSubjects from "@/hooks/useGetSubjects";
-import useGetClassDetails from "@/hooks/useGetClassDetails";
+import { useGetClassDetails } from "@/hooks/useGetClassDetails";
+import { useGetSubjects } from "@/hooks/useGetSubjects";
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
@@ -21,8 +21,8 @@ export function TeacherDataTableToolbar<TData>({
   const isFiltered = table.getState().columnFilters.length > 0;
 
   const { userData } = useUserAuth(["admin", "teacher", "student", "parent"]);
-  const { subjectData } = useGetSubjects(userData);
-  const { ClassData } = useGetClassDetails(userData);
+  const { data: subjectData } = useGetSubjects(userData);
+  const { data: ClassData } = useGetClassDetails(userData);
 
   const subjectName = subjectData?.map((subject) => ({
     value: subject?.name,

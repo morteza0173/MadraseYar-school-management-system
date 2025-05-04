@@ -12,18 +12,19 @@ import {
 import { Badge } from "./ui/badge";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useUserAuth } from "@/hooks/useUserAuth";
-import useGetResultData from "@/hooks/useGetResultData";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { useState } from "react";
 import { Button } from "./ui/button";
 import { AlertTriangle, Check, ChevronsUpDown, Loader2 } from "lucide-react";
 import { Command, CommandGroup, CommandItem, CommandList } from "./ui/command";
 import { cn } from "@/lib/utils";
+import { useGetResultData } from "@/hooks/useGetResultData";
 
 export function OverallClassPerformanceChart() {
   const mobile = useIsMobile();
   const { userData } = useUserAuth(["teacher", "admin"]);
-  const { resultsData, isResultsPending } = useGetResultData(userData);
+  const { data: resultsData, isPending: isResultsPending } =
+    useGetResultData(userData);
   const uniqueClasses = Array.from(
     new Set(resultsData?.map((item) => item.className))
   );

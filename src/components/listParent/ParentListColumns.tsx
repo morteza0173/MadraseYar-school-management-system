@@ -5,7 +5,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { ParentDataTableRowActions } from "./ParentDataTableRowActions";
 import { Badge } from "../ui/badge";
 import { DataTableColumnHeader } from "../tableComponent/data-table-column-header";
-import { ParentSingleType } from "@/actions/parentAction";
+import { ParentSingleType } from "@/db/queries/getParent";
 
 export const ParentListColumns: ColumnDef<ParentSingleType>[] = [
   {

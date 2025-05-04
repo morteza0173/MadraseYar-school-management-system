@@ -8,7 +8,7 @@ import { TrashIcon, X } from "lucide-react";
 import { AnnouncementDataTableViewOptions } from "./AnnouncementDataTableViewOptions";
 import { DataTableFacetedFilter } from "../tableComponent/data-table-faceted-filter";
 import { useUserAuth } from "@/hooks/useUserAuth";
-import useGetClassDetails from "@/hooks/useGetClassDetails";
+import { useGetClassDetails } from "@/hooks/useGetClassDetails";
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
@@ -20,7 +20,7 @@ export function AnnouncementDataTableToolbar<TData>({
   const isFiltered = table.getState().columnFilters.length > 0;
 
   const { userData } = useUserAuth(["admin", "teacher", "student", "parent"]);
-  const { ClassData } = useGetClassDetails(userData);
+  const { data: ClassData } = useGetClassDetails(userData);
 
   const className = ClassData?.map((Class) => ({
     value: Class?.name,
@@ -38,7 +38,7 @@ export function AnnouncementDataTableToolbar<TData>({
           }}
           className="h-8 w-full md:w-[150px] lg:w-[250px]"
         />
-   
+
         {table.getColumn("className") && (
           <DataTableFacetedFilter
             column={table.getColumn("className")}

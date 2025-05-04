@@ -7,12 +7,12 @@ import { Input } from "@/components/ui/input";
 import { TrashIcon, X } from "lucide-react";
 import { DataTableFacetedFilter } from "../tableComponent/data-table-faceted-filter";
 import { useUserAuth } from "@/hooks/useUserAuth";
-import useGetClassDetails from "@/hooks/useGetClassDetails";
 import { useEffect, useState } from "react";
 import { Label } from "../ui/label";
 import ResponsiveModalForm from "../ResponsiveModalForm";
 import { AssignmentDataTableViewOptions } from "./AssignmentDataTableViewOptions";
 import DeleteAssignmentsForm from "./DeleteAssignmentForm";
+import { useGetClassDetails } from "@/hooks/useGetClassDetails";
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
@@ -28,7 +28,7 @@ export function AssignmentDataTableToolbar<TData>({
   const isFiltered = table.getState().columnFilters.length > 0;
 
   const { userData } = useUserAuth(["admin", "teacher", "student", "parent"]);
-  const { ClassData } = useGetClassDetails(userData);
+  const { data: ClassData } = useGetClassDetails(userData);
 
   const className = ClassData?.map((Class) => ({
     value: Class?.name,

@@ -1,15 +1,18 @@
 "use client";
 
-
 import { ResultListColumns } from "@/components/listResult/ResultListColumns";
 import { ResultListDataTable } from "@/components/listResult/ResultListDataTable";
-import useGetResultData from "@/hooks/useGetResultData";
+import { useGetResultData } from "@/hooks/useGetResultData";
 import { useUserAuth } from "@/hooks/useUserAuth";
 
 const ResultDataPage = () => {
   const { userData } = useUserAuth(["admin", "teacher", "student", "parent"]);
-  const { isResultsPending, resultsData, resultsRefetch, isResultsError } =
-    useGetResultData(userData); // استفاده از هوک دریافت نمرات
+  const {
+    isPending: isResultsPending,
+    data: resultsData,
+    refetch: resultsRefetch,
+    isError: isResultsError,
+  } = useGetResultData(userData); // استفاده از هوک دریافت نمرات
 
   return (
     <div className="h-auto pb-10 flex-1 flex-col px-1 md:px-4 lg:px-8 md:flex">

@@ -1,26 +1,24 @@
 import { getUserInfoProps } from "@/actions/dashboardAction";
-import { getExams } from "@/actions/examAction";
+import { ExamsProps } from "@/db/queries/getExams";
 import { useQuery } from "@tanstack/react-query";
 
-const useGetExamData = (userData: getUserInfoProps | undefined) => {
-  const userId = userData?.id;
-  const {
-    isPending: isExamsPending,
-    isError: isExamsError,
-    data: examsData,
-    refetch: examsRefetch,
-  } = useQuery({
-    queryKey: ["exams", userId],
-    queryFn: async () => getExams(userData!), 
-    enabled: !!userId,
+export const useGetExamData = (user: getUserInfoProps | undefined) => {
+  return useQuery<ExamsProps[]>({
+    queryKey: ["exams", user?.id],
+    queryFn: async () => {
+      const res = await fetch("/api/exams", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(user),
+      });
+      if (!res.ok) {
+        throw new Error("خطا در دریافت امتحانات");
+      }
+
+      return res.json();
+    },
+    enabled: !!user,
   });
-
-  return {
-    isExamsPending,
-    isExamsError,
-    examsData,
-    examsRefetch,
-  };
 };
-
-export default useGetExamData;

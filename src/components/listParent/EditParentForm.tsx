@@ -20,7 +20,8 @@ import { ParentEditFormSchemas } from "@/lib/schemas";
 import { Textarea } from "../ui/textarea";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { EditParentData, ParentSingleType } from "@/actions/parentAction";
+import { EditParentData } from "@/actions/parentAction";
+import { ParentSingleType } from "@/db/queries/getParent";
 
 type Row<T> = {
   original: T;

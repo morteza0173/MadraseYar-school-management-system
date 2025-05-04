@@ -10,14 +10,17 @@ import {
 } from "lucide-react";
 import { Avatar, AvatarImage } from "./ui/avatar";
 import { useUserAuth } from "@/hooks/useUserAuth";
-import useGetTeacherData from "@/hooks/useGetTeacherData";
 import { useEffect, useState } from "react";
 import { FormattedTeacher } from "@/actions/teacherAction";
+import { useGetTeacherData } from "@/hooks/useGetTeacherData";
 
 const TeacherCard = ({ control }: { control: string }) => {
   const { isUserError, isUserPending, userData } = useUserAuth(["teacher"]);
-  const { isTeacherDataError, isTeacherDataPending, teacherData } =
-    useGetTeacherData(userData);
+  const {
+    isError: isTeacherDataError,
+    isPending: isTeacherDataPending,
+    data: teacherData,
+  } = useGetTeacherData(userData);
 
   const [teacherInfo, setTeacherInfo] = useState<
     FormattedTeacher | undefined

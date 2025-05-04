@@ -36,16 +36,20 @@ import {
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { Calendar } from "../ui/calendar";
-import useGetLessonsData from "@/hooks/useGetLessonsData";
-import useGetClassDetails from "@/hooks/useGetClassDetails";
 import { AddAssignmentData } from "@/actions/assignmentAction";
+import { useGetClassDetails } from "@/hooks/useGetClassDetails";
+import { useGetLessonsData } from "@/hooks/useGetLessonsData";
 
 const AddAssignmentForm = ({ onCancel }: { onCancel: () => void }) => {
   const { userData } = useUserAuth(["admin", "teacher", "student", "parent"]);
-  const { lessonsData, isLessonsPending, isLessonsError, lessonsRefetch } =
-    useGetLessonsData(userData);
+  const {
+    data: lessonsData,
+    isPending: isLessonsPending,
+    isError: isLessonsError,
+    refetch: lessonsRefetch,
+  } = useGetLessonsData(userData);
 
-  const { ClassData } = useGetClassDetails(userData);
+  const { data: ClassData } = useGetClassDetails(userData);
 
   const [openLessonList, setOpenLessonList] = useState(false);
   const [lessonValue, setLessonValue] = useState<number | undefined>(undefined);

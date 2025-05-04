@@ -2,16 +2,16 @@
 
 import { StudentListColumns } from "@/components/listStudent/StudentListColumns";
 import { StudentListDataTable } from "@/components/listStudent/StudentListDataTable";
-import useGetStudentData from "@/hooks/useGetStudentData";
+import { useGetStudentData } from "@/hooks/useGetStudentData";
 import { useUserAuth } from "@/hooks/useUserAuth";
 
 const StudentDataPage = () => {
   const { userData } = useUserAuth(["admin", "teacher", "strudent", "parent"]);
   const {
-    studentData,
-    isStudentDataPending,
-    isStudentDataError,
-    studentDataRefetch,
+    data: studentData,
+    isPending: isStudentDataPending,
+    isError: isStudentDataError,
+    refetch: studentDataRefetch,
   } = useGetStudentData(userData);
 
   return (

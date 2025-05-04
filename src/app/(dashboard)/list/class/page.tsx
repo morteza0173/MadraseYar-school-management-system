@@ -1,13 +1,13 @@
 "use client";
 import { classListColumns } from "@/components/ClassList/classListColumns";
 import { ClassListDataTable } from "@/components/ClassList/ClassListDataTable";
-import useGetClassDetails from "@/hooks/useGetClassDetails";
+import { useGetClassDetails } from "@/hooks/useGetClassDetails";
 import { useUserAuth } from "@/hooks/useUserAuth";
 
 const ClassPage = () => {
   const { userData } = useUserAuth(["admin", "teacher", "student", "parent"]);
 
-  const { ClassData, classRefetch, isClassError, isClassPending } =
+  const { data:ClassData, refetch:classRefetch, isError:isClassError, isPending:isClassPending } =
     useGetClassDetails(userData);
 
 

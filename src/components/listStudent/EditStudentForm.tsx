@@ -40,10 +40,10 @@ import {
   CommandList,
 } from "../ui/command";
 import { useUserAuth } from "@/hooks/useUserAuth";
-import useGetClassDetails from "@/hooks/useGetClassDetails";
-import useGetParentData from "@/hooks/useGetParentData";
 import { cn } from "@/lib/utils";
 import { EditStudentData, getStudentInfo } from "@/actions/studentAction";
+import { useGetClassDetails } from "@/hooks/useGetClassDetails";
+import { useGetParentData } from "@/hooks/useGetParentData";
 
 type Row<T> = {
   original: T;
@@ -56,10 +56,18 @@ interface EditStudentFormProps {
 
 const EditStudentForm = ({ onCancel, row }: EditStudentFormProps) => {
   const { userData } = useUserAuth(["admin", "teacher", "student", "parent"]);
-  const { ClassData, classRefetch, isClassError, isClassPending } =
-    useGetClassDetails(userData);
-  const { isParentError, isParentPending, parentData, parentRefetch } =
-    useGetParentData();
+  const {
+    data: ClassData,
+    refetch: classRefetch,
+    isError: isClassError,
+    isPending: isClassPending,
+  } = useGetClassDetails(userData);
+  const {
+    isError: isParentError,
+    isPending: isParentPending,
+    data: parentData,
+    refetch: parentRefetch,
+  } = useGetParentData();
   const {
     data: studentInfo,
     isPending: studentInfoPending,

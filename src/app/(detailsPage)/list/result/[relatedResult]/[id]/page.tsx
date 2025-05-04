@@ -6,9 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import useGetAssignmentData from "@/hooks/useGetAssignmentData";
-import useGetExamData from "@/hooks/useGetExamData";
-import useGetStudentResultData from "@/hooks/useGetStudentResultData";
+import { useGetAssignmentData } from "@/hooks/useGetAssignmentData";
+import { useGetExamData } from "@/hooks/useGetExamData";
+import { useGetStudentResultData } from "@/hooks/useGetStudentResultData";
 import { useUserAuth } from "@/hooks/useUserAuth";
 import { calculateDaysDifference } from "@/lib/calculateDaysDifference";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -22,9 +22,9 @@ export interface Exam {
   title: string;
   startTime: Date;
   endTime: Date;
-  lessonId: number | undefined;
+  lessonId?: number | undefined;
   lessonName: string;
-  classId: number | undefined;
+  classId?: number | undefined;
   className: string;
 }
 
@@ -64,15 +64,17 @@ const ResultdetailPage = () => {
 
   const { userData } = useUserAuth(["admin", "teacher", "student", "parent"]);
 
-  const { examsData, isExamsPending } = useGetExamData(userData);
-  const { assignmentsData, isAssignmentsPending } =
+  const { data: examsData, isPending: isExamsPending } =
+    useGetExamData(userData);
+  const { data: assignmentsData, isPending: isAssignmentsPending } =
     useGetAssignmentData(userData);
 
-  const { isResultPending, resultData } = useGetStudentResultData({
-    id: Number(id),
-    decodedRelatedResult,
-    role: userData?.role || "",
-  });
+  const { isPending: isResultPending, data: resultData } =
+    useGetStudentResultData({
+      id: Number(id),
+      decodedRelatedResult,
+      role: userData?.role || "",
+    });
 
   const { mutate: updateScoreMutate, isPending: updateScorePending } =
     useMutation({

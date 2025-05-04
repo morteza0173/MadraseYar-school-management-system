@@ -11,11 +11,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Ellipsis } from "lucide-react";
 import { useUserAuth } from "@/hooks/useUserAuth";
-import { ParentSingleType } from "@/actions/parentAction";
 import ResponsiveModalForm from "../ResponsiveModalForm";
 import { useState } from "react";
 import EditParentForm from "./EditParentForm";
 import DeleteParentForm from "./DeleteParentForm";
+import { ParentSingleType } from "@/db/queries/getParent";
 
 interface DataTableRowActionsProps<TData extends ParentSingleType> {
   row: Row<TData>;

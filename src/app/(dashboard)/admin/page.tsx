@@ -10,8 +10,9 @@ import { OverallClassPerformanceChart } from "@/components/OverallClassPerforman
 import { RadialChart } from "@/components/RadialChart";
 import UserCard from "@/components/UserCard";
 import useGetAdmins from "@/hooks/useGetAdmins";
-import useGetAnnouncementsData from "@/hooks/useGetAnnouncementsData";
-import useGetClassDetails from "@/hooks/useGetClassDetails";
+import { useGetAnnouncementsData } from "@/hooks/useGetAnnouncementsData";
+import { useGetClassDetails } from "@/hooks/useGetClassDetails";
+
 import useGetStudents from "@/hooks/useGetStudents";
 import useGetTeacher from "@/hooks/useGetTeacher";
 import { useUserAuth } from "@/hooks/useUserAuth";
@@ -24,8 +25,9 @@ const AdminPage = () => {
   const { studentData, isStudentPending } = useGetStudents();
   const { teacherData, isTeacherPending } = useGetTeacher();
   const { adminData, isAdminPending } = useGetAdmins();
-  const { ClassData, isClassPending } = useGetClassDetails(userData);
-  const { isAnnouncementsPending, announcementsData } =
+  const { data: ClassData, isPending: isClassPending } =
+    useGetClassDetails(userData);
+  const { isPending: isAnnouncementsPending, data: announcementsData } =
     useGetAnnouncementsData(userData);
 
   const [daypickerValue, setDaypickerValue] = useState<Date | undefined>(

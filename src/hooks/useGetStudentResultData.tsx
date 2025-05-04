@@ -1,4 +1,4 @@
-import { getExamOrAssignmentDetails } from "@/actions/resultDetailPageAction";
+import { RankedStudent } from "@/lib/type";
 import { useQuery } from "@tanstack/react-query";
 
 interface UseGetStudentResultDataProps {
@@ -7,29 +7,35 @@ interface UseGetStudentResultDataProps {
   role: string;
 }
 
-const useGetStudentResultData = ({
+export const useGetStudentResultData = ({
   id,
   decodedRelatedResult,
   role,
 }: UseGetStudentResultDataProps) => {
-  const {
-    isLoading: isResultPending,
-    isError: isResultError,
-    data: resultData,
-    refetch: resultRefetch,
-  } = useQuery({
+  const data = {
+    id,
+    decodedRelatedResult,
+    role,
+  };
+
+  console.log(id, decodedRelatedResult, role);
+
+  return useQuery<RankedStudent[]>({
     queryKey: ["studentResult", id, decodedRelatedResult, role],
-    queryFn: async () =>
-      getExamOrAssignmentDetails({ id, decodedRelatedResult, role }),
+    queryFn: async () => {
+      const res = await fetch("/api/resultsDetailPage", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) {
+        throw new Error("خطا در دریافت جزئیات نمرات");
+      }
+
+      return res.json();
+    },
     enabled: !!id && !!decodedRelatedResult && !!role,
   });
-
-  return {
-    isResultPending,
-    isResultError,
-    resultData,
-    resultRefetch,
-  };
 };
-
-export default useGetStudentResultData;

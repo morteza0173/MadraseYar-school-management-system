@@ -36,11 +36,11 @@ import {
   CommandList,
 } from "../ui/command";
 import { useUserAuth } from "@/hooks/useUserAuth";
-import useGetClassDetails from "@/hooks/useGetClassDetails";
 import { cn } from "@/lib/utils";
 import { Calendar } from "../ui/calendar";
-import useGetLessonsData from "@/hooks/useGetLessonsData";
 import { EditAssignmentData } from "@/actions/assignmentAction";
+import { useGetClassDetails } from "@/hooks/useGetClassDetails";
+import { useGetLessonsData } from "@/hooks/useGetLessonsData";
 
 type Row<T> = {
   original: T;
@@ -64,10 +64,14 @@ interface EditStudentFormProps {
 
 const EditAssignmentForm = ({ onCancel, row }: EditStudentFormProps) => {
   const { userData } = useUserAuth(["admin", "teacher", "student", "parent"]);
-  const { lessonsData, isLessonsPending, isLessonsError, lessonsRefetch } =
-    useGetLessonsData(userData);
+  const {
+    data: lessonsData,
+    isPending: isLessonsPending,
+    isError: isLessonsError,
+    refetch: lessonsRefetch,
+  } = useGetLessonsData(userData);
 
-  const { ClassData } = useGetClassDetails(userData);
+  const { data: ClassData } = useGetClassDetails(userData);
 
   const [openLessonList, setOpenLessonList] = useState(false);
   const [lessonValue, setLessonValue] = useState<number | undefined>(

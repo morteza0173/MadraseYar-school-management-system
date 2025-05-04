@@ -37,10 +37,10 @@ import {
   CommandList,
 } from "../ui/command";
 import { useUserAuth } from "@/hooks/useUserAuth";
-import useGetClassDetails from "@/hooks/useGetClassDetails";
 import { cn } from "@/lib/utils";
 import { Calendar } from "../ui/calendar";
 import { EditEventData } from "@/actions/eventAction";
+import { useGetClassDetails } from "@/hooks/useGetClassDetails";
 
 type Row<T> = {
   original: T;
@@ -61,8 +61,12 @@ interface EditStudentFormProps {
 
 const EditeventForm = ({ onCancel, row }: EditStudentFormProps) => {
   const { userData } = useUserAuth(["admin", "teacher", "student", "parent"]);
-  const { ClassData, classRefetch, isClassError, isClassPending } =
-    useGetClassDetails(userData);
+  const {
+    data: ClassData,
+    refetch: classRefetch,
+    isError: isClassError,
+    isPending: isClassPending,
+  } = useGetClassDetails(userData);
 
   const [openClassList, setOpenClassList] = useState(false);
   const [classValue, setClassValue] = useState<string | undefined>(

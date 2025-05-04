@@ -6,12 +6,12 @@ import WeeklyCalendar from "@/components/WeeklyCalendar";
 import { DatePicker } from "@/components/ClanderDatePicker";
 import { Announcements } from "@/components/Announcements";
 import { useUserAuth } from "@/hooks/useUserAuth";
-import useGetAnnouncementsData from "@/hooks/useGetAnnouncementsData";
 import { useState } from "react";
+import { useGetAnnouncementsData } from "@/hooks/useGetAnnouncementsData";
 
 const StudentPage = () => {
   const { userData } = useUserAuth(["student"]);
-  const { isAnnouncementsPending, announcementsData } =
+  const { isPending: isAnnouncementsPending, data: announcementsData } =
     useGetAnnouncementsData(userData);
   const [daypickerValue, setDaypickerValue] = useState<Date | undefined>(
     new Date()

@@ -1,20 +1,24 @@
 import { getUserInfoProps } from "@/actions/dashboardAction";
-import { getTeacherData } from "@/actions/teacherAction";
+import { FormattedTeacher } from "@/db/queries/getTeacher";
 import { useQuery } from "@tanstack/react-query";
 
-const useGetTeacherData = (userData: getUserInfoProps | undefined) => {
+export const useGetTeacherData = (userData: getUserInfoProps | undefined) => {
   const userId = userData?.id;
-  const {
-    isPending: isTeacherDataPending,
-    isError: isTeacherDataError,
-    data: teacherData,
-    refetch: teacherDataRefetch,
-  } = useQuery({
+  return useQuery<FormattedTeacher[]>({
     queryKey: ["teacherData", userId],
-    queryFn: async () => getTeacherData(userId!),
+    queryFn: async () => {
+      const res = await fetch("/api/teachers", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(userId),
+      });
+      if (!res.ok) {
+        throw new Error("خطا در دریافت اطلاعات معلمین");
+      }
+      return res.json();
+    },
     enabled: !!userId,
   });
-
-  return { teacherData , isTeacherDataError , isTeacherDataPending , teacherDataRefetch};
 };
-export default useGetTeacherData;

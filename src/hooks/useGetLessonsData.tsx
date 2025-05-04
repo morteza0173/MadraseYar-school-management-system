@@ -1,20 +1,24 @@
 import { getUserInfoProps } from "@/actions/dashboardAction";
-import { getLessonsData } from "@/actions/lessonsAction";
+import { getLessonsProps } from "@/db/queries/getLessons";
 import { useQuery } from "@tanstack/react-query";
 
-const useGetLessonsData = (userData: getUserInfoProps | undefined) => {
-  const userId = userData?.id;
-  const {
-    isPending: isLessonsPending,
-    isError: isLessonsError,
-    data: lessonsData,
-    refetch: lessonsRefetch,
-  } = useQuery({
-    queryKey: ["lessons", userId],
-    queryFn: async () => getLessonsData(userId!),
-    enabled: !!userId,
-  });
+export const useGetLessonsData = (user: getUserInfoProps | undefined) => {
+  return useQuery<getLessonsProps[]>({
+    queryKey: ["lessons", user?.id],
+    queryFn: async () => {
+      const res = await fetch("/api/lessons", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(user),
+      });
+      if (!res.ok) {
+        throw new Error("خطا در دریافت درس‌ها");
+      }
 
-  return { isLessonsPending, isLessonsError, lessonsData, lessonsRefetch };
+      return res.json();
+    },
+    enabled: !!user,
+  });
 };
-export default useGetLessonsData;

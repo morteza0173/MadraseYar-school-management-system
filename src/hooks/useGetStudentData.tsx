@@ -1,20 +1,25 @@
 import { getUserInfoProps } from "@/actions/dashboardAction";
-import { getStudentData } from "@/actions/studentAction";
+import { StudentDataProps } from "@/db/queries/getStudents";
 import { useQuery } from "@tanstack/react-query";
 
-const useGetStudentData = (userData: getUserInfoProps | undefined) => {
+export const useGetStudentData = (userData: getUserInfoProps | undefined) => {
   const userId = userData?.id;
-  const {
-    isPending: isStudentDataPending,
-    isError: isStudentDataError,
-    data: studentData,
-    refetch: studentDataRefetch,
-  } = useQuery({
+  return useQuery<StudentDataProps[]>({
     queryKey: ["studentData", userId],
-    queryFn: async () => getStudentData(userId!),
+    queryFn: async () => {
+      const res = await fetch("/api/students", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(userId),
+      });
+      if (!res.ok) {
+        throw new Error("خطا در دریافت دانش‌آموزان");
+      }
+
+      return res.json();
+    },
     enabled: !!userId,
   });
-
-  return { studentData, isStudentDataPending, isStudentDataError, studentDataRefetch };
 };
-export default useGetStudentData;

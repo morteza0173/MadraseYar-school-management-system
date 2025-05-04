@@ -3,21 +3,23 @@ import InfoCard from "@/components/InfoCard";
 import { EventCard } from "@/components/EventCard";
 import { DatePicker } from "@/components/ClanderDatePicker";
 import { useUserAuth } from "@/hooks/useUserAuth";
-import useGetTeacherData from "@/hooks/useGetTeacherData";
 import { useEffect, useState } from "react";
 import { FormattedTeacher } from "@/actions/teacherAction";
-import useGetClassDetails from "@/hooks/useGetClassDetails";
 import WeeklyCalendarTeacher from "@/components/WeeklyCalendarTeacher";
 import { Announcements } from "@/components/Announcements";
-import useGetAnnouncementsData from "@/hooks/useGetAnnouncementsData";
 import { OverallClassPerformanceChart } from "@/components/OverallClassPerformanceChart";
 import { AvaregeScoreClassChart } from "@/components/AvaregeScoreClassChart";
+import { useGetClassDetails } from "@/hooks/useGetClassDetails";
+import { useGetAnnouncementsData } from "@/hooks/useGetAnnouncementsData";
+import { useGetTeacherData } from "@/hooks/useGetTeacherData";
 
 const TeacherPage = () => {
   const { userData } = useUserAuth(["teacher"]);
-  const { isTeacherDataError, teacherData } = useGetTeacherData(userData);
-  const { ClassData, isClassError } = useGetClassDetails(userData);
-  const { isAnnouncementsPending, announcementsData } =
+  const { isError: isTeacherDataError, data: teacherData } =
+    useGetTeacherData(userData);
+  const { data: ClassData, isError: isClassError } =
+    useGetClassDetails(userData);
+  const { isPending: isAnnouncementsPending, data: announcementsData } =
     useGetAnnouncementsData(userData);
 
   const [teacherInfo, setTeacherInfo] = useState<

@@ -15,7 +15,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { gradeListProps } from "@/actions/gradeActions";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import {
@@ -40,7 +39,8 @@ import { EditClass } from "@/actions/classAction";
 import { AddClassFormSchema } from "@/lib/schemas";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import useGetTeacher from "@/hooks/useGetTeacher";
-import useGetGradeData from "@/hooks/useGetGradeData";
+import { useGetGradeData } from "@/hooks/useGetGradeData";
+import { gradeListProps } from "@/db/queries/getGrade";
 
 interface RowData {
   name: string;
@@ -62,7 +62,6 @@ interface EditeClassFormProps {
 }
 
 const EditClassForm = ({ onCancel, row }: EditeClassFormProps) => {
-
   const [openTeacherList, setOpenTeacherList] = useState(false);
   const [supervisorValue, setSupervisorValue] = useState("");
   const [searchTeacher, setSearchTeacher] = useState("");
@@ -71,7 +70,7 @@ const EditClassForm = ({ onCancel, row }: EditeClassFormProps) => {
   const [gradeValue, setGradeValue] = useState("");
 
   const queryClient = useQueryClient();
-  const {mutate,isPending} = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: async (data: FormData) => EditClass(data),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["classDetails"] });
@@ -86,8 +85,12 @@ const EditClassForm = ({ onCancel, row }: EditeClassFormProps) => {
   const { teacherData, isTeacherError, isTeacherPending, teacherRefetch } =
     useGetTeacher();
 
-  const { gradeData, gradeRefetch, isGradeError, isGradePending } =
-    useGetGradeData();
+  const {
+    data: gradeData,
+    refetch: gradeRefetch,
+    isError: isGradeError,
+    isPending: isGradePending,
+  } = useGetGradeData();
 
   const filteredTeacherList = teacherData?.filter((teacher) => {
     if (!searchTeacher) return true;
@@ -129,7 +132,6 @@ const EditClassForm = ({ onCancel, row }: EditeClassFormProps) => {
   });
 
   const onSubmit = async (data: z.infer<typeof AddClassFormSchema>) => {
-
     const formData = new FormData();
     formData.set("classId", row.original.name);
     formData.set("className", data.className);

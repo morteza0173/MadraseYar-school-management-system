@@ -7,8 +7,8 @@ import { Input } from "@/components/ui/input";
 import { X } from "lucide-react";
 import { DataTableFacetedFilter } from "../tableComponent/data-table-faceted-filter";
 import { useUserAuth } from "@/hooks/useUserAuth";
-import useGetClassDetails from "@/hooks/useGetClassDetails";
 import { ResultDataTableViewOptions } from "./ResultDataTableViewOptions";
+import { useGetClassDetails } from "@/hooks/useGetClassDetails";
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
@@ -20,7 +20,7 @@ export function ResultDataTableToolbar<TData>({
   const isFiltered = table.getState().columnFilters.length > 0;
 
   const { userData } = useUserAuth(["admin", "teacher", "student", "parent"]);
-  const { ClassData } = useGetClassDetails(userData);
+  const { data: ClassData } = useGetClassDetails(userData);
 
   const className = ClassData?.map((Class) => ({
     value: Class?.name,

@@ -1,14 +1,14 @@
 import { useUserAuth } from "@/hooks/useUserAuth";
 import { Card, CardContent } from "./ui/card";
 import { Separator } from "./ui/separator";
-import useGetEventData from "@/hooks/useGetEventData";
-import useGetExamData from "@/hooks/useGetExamData";
-import useGetAssignmentData from "@/hooks/useGetAssignmentData";
 import { Loader2 } from "lucide-react";
 import { useMemo } from "react";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { useRouter } from "next/navigation";
+import { useGetAssignmentData } from "@/hooks/useGetAssignmentData";
+import { useGetEventData } from "@/hooks/useGetEventData";
+import { useGetExamData } from "@/hooks/useGetExamData";
 
 type CombinedDataItem = {
   id: number;
@@ -27,9 +27,11 @@ export const EventCard = ({
   daypickerValue: Date | undefined;
 }) => {
   const { userData } = useUserAuth(["admin", "teacher", "student", "parent"]);
-  const { eventsData, isEventsPending } = useGetEventData(userData);
-  const { examsData, isExamsPending } = useGetExamData(userData);
-  const { assignmentsData, isAssignmentsPending } =
+  const { data: eventsData, isPending: isEventsPending } =
+    useGetEventData(userData);
+  const { data: examsData, isPending: isExamsPending } =
+    useGetExamData(userData);
+  const { data: assignmentsData, isPending: isAssignmentsPending } =
     useGetAssignmentData(userData);
 
   const combinedData = useMemo(() => {

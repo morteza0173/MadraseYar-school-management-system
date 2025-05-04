@@ -1,26 +1,24 @@
 import { getUserInfoProps } from "@/actions/dashboardAction";
-import { getEvents } from "@/actions/eventAction";
+import { EventsProps } from "@/db/queries/getEvents";
 import { useQuery } from "@tanstack/react-query";
 
-const useGetEventData = (userData: getUserInfoProps | undefined) => {
-  const userId = userData?.id;
-  const {
-    isPending: isEventsPending,
-    isError: isEventsError,
-    data: eventsData,
-    refetch: eventsRefetch,
-  } = useQuery({
-    queryKey: ["events", userId],
-    queryFn: async () => getEvents(userData!), // فراخوانی اکشن دریافت رویدادها
-    enabled: !!userId,
+export const useGetEventData = (user: getUserInfoProps | undefined) => {
+  return useQuery<EventsProps[]>({
+    queryKey: ["events", user?.id],
+    queryFn: async () => {
+      const res = await fetch("/api/events", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(user),
+      });
+      if (!res.ok) {
+        throw new Error("خطا در دریافت رویداد‌ها");
+      }
+
+      return res.json();
+    },
+    enabled: !!user,
   });
-
-  return {
-    isEventsPending,
-    isEventsError,
-    eventsData,
-    eventsRefetch,
-  };
 };
-
-export default useGetEventData;

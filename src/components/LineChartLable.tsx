@@ -20,9 +20,9 @@ import {
 import { Button } from "./ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useUserAuth } from "@/hooks/useUserAuth";
-import useGetResultData from "@/hooks/useGetResultData";
 import { useMemo } from "react";
 import { toJalaali } from "jalaali-js";
+import { useGetResultData } from "@/hooks/useGetResultData";
 
 const chartConfig = {
   result: {
@@ -37,7 +37,8 @@ const chartConfig = {
 
 export function LineChartLable() {
   const { userData } = useUserAuth(["admin", "teacher", "student", "parent"]);
-  const { resultsData, isResultsPending } = useGetResultData(userData);
+  const { data: resultsData, isPending: isResultsPending } =
+    useGetResultData(userData);
 
   const { chartData, yDomain } = useMemo(() => {
     if (!resultsData || isResultsPending)
@@ -125,7 +126,7 @@ export function LineChartLable() {
     const allScores = computedChartData.map((data) => data.result);
     const minScore = Math.min(...allScores);
     const maxScore = Math.max(...allScores);
-    const yDomain = [Math.floor(minScore) , Math.ceil(maxScore) ];
+    const yDomain = [Math.floor(minScore), Math.ceil(maxScore)];
 
     return { chartData: computedChartData, yDomain };
   }, [resultsData, isResultsPending]);

@@ -6,9 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { TrashIcon, X } from "lucide-react";
 import { ParentDataTableViewOptions } from "./ParentDataTableViewOptions";
-import useGetClassDetails from "@/hooks/useGetClassDetails";
 import { useUserAuth } from "@/hooks/useUserAuth";
 import { DataTableFacetedFilter } from "../tableComponent/data-table-faceted-filter";
+import { useGetClassDetails } from "@/hooks/useGetClassDetails";
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
@@ -21,7 +21,7 @@ export function ParentDataTableToolbar<TData>({
 
   const { userData } = useUserAuth(["admin", "teacher", "student", "parent"]);
   // const { subjectData } = useGetSubjects(userData);
-  const { ClassData } = useGetClassDetails(userData);
+  const { data: ClassData } = useGetClassDetails(userData);
 
   // const subjectName = subjectData?.map((subject) => ({
   //   value: subject?.name,

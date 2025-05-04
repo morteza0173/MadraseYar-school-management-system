@@ -24,7 +24,7 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { useUserAuth } from "@/hooks/useUserAuth";
-import useGetResultData from "@/hooks/useGetResultData";
+import { useGetResultData } from "@/hooks/useGetResultData";
 // const chartData = [
 //   { month: "9 ب", desktop: 16, mobile: 80 },
 //   { month: "10 الف", desktop: 15.5, mobile: 200 },
@@ -36,7 +36,8 @@ import useGetResultData from "@/hooks/useGetResultData";
 
 export function AvaregeScoreClassChart() {
   const { userData } = useUserAuth(["teacher", "admin"]);
-  const { resultsData, isResultsPending } = useGetResultData(userData);
+  const { data: resultsData, isPending: isResultsPending } =
+    useGetResultData(userData);
 
   const classScoreMap: Record<string, number[]> = {};
 

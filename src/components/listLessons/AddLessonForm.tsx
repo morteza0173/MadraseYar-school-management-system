@@ -40,10 +40,10 @@ import { AddLessonFormSchema } from "@/lib/schemas";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useUserAuth } from "@/hooks/useUserAuth";
 import useGetTeacher from "@/hooks/useGetTeacher";
-import useGetSubjects from "@/hooks/useGetSubjects";
-import useGetClassDetails from "@/hooks/useGetClassDetails";
 import { Day, Prisma } from "@prisma/client";
 import { AddLesson } from "@/actions/lessonsAction";
+import { useGetClassDetails } from "@/hooks/useGetClassDetails";
+import { useGetSubjects } from "@/hooks/useGetSubjects";
 
 const days = [
   { label: "شنبه", value: "SATURDAY" },
@@ -61,10 +61,18 @@ const AddLessonsForm = ({ onCancel }: AddLessonsFormProps) => {
   const { userData } = useUserAuth(["admin", "teacher", "student", "parent"]);
   const { teacherData, isTeacherError, isTeacherPending, teacherRefetch } =
     useGetTeacher();
-  const { isSubjectError, isSubjectPending, subjectData, subjectRefetch } =
-    useGetSubjects(userData);
-  const { ClassData, classRefetch, isClassError, isClassPending } =
-    useGetClassDetails(userData);
+  const {
+    isError: isSubjectError,
+    isPending: isSubjectPending,
+    data: subjectData,
+    refetch: subjectRefetch,
+  } = useGetSubjects(userData);
+  const {
+    data: ClassData,
+    refetch: classRefetch,
+    isError: isClassError,
+    isPending: isClassPending,
+  } = useGetClassDetails(userData);
 
   const [openTeacherList, setOpenTeacherList] = useState(false);
   const [teacherValue, setTeacherValue] = useState("");

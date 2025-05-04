@@ -2,14 +2,18 @@
 
 import { SubjectListColumns } from "@/components/listSubject/SubjectListColumns";
 import { SubjectListDataTable } from "@/components/listSubject/SubjectListDataTable";
-import useGetSubjects from "@/hooks/useGetSubjects";
+import { useGetSubjects } from "@/hooks/useGetSubjects";
 import { useUserAuth } from "@/hooks/useUserAuth";
 
 const ClassPage = () => {
   const { userData } = useUserAuth(["admin", "teacher", "student", "parent"]);
 
-  const { isSubjectError, subjectRefetch, subjectData, isSubjectPending } =
-    useGetSubjects(userData);
+  const {
+    isError: isSubjectError,
+    refetch: subjectRefetch,
+    data: subjectData,
+    isPending: isSubjectPending,
+  } = useGetSubjects(userData);
 
   return (
     <div className="h-auto pb-10 flex-1 flex-col px-1 md:px-4 lg:px-8 md:flex">

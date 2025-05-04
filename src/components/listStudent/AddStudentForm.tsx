@@ -32,7 +32,6 @@ import { useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useUserAuth } from "@/hooks/useUserAuth";
-import useGetClassDetails from "@/hooks/useGetClassDetails";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import {
   Command,
@@ -42,15 +41,24 @@ import {
   CommandList,
 } from "../ui/command";
 import { cn } from "@/lib/utils";
-import useGetParentData from "@/hooks/useGetParentData";
 import { AddStudentData } from "@/actions/studentAction";
+import { useGetClassDetails } from "@/hooks/useGetClassDetails";
+import { useGetParentData } from "@/hooks/useGetParentData";
 
 const AddStudentForm = ({ onCancel }: { onCancel: () => void }) => {
   const { userData } = useUserAuth(["admin", "teacher", "student", "parent"]);
-  const { ClassData, classRefetch, isClassError, isClassPending } =
-    useGetClassDetails(userData);
-  const { isParentError, isParentPending, parentData, parentRefetch } =
-    useGetParentData();
+  const {
+    data: ClassData,
+    refetch: classRefetch,
+    isError: isClassError,
+    isPending: isClassPending,
+  } = useGetClassDetails(userData);
+  const {
+    isError: isParentError,
+    isPending: isParentPending,
+    data: parentData,
+    refetch: parentRefetch,
+  } = useGetParentData();
 
   const [openParentList, setOpenParentList] = useState(false);
   const [parentValue, setParentValue] = useState<

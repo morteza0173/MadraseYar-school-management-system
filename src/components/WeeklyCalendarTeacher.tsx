@@ -7,25 +7,14 @@ import { Card, CardContent } from "./ui/card";
 import { Button } from "./ui/button";
 import { format } from "date-fns";
 import { createRoot } from "react-dom/client";
-import useGetLessonsData from "@/hooks/useGetLessonsData";
 import { useUserAuth } from "@/hooks/useUserAuth";
 import { useEffect, useMemo, useState } from "react";
 import { Loader2 } from "lucide-react";
+import { useGetLessonsData } from "@/hooks/useGetLessonsData";
+import { getLessonsProps } from "@/db/queries/getLessons";
 
 
-interface Lesson {
-  lessonId: number;
-  lessonName: string;
-  subjectName: string;
-  className: string;
-  day: string;
-  startTime: string;
-  endTime: string;
-  teacher: {
-    id: string;
-    name: string;
-  };
-}
+
 
 interface transformedLessonsProps {
   title: string;
@@ -54,7 +43,7 @@ const dayMapping: Record<string, string> = {
 
 export default function WeeklyCalendarTeacher() {
   const { userData ,isUserPending} = useUserAuth(["teacher"]);
-  const { lessonsData, isLessonsPending, isLessonsError,lessonsRefetch
+  const { data:lessonsData, isPending:isLessonsPending, isError:isLessonsError,refetch:lessonsRefetch
   } =
     useGetLessonsData(userData);
 
@@ -94,7 +83,7 @@ export default function WeeklyCalendarTeacher() {
 
     let minMinutes = Infinity;
     let maxMinutes = -Infinity;
-    lessonsData.forEach((lesson: Lesson) => {
+    lessonsData.forEach((lesson: getLessonsProps) => {
       const [startHour, startMinute] = lesson.startTime.split(":").map(Number);
       const [endHour, endMinute] = lesson.endTime.split(":").map(Number);
       const startTotal = startHour * 60 + startMinute;

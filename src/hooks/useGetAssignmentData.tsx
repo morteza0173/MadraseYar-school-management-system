@@ -1,26 +1,24 @@
 import { getUserInfoProps } from "@/actions/dashboardAction";
-import { getAssignments } from "@/actions/assignmentAction"; // اکشن دریافت تکالیف
+import { AssignmentsProps } from "@/db/queries/getAssignments";
 import { useQuery } from "@tanstack/react-query";
 
-const useGetAssignmentData = (userData: getUserInfoProps | undefined) => {
-  const userId = userData?.id;
-  const {
-    isPending: isAssignmentsPending,
-    isError: isAssignmentsError,
-    data: assignmentsData,
-    refetch: assignmentsRefetch,
-  } = useQuery({
-    queryKey: ["assignments", userId],
-    queryFn: async () => getAssignments(userData!), // فراخوانی اکشن دریافت تکالیف
-    enabled: !!userId,
+export const useGetAssignmentData = (user: getUserInfoProps | undefined) => {
+  return useQuery<AssignmentsProps[]>({
+    queryKey: ["assignments", user?.id],
+    queryFn: async () => {
+      const res = await fetch("/api/assignments", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(user),
+      });
+      if (!res.ok) {
+        throw new Error("خطا در دریافت تکالیف");
+      }
+
+      return res.json();
+    },
+    enabled: !!user,
   });
-
-  return {
-    isAssignmentsPending,
-    isAssignmentsError,
-    assignmentsData,
-    assignmentsRefetch,
-  };
 };
-
-export default useGetAssignmentData;

@@ -3,16 +3,16 @@
 
 import { AssignmentListColumns } from "@/components/listAssignment/AssignmentListColumns";
 import { AssignmentListDataTable } from "@/components/listAssignment/AssignmentListDataTable";
-import useGetAssignmentData from "@/hooks/useGetAssignmentData";
+import { useGetAssignmentData } from "@/hooks/useGetAssignmentData";
 import { useUserAuth } from "@/hooks/useUserAuth";
 
 const AssignmentDataPage = () => {
   const { userData } = useUserAuth(["admin", "teacher", "student", "parent"]);
   const {
-    isAssignmentsPending,
-    assignmentsData,
-    assignmentsRefetch,
-    isAssignmentsError,
+    isPending:isAssignmentsPending,
+    data:assignmentsData,
+    refetch:assignmentsRefetch,
+    isError:isAssignmentsError,
   } = useGetAssignmentData(userData); // استفاده از هوک دریافت تکالیف
 
   return (

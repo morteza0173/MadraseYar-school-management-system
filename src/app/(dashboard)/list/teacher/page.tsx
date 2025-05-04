@@ -1,16 +1,16 @@
 "use client";
 import { TeacherListColumns } from "@/components/listTeacher/TeacherListColumns";
 import { TeacherListDataTable } from "@/components/listTeacher/TeacherListDataTable";
-import useGetTeacherData from "@/hooks/useGetTeacherData";
+import { useGetTeacherData } from "@/hooks/useGetTeacherData";
 import { useUserAuth } from "@/hooks/useUserAuth";
 
 const TeacherDataPage = () => {
   const { userData } = useUserAuth(["admin", "teacher", "strudent", "parent"]);
   const {
-    teacherData,
-    isTeacherDataError,
-    isTeacherDataPending,
-    teacherDataRefetch,
+    data: teacherData,
+    isError: isTeacherDataError,
+    isPending: isTeacherDataPending,
+    refetch: teacherDataRefetch,
   } = useGetTeacherData(userData);
 
   return (
