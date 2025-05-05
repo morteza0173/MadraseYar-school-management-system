@@ -1,17 +1,13 @@
 "use client";
 import { gradeListColumns } from "@/components/listGrade/gradeListColumns";
-import { GradeListDataTable } from "@/components/listGrade/GradeListDataTable";
+import { GradeListDataTableViewOptions } from "@/components/listGrade/GradeListDataTableViewOptions";
+import { ReusableDataTable } from "@/components/tableComponent/ReusableDataTable";
 import { useGetGradeData } from "@/hooks/useGetGradeData";
 import { useUserAuth } from "@/hooks/useUserAuth";
 const GradePage = () => {
   useUserAuth(["admin"]);
 
-  const {
-    data: gradeData,
-    refetch: gradeRefetch,
-    isError: isGradeError,
-    isPending: isGradePending,
-  } = useGetGradeData();
+  const query = useGetGradeData();
 
   return (
     <div className="h-auto pb-10 flex-1 flex-col px-1 md:px-4 lg:px-8 md:flex">
@@ -20,13 +16,9 @@ const GradePage = () => {
           لیست سال تحصیلی در جدول زیر نمایش داده میشود
         </p>
       </div>
-      <GradeListDataTable
-        isPending={isGradePending}
-        isError={isGradeError}
-        refetch={gradeRefetch}
-        data={gradeData || []}
-        columns={gradeListColumns}
-      />
+      <ReusableDataTable query={query} columns={gradeListColumns}>
+        {(table) => <GradeListDataTableViewOptions table={table} />}
+      </ReusableDataTable>
     </div>
   );
 };

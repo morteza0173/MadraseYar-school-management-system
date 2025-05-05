@@ -1,17 +1,13 @@
 "use client";
+import { ParentDataTableToolbar } from "@/components/listParent/ParentDataTableToolbar";
 import { ParentListColumns } from "@/components/listParent/ParentListColumns";
-import { ParentListDataTable } from "@/components/listParent/ParentListDataTable";
+import { ReusableDataTable } from "@/components/tableComponent/ReusableDataTable";
 import { useGetParentData } from "@/hooks/useGetParentData";
 import { useUserAuth } from "@/hooks/useUserAuth";
 
 const ParentDataPage = () => {
   const { userData } = useUserAuth(["admin", "teacher"]);
-  const {
-    refetch: parentRefetch,
-    data: parentData,
-    isError: isParentError,
-    isPending: isParentPending,
-  } = useGetParentData();
+  const query = useGetParentData();
 
   console.log(userData);
 
@@ -22,13 +18,14 @@ const ParentDataPage = () => {
           لیست والدین در جدول زیر نمایش داده میشود
         </p>
       </div>
-      <ParentListDataTable
-        data={parentData || []}
+      <ReusableDataTable
+        query={query}
         columns={ParentListColumns}
-        isParentDataError={isParentError}
-        isParentDataPending={isParentPending}
-        parentDataRefetch={parentRefetch}
-      />
+        mobileVisibility={{ phone: false }}
+        desktopVisibility={{ phone: true }}
+      >
+        {(table) => <ParentDataTableToolbar table={table} />}
+      </ReusableDataTable>
     </div>
   );
 };

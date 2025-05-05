@@ -1,18 +1,14 @@
 "use client";
 
+import { EventDataTableToolbar } from "@/components/listEvent/EventDataTableToolbar";
 import { EventListColumns } from "@/components/listEvent/EventListColumns";
-import { EventListDataTable } from "@/components/listEvent/EventListDataTable";
+import { ReusableDataTable } from "@/components/tableComponent/ReusableDataTable";
 import { useGetEventData } from "@/hooks/useGetEventData";
 import { useUserAuth } from "@/hooks/useUserAuth";
 
 const EventDataPage = () => {
   const { userData } = useUserAuth(["admin", "teacher", "student", "parent"]);
-  const {
-    isPending: isEventsPending,
-    data: eventsData,
-    refetch: eventsRefetch,
-    isError: isEventsError,
-  } = useGetEventData(userData); // استفاده از هوک دریافت رویدادها
+  const query = useGetEventData(userData);
 
   return (
     <div className="h-auto pb-10 flex-1 flex-col px-1 md:px-4 lg:px-8 md:flex">
@@ -21,13 +17,14 @@ const EventDataPage = () => {
           لیست رویداد‌ها در جدول زیر نمایش داده میشود
         </p>
       </div>
-      <EventListDataTable
-        data={eventsData || []}
+      <ReusableDataTable
+        query={query}
         columns={EventListColumns}
-        isEventsError={isEventsError}
-        isEventsPending={isEventsPending}
-        eventsRefetch={eventsRefetch}
-      />
+        mobileVisibility={{ date: false }}
+        desktopVisibility={{ date: true }}
+      >
+        {(table) => <EventDataTableToolbar table={table} />}
+      </ReusableDataTable>
     </div>
   );
 };

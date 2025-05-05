@@ -1,19 +1,15 @@
 "use client";
 
+import { LessonsDataTableToolbar } from "@/components/listLessons/LessonsDataTableToolbar";
 import { LessonListColumns } from "@/components/listLessons/LessonsListColumns";
-import { LessonsListDataTable } from "@/components/listLessons/LessonsListDataTable";
+import { ReusableDataTable } from "@/components/tableComponent/ReusableDataTable";
 import { useGetLessonsData } from "@/hooks/useGetLessonsData";
 import { useUserAuth } from "@/hooks/useUserAuth";
 
 const LessonPage = () => {
   const { userData } = useUserAuth(["admin", "teacher", "student", "parent"]);
 
-  const {
-    isError: isLessonsError,
-    isPending: isLessonsPending,
-    data: lessonsData,
-    refetch: lessonsRefetch,
-  } = useGetLessonsData(userData);
+  const query = useGetLessonsData(userData);
 
   return (
     <div className="h-auto pb-10 flex-1 flex-col px-1 md:px-4 lg:px-8 md:flex">
@@ -23,13 +19,24 @@ const LessonPage = () => {
           میشود
         </p>
       </div>
-      <LessonsListDataTable
-        isLessonsPending={isLessonsPending}
-        isLessonsError={isLessonsError}
-        LessonsRefetch={lessonsRefetch}
-        data={lessonsData || []}
+      <ReusableDataTable
+        query={query}
         columns={LessonListColumns}
-      />
+        mobileVisibility={{
+          subjectName: false,
+          teacher: false,
+          endTime: false,
+          className: false,
+        }}
+        desktopVisibility={{
+          subjectName: true,
+          teacher: true,
+          endTime: true,
+          className: true,
+        }}
+      >
+        {(table) => <LessonsDataTableToolbar table={table} />}
+      </ReusableDataTable>
     </div>
   );
 };

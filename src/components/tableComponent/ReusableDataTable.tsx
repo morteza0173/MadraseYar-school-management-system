@@ -15,10 +15,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 
-import { useEffect, useState } from "react";
-import { useIsMobile } from "@/hooks/use-mobile";
 import { UseQueryResult } from "@tanstack/react-query";
-import { LessonsDataTableToolbar } from "./LessonsDataTableToolbar";
 import {
   Table,
   TableBody,
@@ -30,57 +27,58 @@ import {
 import { Loader2, TriangleAlert } from "lucide-react";
 import { Button } from "../ui/button";
 import { DataTablePagination } from "../tableComponent/data-table-pagination";
+import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
+import type { Table as ReactTableInstance } from "@tanstack/react-table";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
-  data: TData[];
-  isLessonsPending: boolean;
-  isLessonsError: boolean;
-  LessonsRefetch: UseQueryResult<TData[]>["refetch"];
+  query: {
+    data?: TData[];
+    isError: boolean;
+    isPending: boolean;
+    refetch: UseQueryResult<TData[]>["refetch"];
+  };
+  mobileVisibility?: VisibilityState;
+  desktopVisibility?: VisibilityState;
+  children?: (table: ReactTableInstance<TData>) => React.ReactNode;
 }
-
 const MotionTableRow = motion.create(TableRow);
 
-export function LessonsListDataTable<TData, TValue>({
+export function ReusableDataTable<TData, TValue>({
   columns,
-  data,
-  isLessonsPending,
-  isLessonsError,
-  LessonsRefetch,
+  query,
+  mobileVisibility,
+  desktopVisibility,
+  children,
 }: DataTableProps<TData, TValue>) {
-  const isMobile = useIsMobile();
+  const { data: queryData, isPending, isError, refetch } = query;
+  const [data, setData] = useState<TData[]>([]);
+
   const [rowSelection, setRowSelection] = useState({});
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [sorting, setSorting] = useState<SortingState>([]);
 
-  const [hasMountedOnce, setHasMountedOnce] = useState(false);
   useEffect(() => {
-    if (!isLessonsPending) {
-      setHasMountedOnce(true);
-    }
-  }, [isLessonsPending]);
+    setData(queryData || []);
+  }, [queryData]);
 
   useEffect(() => {
-    if (isMobile) {
-      setColumnVisibility((prevState) => ({
-        ...prevState,
-        subjectName: false,
-        teacher: false,
-        endTime: false,
-        className: false,
-      }));
-    } else {
-      setColumnVisibility((prevState) => ({
-        ...prevState,
-        subjectName: true,
-        teacher: true,
-        endTime: true,
-        className: true,
-      }));
-    }
-  }, [isMobile]);
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setColumnVisibility(mobileVisibility || {});
+      } else {
+        setColumnVisibility(desktopVisibility || {});
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    handleResize();
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [mobileVisibility, desktopVisibility]);
 
   const table = useReactTable({
     data,
@@ -105,10 +103,8 @@ export function LessonsListDataTable<TData, TValue>({
   });
 
   return (
-    <div className="space-y-2 ">
-      <div className="flex justify-between">
-        <LessonsDataTableToolbar table={table} />
-      </div>
+    <div className="space-y-2">
+      {children?.(table)}
       <div className="overflow-y-auto rounded-md border">
         <Table>
           <TableHeader>
@@ -137,18 +133,8 @@ export function LessonsListDataTable<TData, TValue>({
                 table.getRowModel().rows.map((row) => (
                   <MotionTableRow
                     layout
-                    initial={
-                      hasMountedOnce
-                        ? { opacity: 0, height: 0, backgroundColor: "#bbf7d0" }
-                        : { opacity: 0, height: 0 }
-                    }
-                    animate={{
-                      opacity: 1,
-                      height: "auto",
-                      backgroundColor:
-                        row.index % 2 === 0 ? "#ffffff" : "#f3f4f6",
-                    }}
-                    exit={{ backgroundColor: "#fca5a5"}}
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
                     transition={{
                       opacity: { duration: 0.5 },
                       height: { duration: 0.5 },
@@ -160,7 +146,7 @@ export function LessonsListDataTable<TData, TValue>({
                   >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell
-                        className="px-1 md:px-2 lg:px-4 py-2  text-xs md:text-sm"
+                        className="px-1 md:px-2 lg:px-4 py-2 text-xs md:text-sm"
                         key={cell.id}
                       >
                         {flexRender(
@@ -178,19 +164,16 @@ export function LessonsListDataTable<TData, TValue>({
                     className="h-24 text-center"
                   >
                     <div className="flex items-center justify-center h-full w-full">
-                      {isLessonsPending ? (
+                      {isPending ? (
                         <div className="flex gap-2 items-center">
-                          <Loader2 className="animate-spin w-4 h-4" />
+                          <Loader2 className="size-4 animate-spin" />
                           <p>در حال دریافت اطلاعات</p>
                         </div>
-                      ) : isLessonsError ? (
+                      ) : isError ? (
                         <div className="flex gap-2 items-center">
                           <TriangleAlert className="size-4" />
                           <p>مشکلی در دریافت اطلاعات به وجود آمد</p>
-                          <Button
-                            variant="outline"
-                            onClick={() => LessonsRefetch()}
-                          >
+                          <Button variant="outline" onClick={() => refetch()}>
                             تلاش مجدد
                           </Button>
                         </div>

@@ -1,18 +1,14 @@
 "use client";
 
+import { AnnouncementDataTableToolbar } from "@/components/listAnnouncements/AnnouncementDataTableToolbar";
 import { AnnouncementListColumns } from "@/components/listAnnouncements/AnnouncementListColumns";
-import { AnnouncementListDataTable } from "@/components/listAnnouncements/AnnouncementListDataTable";
+import { ReusableDataTable } from "@/components/tableComponent/ReusableDataTable";
 import { useGetAnnouncementsData } from "@/hooks/useGetAnnouncementsData";
 import { useUserAuth } from "@/hooks/useUserAuth";
 
 const AnnouncementDataPage = () => {
   const { userData } = useUserAuth(["admin", "teacher", "strudent", "parent"]);
-  const {
-    data: announcementsData,
-    isPending: isAnnouncementsPending,
-    isError: isAnnouncementsError,
-    refetch: announcementsRefetch,
-  } = useGetAnnouncementsData(userData);
+  const query = useGetAnnouncementsData(userData);
 
   return (
     <div className="h-auto pb-10 flex-1 flex-col px-1 md:px-4 lg:px-8 md:flex">
@@ -21,13 +17,14 @@ const AnnouncementDataPage = () => {
           لیست اعلامیه‌ها در جدول زیر نمایش داده میشود
         </p>
       </div>
-      <AnnouncementListDataTable
-        data={announcementsData || []}
+      <ReusableDataTable
+        query={query}
         columns={AnnouncementListColumns}
-        isAnnouncementsError={isAnnouncementsError}
-        isAnnouncementsPending={isAnnouncementsPending}
-        announcementsRefetch={announcementsRefetch}
-      />
+        mobileVisibility={{ date: false }}
+        desktopVisibility={{ date: true }}
+      >
+        {(table) => <AnnouncementDataTableToolbar table={table} />}
+      </ReusableDataTable>
     </div>
   );
 };

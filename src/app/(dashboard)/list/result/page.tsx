@@ -1,18 +1,14 @@
 "use client";
 
+import { ResultDataTableToolbar } from "@/components/listResult/ResultDataTableToolbar";
 import { ResultListColumns } from "@/components/listResult/ResultListColumns";
-import { ResultListDataTable } from "@/components/listResult/ResultListDataTable";
+import { ReusableDataTable } from "@/components/tableComponent/ReusableDataTable";
 import { useGetResultData } from "@/hooks/useGetResultData";
 import { useUserAuth } from "@/hooks/useUserAuth";
 
 const ResultDataPage = () => {
   const { userData } = useUserAuth(["admin", "teacher", "student", "parent"]);
-  const {
-    isPending: isResultsPending,
-    data: resultsData,
-    refetch: resultsRefetch,
-    isError: isResultsError,
-  } = useGetResultData(userData); // استفاده از هوک دریافت نمرات
+  const query = useGetResultData(userData);
 
   return (
     <div className="h-auto pb-10 flex-1 flex-col px-1 md:px-4 lg:px-8 md:flex">
@@ -21,13 +17,14 @@ const ResultDataPage = () => {
           لیست نمرات در جدول زیر نمایش داده میشود
         </p>
       </div>
-      <ResultListDataTable
-        data={resultsData || []}
+      <ReusableDataTable
+        query={query}
         columns={ResultListColumns}
-        isResultsError={isResultsError}
-        isResultsPending={isResultsPending}
-        resultsRefetch={resultsRefetch}
-      />
+        mobileVisibility={{ lessonName: false, createdAt: false }}
+        desktopVisibility={{ lessonName: true, createdAt: true }}
+      >
+        {(table) => <ResultDataTableToolbar table={table} />}
+      </ReusableDataTable>
     </div>
   );
 };

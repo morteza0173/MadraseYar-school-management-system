@@ -1,17 +1,13 @@
 "use client";
+import { TeacherDataTableToolbar } from "@/components/listTeacher/TeacherDataTableToolbar";
 import { TeacherListColumns } from "@/components/listTeacher/TeacherListColumns";
-import { TeacherListDataTable } from "@/components/listTeacher/TeacherListDataTable";
+import { ReusableDataTable } from "@/components/tableComponent/ReusableDataTable";
 import { useGetTeacherData } from "@/hooks/useGetTeacherData";
 import { useUserAuth } from "@/hooks/useUserAuth";
 
 const TeacherDataPage = () => {
   const { userData } = useUserAuth(["admin", "teacher", "strudent", "parent"]);
-  const {
-    data: teacherData,
-    isError: isTeacherDataError,
-    isPending: isTeacherDataPending,
-    refetch: teacherDataRefetch,
-  } = useGetTeacherData(userData);
+  const query = useGetTeacherData(userData);
 
   return (
     <div className="h-auto pb-10 flex-1 flex-col px-1 md:px-4 lg:px-8 md:flex">
@@ -20,13 +16,22 @@ const TeacherDataPage = () => {
           لیست معلمان در جدول زیر نمایش داده میشود
         </p>
       </div>
-      <TeacherListDataTable
-        data={teacherData || []}
+      <ReusableDataTable
+        query={query}
         columns={TeacherListColumns}
-        isTeacherDataError={isTeacherDataError}
-        isTeacherDataPending={isTeacherDataPending}
-        teacherDataRefetch={teacherDataRefetch}
-      />
+        mobileVisibility={{
+          phone: false,
+          subject: false,
+          eventOnGoing: false,
+        }}
+        desktopVisibility={{
+          phone: true,
+          subject: true,
+          eventOnGoing: true,
+        }}
+      >
+        {(table) => <TeacherDataTableToolbar table={table} />}
+      </ReusableDataTable>
     </div>
   );
 };

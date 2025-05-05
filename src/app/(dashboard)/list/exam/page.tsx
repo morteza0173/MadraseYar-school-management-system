@@ -1,18 +1,14 @@
 "use client";
 
+import { ExamDataTableToolbar } from "@/components/listExam/ExamDataTableToolbar";
 import { ExamListColumns } from "@/components/listExam/ExamListColumns";
-import { ExamListDataTable } from "@/components/listExam/ExamListDataTable";
+import { ReusableDataTable } from "@/components/tableComponent/ReusableDataTable";
 import { useGetExamData } from "@/hooks/useGetExamData";
 import { useUserAuth } from "@/hooks/useUserAuth";
 
 const ExamDataPage = () => {
   const { userData } = useUserAuth(["admin", "teacher", "student", "parent"]);
-  const {
-    isPending: isExamsPending,
-    data: examsData,
-    refetch: examsRefetch,
-    isError: isExamsError,
-  } = useGetExamData(userData); // استفاده از هوک دریافت امتحانات
+  const query = useGetExamData(userData);
 
   return (
     <div className="h-auto pb-10 flex-1 flex-col px-1 md:px-4 lg:px-8 md:flex">
@@ -21,13 +17,14 @@ const ExamDataPage = () => {
           لیست امتحانات در جدول زیر نمایش داده میشود
         </p>
       </div>
-      <ExamListDataTable
-        data={examsData || []}
+      <ReusableDataTable
+        query={query}
         columns={ExamListColumns}
-        isExamsError={isExamsError}
-        isExamsPending={isExamsPending}
-        examsRefetch={examsRefetch}
-      />
+        mobileVisibility={{ lessonName: false, remainingTime: false }}
+        desktopVisibility={{ lessonName: true, remainingTime: true }}
+      >
+        {(table) => <ExamDataTableToolbar table={table} />}
+      </ReusableDataTable>
     </div>
   );
 };

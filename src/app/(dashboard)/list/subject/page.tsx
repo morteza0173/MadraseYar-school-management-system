@@ -1,19 +1,15 @@
 "use client";
 
 import { SubjectListColumns } from "@/components/listSubject/SubjectListColumns";
-import { SubjectListDataTable } from "@/components/listSubject/SubjectListDataTable";
+import { SubjectListDataTableViewOptions } from "@/components/listSubject/SubjectListDataTableViewOptions";
+import { ReusableDataTable } from "@/components/tableComponent/ReusableDataTable";
 import { useGetSubjects } from "@/hooks/useGetSubjects";
 import { useUserAuth } from "@/hooks/useUserAuth";
 
 const ClassPage = () => {
   const { userData } = useUserAuth(["admin", "teacher", "student", "parent"]);
 
-  const {
-    isError: isSubjectError,
-    refetch: subjectRefetch,
-    data: subjectData,
-    isPending: isSubjectPending,
-  } = useGetSubjects(userData);
+  const query = useGetSubjects(userData);
 
   return (
     <div className="h-auto pb-10 flex-1 flex-col px-1 md:px-4 lg:px-8 md:flex">
@@ -23,13 +19,9 @@ const ClassPage = () => {
           بیشتر در لیست دروس مشاهده کنید
         </p>
       </div>
-      <SubjectListDataTable
-        isSubjectPending={isSubjectPending}
-        isSubjectError={isSubjectError}
-        SubjectRefetch={subjectRefetch}
-        data={subjectData || []}
-        columns={SubjectListColumns}
-      />
+      <ReusableDataTable query={query} columns={SubjectListColumns} >
+        {(table) => <SubjectListDataTableViewOptions table={table} />}
+      </ReusableDataTable>
     </div>
   );
 };

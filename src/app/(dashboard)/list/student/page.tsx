@@ -1,18 +1,14 @@
 "use client";
 
+import { StudentDataTableToolbar } from "@/components/listStudent/StudentDataTableToolbar";
 import { StudentListColumns } from "@/components/listStudent/StudentListColumns";
-import { StudentListDataTable } from "@/components/listStudent/StudentListDataTable";
+import { ReusableDataTable } from "@/components/tableComponent/ReusableDataTable";
 import { useGetStudentData } from "@/hooks/useGetStudentData";
 import { useUserAuth } from "@/hooks/useUserAuth";
 
 const StudentDataPage = () => {
   const { userData } = useUserAuth(["admin", "teacher", "strudent", "parent"]);
-  const {
-    data: studentData,
-    isPending: isStudentDataPending,
-    isError: isStudentDataError,
-    refetch: studentDataRefetch,
-  } = useGetStudentData(userData);
+  const query = useGetStudentData(userData);
 
   return (
     <div className="h-auto pb-10 flex-1 flex-col px-1 md:px-4 lg:px-8 md:flex">
@@ -21,13 +17,26 @@ const StudentDataPage = () => {
           لیست دانش‌آموزان در جدول زیر نمایش داده میشود
         </p>
       </div>
-      <StudentListDataTable
-        data={studentData || []}
+      <ReusableDataTable
+        query={query}
         columns={StudentListColumns}
-        isStudentDataError={isStudentDataError}
-        isStudentDataPending={isStudentDataPending}
-        studentDataRefetch={studentDataRefetch}
-      />
+        mobileVisibility={{
+          phone: false,
+          address: false,
+          parent: false,
+          upcomingAssignments: false,
+          upcomingExams: false,
+        }}
+        desktopVisibility={{
+          phone: false,
+          address: false,
+          parent: true,
+          upcomingAssignments: true,
+          upcomingExams: true,
+        }}
+      >
+        {(table) => <StudentDataTableToolbar table={table} />}
+      </ReusableDataTable>
     </div>
   );
 };
