@@ -3,15 +3,22 @@ import { useFormStatus } from "react-dom";
 import { Button } from "./ui/button";
 import { Loader2Icon } from "lucide-react";
 
-const SubmitButton = ({ text }: { text: string }) => {
+const SubmitButton = ({
+  text,
+  isPending,
+}: {
+  text: string;
+  isPending?: boolean;
+}) => {
   const { pending } = useFormStatus();
+  const isLoading = isPending ?? pending;
   return (
     <Button
       className="w-full bg-orange-400 hover:bg-orange-300"
-      disabled={pending}
+      disabled={isLoading}
       type="submit"
     >
-      {pending ? (
+      {isLoading ? (
         <>
           <Loader2Icon className="ml-2 h-4 w-4 animate-spin" />
           لطفا صبر کنید ...

@@ -18,6 +18,8 @@ export const AddClassFormSchema = z.object({
   grade: z.string().nonempty("باید سال تحصیلی را انتخاب کنید"),
 });
 
+export type AddClassFormSchemaProps = z.infer<typeof AddClassFormSchema>
+
 export const AddLessonFormSchema = z
   .object({
     lessonName: z
