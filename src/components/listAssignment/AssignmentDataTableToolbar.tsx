@@ -1,18 +1,17 @@
 "use client";
 
 import { Table } from "@tanstack/react-table";
-
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { TrashIcon, X } from "lucide-react";
-import { DataTableFacetedFilter } from "../tableComponent/data-table-faceted-filter";
 import { useUserAuth } from "@/hooks/useUserAuth";
-import { useEffect, useState } from "react";
-import { Label } from "../ui/label";
+import { useState } from "react";
 import ResponsiveModalForm from "../ResponsiveModalForm";
 import { AssignmentDataTableViewOptions } from "./AssignmentDataTableViewOptions";
 import DeleteAssignmentsForm from "./DeleteAssignmentForm";
 import { useGetClassDetails } from "@/hooks/useGetClassDetails";
+import DeleteSelectedButton from "../tableComponent/deleteSelectedButton";
+import ResetFilterButton from "../tableComponent/resetFilterButton";
+import { DataTableFacetedFilter } from "../tableComponent/data-table-faceted-filter";
+import DataFilterToggle from "../tableComponent/DataFilterToggle";
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
@@ -25,8 +24,6 @@ export function AssignmentDataTableToolbar<TData>({
   const closeDelete = () => setIsOpenDelete(false);
   const openDelete = () => setIsOpenDelete(true);
 
-  const isFiltered = table.getState().columnFilters.length > 0;
-
   const { userData } = useUserAuth(["admin", "teacher", "student", "parent"]);
   const { data: ClassData } = useGetClassDetails(userData);
 
@@ -34,20 +31,6 @@ export function AssignmentDataTableToolbar<TData>({
     value: Class?.name,
     label: Class?.name,
   }));
-
-  const [showUpcomingEvents, setShowUpcomingEvents] = useState(true);
-
-  useEffect(() => {
-    table.getColumn("dueDate")?.setFilterValue("upcoming"); // فعال کردن فیلتر
-  }, [table]);
-
-  const handleUpcomingEventsFilter = (checked: boolean) => {
-    if (checked) {
-      table.getColumn("dueDate")?.setFilterValue("upcoming"); // فعال کردن فیلتر
-    } else {
-      table.getColumn("dueDate")?.setFilterValue(undefined); // حذف فیلتر
-    }
-  };
 
   const selectedIds = table
     .getFilteredSelectedRowModel()
@@ -74,55 +57,23 @@ export function AssignmentDataTableToolbar<TData>({
             }}
             className="h-8 w-full md:w-[150px] lg:w-[250px]"
           />
-
-          {table.getColumn("className") && (
-            <DataTableFacetedFilter
-              column={table.getColumn("className")}
-              title="کلاس"
-              options={className || []}
-            />
-          )}
-
-          {table.getColumn("dueDate") && (
-            <div className="flex items-center gap-2">
-              <Label htmlFor="upcoming-events" className="text-sm">
-                فقط تکالیف پیش‌رو
-              </Label>
-              <Input
-                type="checkbox"
-                id="upcoming-events"
-                checked={showUpcomingEvents}
-                onChange={(e) => {
-                  setShowUpcomingEvents(e.target.checked);
-                  handleUpcomingEventsFilter(e.target.checked);
-                }}
-                className="h-4 w-4"
-              />
-            </div>
-          )}
-
-          {isFiltered && (
-            <Button
-              variant="ghost"
-              onClick={() => {
-                table.resetColumnFilters();
-                setShowUpcomingEvents(false);
-              }}
-              className="h-8 px-2 lg:px-3"
-            >
-              ریست
-              <X className="mr-2 h-4 w-4" />
-            </Button>
-          )}
+          <DataTableFacetedFilter
+            table={table}
+            column="className"
+            title="کلاس"
+            options={className || []}
+          />
+          <DataFilterToggle
+            table={table}
+            column="dueDate"
+            filterValue="upcoming"
+            title="فقط تکالیف پیش‌رو"
+          />
+          <ResetFilterButton table={table} />
         </div>
 
         <div className="flex items-center gap-2 w-full md:w-auto mt-2 md:mt-0">
-          {table.getFilteredSelectedRowModel().rows.length > 0 ? (
-            <Button variant="outline" size="sm" onClick={openDelete}>
-              <TrashIcon className="ml-2 size-4" aria-hidden="true" />
-              حذف کردن ({table.getFilteredSelectedRowModel().rows.length})
-            </Button>
-          ) : null}
+          <DeleteSelectedButton table={table} openDelete={openDelete} />
           <AssignmentDataTableViewOptions table={table} />
         </div>
       </div>

@@ -1,14 +1,13 @@
 "use client";
 
 import { Table } from "@tanstack/react-table";
-
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { TrashIcon, X } from "lucide-react";
 import { AnnouncementDataTableViewOptions } from "./AnnouncementDataTableViewOptions";
-import { DataTableFacetedFilter } from "../tableComponent/data-table-faceted-filter";
 import { useUserAuth } from "@/hooks/useUserAuth";
 import { useGetClassDetails } from "@/hooks/useGetClassDetails";
+import DeleteSelectedButton from "../tableComponent/deleteSelectedButton";
+import ResetFilterButton from "../tableComponent/resetFilterButton";
+import { DataTableFacetedFilter } from "../tableComponent/data-table-faceted-filter";
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
@@ -17,8 +16,6 @@ interface DataTableToolbarProps<TData> {
 export function AnnouncementDataTableToolbar<TData>({
   table,
 }: DataTableToolbarProps<TData>) {
-  const isFiltered = table.getState().columnFilters.length > 0;
-
   const { userData } = useUserAuth(["admin", "teacher", "student", "parent"]);
   const { data: ClassData } = useGetClassDetails(userData);
 
@@ -38,33 +35,16 @@ export function AnnouncementDataTableToolbar<TData>({
           }}
           className="h-8 w-full md:w-[150px] lg:w-[250px]"
         />
-
-        {table.getColumn("className") && (
-          <DataTableFacetedFilter
-            column={table.getColumn("className")}
-            title="کلاس"
-            options={className || []}
-          />
-        )}
-        {isFiltered && (
-          <Button
-            variant="ghost"
-            onClick={() => table.resetColumnFilters()}
-            className="h-8 px-2 lg:px-3"
-          >
-            ریست
-            <X className="mr-2 h-4 w-4" />
-          </Button>
-        )}
+        <DataTableFacetedFilter
+          table={table}
+          column="className"
+          title="کلاس"
+          options={className || []}
+        />
+        <ResetFilterButton table={table} />
       </div>
-
       <div className="flex items-center gap-2 w-full md:w-auto mt-2 md:mt-0">
-        {table.getFilteredSelectedRowModel().rows.length > 0 ? (
-          <Button variant="outline" size="sm">
-            <TrashIcon className="ml-2 size-4" aria-hidden="true" />
-            حذف کردن ({table.getFilteredSelectedRowModel().rows.length})
-          </Button>
-        ) : null}
+        <DeleteSelectedButton table={table} />
         <AnnouncementDataTableViewOptions table={table} />
       </div>
     </div>

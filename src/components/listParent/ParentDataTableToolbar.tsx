@@ -1,14 +1,13 @@
 "use client";
 
 import { Table } from "@tanstack/react-table";
-
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { TrashIcon, X } from "lucide-react";
 import { ParentDataTableViewOptions } from "./ParentDataTableViewOptions";
 import { useUserAuth } from "@/hooks/useUserAuth";
-import { DataTableFacetedFilter } from "../tableComponent/data-table-faceted-filter";
 import { useGetClassDetails } from "@/hooks/useGetClassDetails";
+import DeleteSelectedButton from "../tableComponent/deleteSelectedButton";
+import ResetFilterButton from "../tableComponent/resetFilterButton";
+import { DataTableFacetedFilter } from "../tableComponent/data-table-faceted-filter";
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
@@ -18,15 +17,8 @@ export function ParentDataTableToolbar<TData>({
   table,
 }: DataTableToolbarProps<TData>) {
   const isFiltered = table.getState().columnFilters.length > 0;
-
   const { userData } = useUserAuth(["admin", "teacher", "student", "parent"]);
-  // const { subjectData } = useGetSubjects(userData);
   const { data: ClassData } = useGetClassDetails(userData);
-
-  // const subjectName = subjectData?.map((subject) => ({
-  //   value: subject?.name,
-  //   label: subject?.name,
-  // }));
   const className = ClassData?.map((Class) => ({
     value: Class?.name,
     label: Class?.name,
@@ -45,39 +37,17 @@ export function ParentDataTableToolbar<TData>({
           }}
           className="h-8 w-full md:w-[150px] lg:w-[250px]"
         />
-        {/* {table.getColumn("subject") && (
-          <DataTableFacetedFilter
-            column={table.getColumn("subject")}
-            title="حوزه تدریس"
-            options={subjectName || []}
-          />
-        )} */}
-        {table.getColumn("classes") && (
-          <DataTableFacetedFilter
-            column={table.getColumn("classes")}
-            title="کلاس ها"
-            options={className || []}
-          />
-        )}
-        {isFiltered && (
-          <Button
-            variant="ghost"
-            onClick={() => table.resetColumnFilters()}
-            className="h-8 px-2 lg:px-3"
-          >
-            ریست
-            <X className="mr-2 h-4 w-4" />
-          </Button>
-        )}
+        <DataTableFacetedFilter
+          table={table}
+          column="classes"
+          title="کلاس‌ها"
+          options={className || []}
+        />
+        {isFiltered && <ResetFilterButton table={table} />}
       </div>
 
       <div className="flex items-center gap-2 w-full md:w-auto mt-2 md:mt-0">
-        {table.getFilteredSelectedRowModel().rows.length > 0 ? (
-          <Button variant="outline" size="sm">
-            <TrashIcon className="ml-2 size-4" aria-hidden="true" />
-            حذف کردن ({table.getFilteredSelectedRowModel().rows.length})
-          </Button>
-        ) : null}
+        <DeleteSelectedButton table={table} />
         <ParentDataTableViewOptions table={table} />
       </div>
     </div>

@@ -1,19 +1,17 @@
 "use client";
 
 import { Table } from "@tanstack/react-table";
-
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-
-import { TrashIcon, X } from "lucide-react";
 import { useUserAuth } from "@/hooks/useUserAuth";
 import { LessonsListDataTableViewOptions } from "./LessonsListDataTableViewOptions";
 import ResponsiveModalForm from "../ResponsiveModalForm";
 import { useState } from "react";
 import DeleteLessonsForm from "./DeleteLessonsForm";
-import { DataTableFacetedFilter } from "../tableComponent/data-table-faceted-filter";
 import { useGetClassDetails } from "@/hooks/useGetClassDetails";
 import { useGetSubjects } from "@/hooks/useGetSubjects";
+import DeleteSelectedButton from "../tableComponent/deleteSelectedButton";
+import ResetFilterButton from "../tableComponent/resetFilterButton";
+import { DataTableFacetedFilter } from "../tableComponent/data-table-faceted-filter";
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
@@ -23,13 +21,12 @@ export function LessonsDataTableToolbar<TData>({
   table,
 }: DataTableToolbarProps<TData>) {
   const [isOpenDelete, setIsOpenDelete] = useState(false);
+  const closeDelete = () => setIsOpenDelete(false);
+  const openDelete = () => setIsOpenDelete(true);
 
   const { userData } = useUserAuth(["admin", "teacher", "student", "parent"]);
   const { data: subjectData } = useGetSubjects(userData);
   const { data: ClassData } = useGetClassDetails(userData);
-
-  const closeDelete = () => setIsOpenDelete(false);
-  const openDelete = () => setIsOpenDelete(true);
 
   const subjectName = subjectData?.map((subject) => ({
     value: subject?.name,
@@ -43,8 +40,6 @@ export function LessonsDataTableToolbar<TData>({
   const selectedIds = table
     .getFilteredSelectedRowModel()
     .rows.map((row) => (row.original as { lessonId: number }).lessonId);
-
-  const isFiltered = table.getState().columnFilters.length > 0;
 
   return (
     <>
@@ -65,46 +60,24 @@ export function LessonsDataTableToolbar<TData>({
             onChange={(event) => table.setGlobalFilter(event.target.value)}
             className="h-8 w-full md:w-[150px] lg:w-[250px]"
           />
-          {table.getColumn("subjectName") && (
-            <DataTableFacetedFilter
-              column={table.getColumn("subjectName")}
-              title="حوزه تدریس"
-              options={subjectName || []}
-            />
-          )}
-          {table.getColumn("className") && (
-            <DataTableFacetedFilter
-              column={table.getColumn("className")}
-              title="کلاس ها"
-              options={className || []}
-            />
-          )}
-          {isFiltered && (
-            <Button
-              variant="ghost"
-              onClick={() => table.resetColumnFilters()}
-              className="h-8 px-2 lg:px-3"
-            >
-              ریست
-              <X className="mr-2 h-4 w-4" />
-            </Button>
-          )}
-
-          <div className="flex items-center w-full md:w-auto md:mt-0">
-            {table.getFilteredSelectedRowModel().rows.length > 0 ? (
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full"
-                onClick={openDelete}
-              >
-                <TrashIcon className="ml-2 size-4" aria-hidden="true" />
-                حذف کردن ({table.getFilteredSelectedRowModel().rows.length})
-              </Button>
-            ) : null}
-          </div>
+          <DataTableFacetedFilter
+            table={table}
+            column="subjectName"
+            title="حوزه تدریس"
+            options={subjectName || []}
+          />
+          <DataTableFacetedFilter
+            table={table}
+            column="className"
+            title="کلاس‌ها"
+            options={className || []}
+          />
+          <ResetFilterButton table={table} />
         </div>
-        <LessonsListDataTableViewOptions table={table} />
+        <div className="flex items-center gap-2 w-full md:w-auto md:mt-0">
+          <DeleteSelectedButton table={table} openDelete={openDelete} />
+          <LessonsListDataTableViewOptions table={table} />
+        </div>
       </div>
     </>
   );
