@@ -21,6 +21,7 @@ import {
 import { getUserInfoProps } from "@/actions/dashboardAction";
 import { Skeleton } from "../ui/skeleton";
 import { logout } from "@/actions/loginAction";
+import { useQueryClient } from "@tanstack/react-query";
 
 export function DashboardSidebarUser({
   user,
@@ -30,9 +31,11 @@ export function DashboardSidebarUser({
   isUserPending: boolean;
 }) {
   const { isMobile } = useSidebar();
+  const queryClient = useQueryClient();
 
   const handleLogout = async () => {
     logout();
+    queryClient.clear();
   };
 
   if (isUserPending) {
