@@ -3,7 +3,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -24,7 +23,6 @@ import {
   ChevronUp,
   Loader2,
   Loader2Icon,
-  Search,
   TriangleAlert,
 } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
@@ -39,11 +37,11 @@ import { cn } from "@/lib/utils";
 import { AddLessonFormSchema } from "@/lib/schemas";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useUserAuth } from "@/hooks/useUserAuth";
-import useGetTeacher from "@/hooks/useGetTeacher";
 import { Day, Prisma } from "@prisma/client";
 import { AddLesson } from "@/actions/lessonsAction";
 import { useGetClassDetails } from "@/hooks/useGetClassDetails";
 import { useGetSubjects } from "@/hooks/useGetSubjects";
+import TeacherSelectField from "../tableComponent/ReusableField/TeacherSelectField";
 
 const days = [
   { label: "شنبه", value: "SATURDAY" },
@@ -59,8 +57,6 @@ interface AddLessonsFormProps {
 
 const AddLessonsForm = ({ onCancel }: AddLessonsFormProps) => {
   const { userData } = useUserAuth(["admin", "teacher", "student", "parent"]);
-  const { teacherData, isTeacherError, isTeacherPending, teacherRefetch } =
-    useGetTeacher();
   const {
     isError: isSubjectError,
     isPending: isSubjectPending,
@@ -74,12 +70,8 @@ const AddLessonsForm = ({ onCancel }: AddLessonsFormProps) => {
     isPending: isClassPending,
   } = useGetClassDetails(userData);
 
-  const [openTeacherList, setOpenTeacherList] = useState(false);
   const [teacherValue, setTeacherValue] = useState("");
-  const [searchTeacher, setSearchTeacher] = useState("");
-
   const [openDayList, setOpenDayList] = useState(false);
-
   const queryClient = useQueryClient();
 
   const { mutate, isPending } = useMutation({
@@ -94,22 +86,9 @@ const AddLessonsForm = ({ onCancel }: AddLessonsFormProps) => {
     },
   });
 
-  const filteredTeacherList = teacherData?.filter((teacher) => {
-    if (!searchTeacher) return true;
-
-    const fullName = `${teacher.name} ${teacher.surname}`.toLowerCase();
-    return fullName.includes(searchTeacher.toLowerCase());
-  });
-
-  const selectedTeacher = teacherData?.find(
-    (teacher) => teacher.id === teacherValue
-  );
-
   const [openGradeList, setOpenGradeList] = useState(false);
   const [gradeValue, setGradeValue] = useState("");
-
   const [openSubjectList, setOpenSubjectList] = useState(false);
-
   const [subjectValue, setSubjectValue] = useState("");
 
   const form = useForm<z.infer<typeof AddLessonFormSchema>>({
@@ -491,120 +470,13 @@ const AddLessonsForm = ({ onCancel }: AddLessonsFormProps) => {
             />
           </div>
 
-          <FormField
-            control={form.control}
-            name="teacher"
-            render={({ field }) => (
-              <FormItem>
-                <div className="flex justify-between items-center">
-                  <FormLabel>انتخاب معلم </FormLabel>
-                  <FormControl>
-                    <>
-                      <Popover
-                        open={openTeacherList}
-                        onOpenChange={setOpenTeacherList}
-                        modal
-                      >
-                        <PopoverTrigger asChild>
-                          <Button
-                            variant="outline"
-                            role="combobox"
-                            aria-expanded={openTeacherList}
-                            className="w-[250px] justify-between "
-                          >
-                            {teacherValue
-                              ? `${selectedTeacher?.name} ${selectedTeacher?.surname}`
-                              : "یک معلم از لیست انتخاب کنید"}
-                            <ChevronsUpDown className="opacity-50" />
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-[250px] p-0">
-                          <Command>
-                            {!isTeacherPending && !isTeacherError && (
-                              <div
-                                className="hidden md:flex items-center border-b px-3 w-full"
-                                cmdk-input-wrapper=""
-                              >
-                                <Search className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                                <input
-                                  placeholder="نام معلم را جستجو کنید"
-                                  className="flex h-10 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
-                                  value={searchTeacher}
-                                  tabIndex={-1}
-                                  onChange={(e) =>
-                                    setSearchTeacher(e.target.value)
-                                  }
-                                />
-                              </div>
-                            )}
-                            <CommandList>
-                              <CommandEmpty>
-                                <div className="flex items-center justify-center h-full w-full">
-                                  {isTeacherPending ? (
-                                    <div className="flex gap-2 items-center">
-                                      <Loader2 className="size-4 animate-spin" />
-                                      <p>در حال دریافت اطلاعات</p>
-                                    </div>
-                                  ) : isTeacherError ? (
-                                    <div className="flex flex-col gap-4 items-center">
-                                      <div className="flex gap-2">
-                                        <TriangleAlert className="size-4" />
-                                        <p className="text-xs font-semibold">
-                                          اینترنت خود را ببرسی کنید
-                                        </p>
-                                      </div>
-                                      <Button
-                                        variant="outline"
-                                        onClick={() => teacherRefetch()}
-                                      >
-                                        تلاش مجدد
-                                      </Button>
-                                    </div>
-                                  ) : (
-                                    "نتیجه‌ای یافت نشد"
-                                  )}
-                                </div>
-                              </CommandEmpty>
-                              <CommandGroup>
-                                {filteredTeacherList?.map((teacher) => (
-                                  <CommandItem
-                                    key={teacher.id}
-                                    className="z-[60]"
-                                    value={String(teacher.id)}
-                                    onSelect={(currentValue) => {
-                                      const selectedValue =
-                                        currentValue === String(teacherValue)
-                                          ? ""
-                                          : currentValue;
-                                      setTeacherValue(selectedValue);
-                                      field.onChange(selectedValue);
-                                      setOpenTeacherList(false);
-                                    }}
-                                  >
-                                    {`${teacher.name} ${teacher.surname}`}
-                                    <Check
-                                      className={cn(
-                                        "ml-auto",
-                                        teacherValue === teacher.id
-                                          ? "opacity-100"
-                                          : "opacity-0"
-                                      )}
-                                    />
-                                  </CommandItem>
-                                ))}
-                              </CommandGroup>
-                            </CommandList>
-                          </Command>
-                        </PopoverContent>
-                      </Popover>
-                    </>
-                  </FormControl>
-                </div>
-                <FormDescription>حداقل باید 1 نفر باشد</FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
+          <TeacherSelectField
+            form={form}
+            fieldName="teacher"
+            setTeacherValue={setTeacherValue}
+            teacherValue={teacherValue}
           />
+
           <FormField
             control={form.control}
             name="className"

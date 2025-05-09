@@ -20,7 +20,6 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import useGetTeacher from "@/hooks/useGetTeacher";
-import { AddClassFormSchemaProps } from "@/lib/schemas";
 import { cn } from "@/lib/utils";
 import {
   Check,
@@ -30,33 +29,29 @@ import {
   TriangleAlert,
 } from "lucide-react";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { UseFormReturn } from "react-hook-form";
+import { FieldValues, Path, UseFormReturn } from "react-hook-form";
 
-interface RowData {
-  name: string;
-  grade: number;
-  capacity: number;
-  studentCount: number;
-  supervisor?: string;
-}
-
-type Row<T> = {
+interface Row<T> {
   original: T;
-};
-
-interface TitleInputProps {
-  form: UseFormReturn<AddClassFormSchemaProps>;
-  row?: Row<RowData>;
-  supervisorValue: string;
-  setSupervisorValue: Dispatch<SetStateAction<string>>;
 }
 
-const ClassListSelectTeacherField = ({
+interface TitleInputProps<T extends FieldValues, R> {
+  form: UseFormReturn<T>;
+  row?: Row<R>;
+  teacherValue: string;
+  setTeacherValue: Dispatch<SetStateAction<string>>;
+  fieldName: Path<T>;
+  rowKey?: keyof R;
+}
+
+const TeacherSelectField = <T extends FieldValues, R>({
   form,
   row,
-  supervisorValue,
-  setSupervisorValue,
-}: TitleInputProps) => {
+  teacherValue,
+  setTeacherValue,
+  fieldName,
+  rowKey,
+}: TitleInputProps<T, R>) => {
   const [openTeacherList, setOpenTeacherList] = useState(false);
   const { isTeacherError, isTeacherPending, teacherData, teacherRefetch } =
     useGetTeacher();
@@ -69,30 +64,40 @@ const ClassListSelectTeacherField = ({
     return fullName.includes(searchTeacher.toLowerCase());
   });
 
+  const selectedTeacher = teacherData?.find(
+    (teacher) => teacher.id === teacherValue
+  );
+
   useEffect(() => {
-    if (row?.original?.supervisor && row.original.supervisor.length > 0) {
+    if (
+      row &&
+      rowKey &&
+      row.original[rowKey] &&
+      typeof row.original[rowKey] === "string"
+    ) {
       if (!isTeacherPending && !isTeacherError) {
-        const fullName = row.original.supervisor;
+        const fullName = row.original[rowKey] as string;
         const teacher = teacherData?.find(
           (t) => `${t.name} ${t.surname}` === fullName
         );
         if (teacher) {
-          setSupervisorValue(teacher.id);
+          setTeacherValue(teacher.id);
         }
       }
     }
   }, [
     isTeacherPending,
-    row?.original?.supervisor,
+    row,
+    rowKey,
     isTeacherError,
     teacherData,
-    setSupervisorValue,
+    setTeacherValue,
   ]);
 
   return (
     <FormField
       control={form.control}
-      name="supervisorId"
+      name={fieldName}
       render={({ field }) => (
         <FormItem>
           <div className="flex justify-between items-center">
@@ -111,16 +116,8 @@ const ClassListSelectTeacherField = ({
                       aria-expanded={openTeacherList}
                       className="w-[250px] justify-between "
                     >
-                      {supervisorValue
-                        ? `${
-                            teacherData?.find(
-                              (teacher) => teacher.id === supervisorValue
-                            )?.name
-                          } ${
-                            teacherData?.find(
-                              (teacher) => teacher.id === supervisorValue
-                            )?.surname
-                          }`
+                      {teacherValue
+                        ? `${selectedTeacher?.name} ${selectedTeacher?.surname}`
                         : "یک معلم از لیست انتخاب کنید"}
                       <ChevronsUpDown className="opacity-50" />
                     </Button>
@@ -178,10 +175,10 @@ const ClassListSelectTeacherField = ({
                               value={String(teacher.id)}
                               onSelect={(currentValue) => {
                                 const selectedValue =
-                                  currentValue === String(supervisorValue)
+                                  currentValue === String(teacherValue)
                                     ? ""
                                     : currentValue;
-                                setSupervisorValue(selectedValue);
+                                setTeacherValue(selectedValue);
                                 field.onChange(selectedValue);
                                 setOpenTeacherList(false);
                               }}
@@ -190,7 +187,7 @@ const ClassListSelectTeacherField = ({
                               <Check
                                 className={cn(
                                   "ml-auto",
-                                  supervisorValue === teacher.id
+                                  teacherValue === teacher.id
                                     ? "opacity-100"
                                     : "opacity-0"
                                 )}
@@ -212,4 +209,4 @@ const ClassListSelectTeacherField = ({
     />
   );
 };
-export default ClassListSelectTeacherField;
+export default TeacherSelectField;

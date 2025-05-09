@@ -15,9 +15,9 @@ import { gradeListProps } from "@/db/queries/getGrade";
 import ClassListSimpleField, {
   FieldConfig,
 } from "./form-fields/classListSimpleField";
-import ClassListSelectTeacherField from "./form-fields/classListSelectTeacherField";
 import ClassListSelectGradeField from "./form-fields/ClassListSelectGradeField";
 import SubmitButton from "../SubmitButton";
+import TeacherSelectField from "../tableComponent/ReusableField/TeacherSelectField";
 
 const classNameField: FieldConfig = {
   name: "className",
@@ -94,11 +94,13 @@ const EditClassForm = ({ onCancel, row }: EditeClassFormProps) => {
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <ClassListSimpleField form={form} field={classNameField} />
           <ClassListSimpleField form={form} field={capacityField} />
-          <ClassListSelectTeacherField
+          <TeacherSelectField
             form={form}
             row={row}
-            supervisorValue={supervisorValue}
-            setSupervisorValue={setSupervisorValue}
+            teacherValue={supervisorValue}
+            setTeacherValue={setSupervisorValue}
+            fieldName="supervisorId"
+            rowKey="supervisor"
           />
           <ClassListSelectGradeField
             form={form}

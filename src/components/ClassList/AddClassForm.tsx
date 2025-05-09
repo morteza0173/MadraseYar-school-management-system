@@ -13,9 +13,9 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import ClassListSimpleField, {
   FieldConfig,
 } from "./form-fields/classListSimpleField";
-import ClassListSelectTeacherField from "./form-fields/classListSelectTeacherField";
 import ClassListSelectGradeField from "./form-fields/ClassListSelectGradeField";
 import SubmitButton from "../SubmitButton";
+import TeacherSelectField from "../tableComponent/ReusableField/TeacherSelectField";
 
 const classNameField: FieldConfig = {
   name: "className",
@@ -77,10 +77,11 @@ const AddClassForm = ({ onCancel }: AddClassFormProps) => {
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <ClassListSimpleField form={form} field={classNameField} />
           <ClassListSimpleField form={form} field={capacityField} />
-          <ClassListSelectTeacherField
+          <TeacherSelectField
             form={form}
-            supervisorValue={supervisorValue}
-            setSupervisorValue={setSupervisorValue}
+            teacherValue={supervisorValue}
+            setTeacherValue={setSupervisorValue}
+            fieldName="supervisorId"
           />
           <ClassListSelectGradeField
             form={form}
