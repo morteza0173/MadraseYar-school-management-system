@@ -3,7 +3,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -41,10 +40,10 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Day, Prisma } from "@prisma/client";
 import { useUserAuth } from "@/hooks/useUserAuth";
 import { EditLesson } from "@/actions/lessonsAction";
-import { useGetClassDetails } from "@/hooks/useGetClassDetails";
 import { gradeListProps } from "@/db/queries/getGrade";
 import { useGetSubjects } from "@/hooks/useGetSubjects";
 import TeacherSelectField from "../tableComponent/ReusableField/TeacherSelectField";
+import ClassSelectField from "../tableComponent/ReusableField/ClassSelectField";
 
 const days = [
   { label: "شنبه", value: "SATURDAY" },
@@ -74,19 +73,11 @@ const EditLessonsForm = ({ onCancel, row }: EditLessonFormProps) => {
     data: subjectData,
     refetch: subjectRefetch,
   } = useGetSubjects(userData);
-  const {
-    data: ClassData,
-    refetch: classRefetch,
-    isError: isClassError,
-    isPending: isClassPending,
-  } = useGetClassDetails(userData);
 
   const [teacherValue, setTeacherValue] = useState("");
   const [subjectValue, setSubjectValue] = useState("");
-  const [classValue, setClassValue] = useState("");
+  const [classValue, setClassValue] = useState<string | undefined>("");
   const [openDayList, setOpenDayList] = useState(false);
-  const [openClassList, setOpenClassList] = useState(false);
-
   const [openSubjectList, setOpenSubjectList] = useState(false);
 
   const queryClient = useQueryClient();
@@ -138,15 +129,7 @@ const EditLessonsForm = ({ onCancel, row }: EditLessonFormProps) => {
       }
     }
   }, [isSubjectError, isSubjectPending, row.original.subjectName, subjectData]);
-  useEffect(() => {
-    if (!isClassError && !isClassPending) {
-      const className = row.original.className;
-      const classRow = ClassData?.find((c) => c.name === className);
-      if (classRow) {
-        setClassValue(classRow.name);
-      }
-    }
-  }, [isClassError, isClassPending, row.original.className, ClassData]);
+
   useEffect(() => {
     const selectedDay = row.original.day;
     const day = days?.find((day) => day.label === selectedDay);
@@ -527,105 +510,13 @@ const EditLessonsForm = ({ onCancel, row }: EditLessonFormProps) => {
             row={row}
             rowKey="teacher"
           />
-
-          <FormField
-            control={form.control}
-            name="className"
-            render={({ field }) => (
-              <FormItem>
-                <div className="flex justify-between items-center">
-                  <FormLabel>انتخاب کلاس</FormLabel>
-                  <FormControl>
-                    <>
-                      <Popover
-                        modal
-                        open={openClassList}
-                        onOpenChange={setOpenClassList}
-                      >
-                        <PopoverTrigger asChild>
-                          <Button
-                            variant="outline"
-                            role="combobox"
-                            aria-expanded={openClassList}
-                            className="w-[250px] justify-between "
-                          >
-                            {classValue
-                              ? ClassData?.find(
-                                  (Class) => Class.name === classValue
-                                )?.name
-                              : "کلاس را از لیست انتخاب کنید"}
-                            <ChevronsUpDown className="opacity-50" />
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-[250px] p-0 ">
-                          <Command>
-                            <CommandList>
-                              <CommandEmpty>
-                                <div className="flex items-center justify-center h-full w-full">
-                                  {isClassPending ? (
-                                    <div className="flex gap-2 items-center">
-                                      <Loader2 className="size-4 animate-spin" />
-                                      <p>در حال دریافت اطلاعات</p>
-                                    </div>
-                                  ) : isClassError ? (
-                                    <div className="flex flex-col gap-4 items-center">
-                                      <div className="flex gap-2">
-                                        <TriangleAlert className="size-4" />
-                                        <p className="text-xs font-semibold">
-                                          اینترنت خود را ببرسی کنید
-                                        </p>
-                                      </div>
-                                      <Button
-                                        variant="outline"
-                                        onClick={() => classRefetch()}
-                                      >
-                                        تلاش مجدد
-                                      </Button>
-                                    </div>
-                                  ) : (
-                                    "نتیجه‌ای یافت نشد"
-                                  )}
-                                </div>
-                              </CommandEmpty>
-                              <CommandGroup>
-                                {ClassData?.map((Class) => (
-                                  <CommandItem
-                                    key={Class.name}
-                                    className="z-[60] pointer-events-auto overflow-auto"
-                                    value={String(Class.name)}
-                                    onSelect={(currentValue) => {
-                                      const selectedValue =
-                                        currentValue === String(classValue)
-                                          ? ""
-                                          : currentValue;
-                                      setClassValue(selectedValue);
-                                      field.onChange(selectedValue);
-                                      setOpenClassList(false);
-                                    }}
-                                  >
-                                    {Class.name}
-                                    <Check
-                                      className={cn(
-                                        "ml-auto",
-                                        classValue === Class.name
-                                          ? "opacity-100"
-                                          : "opacity-0"
-                                      )}
-                                    />
-                                  </CommandItem>
-                                ))}
-                              </CommandGroup>
-                            </CommandList>
-                          </Command>
-                        </PopoverContent>
-                      </Popover>
-                    </>
-                  </FormControl>
-                </div>
-                <FormDescription>سال تحصیلی انتخاب کنید</FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
+          <ClassSelectField
+            form={form}
+            classValue={classValue}
+            setClassValue={setClassValue}
+            fieldName="className"
+            row={row}
+            rowKey="className"
           />
           <div className="flex gap-2">
             <Button

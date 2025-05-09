@@ -39,9 +39,9 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useUserAuth } from "@/hooks/useUserAuth";
 import { Day, Prisma } from "@prisma/client";
 import { AddLesson } from "@/actions/lessonsAction";
-import { useGetClassDetails } from "@/hooks/useGetClassDetails";
 import { useGetSubjects } from "@/hooks/useGetSubjects";
 import TeacherSelectField from "../tableComponent/ReusableField/TeacherSelectField";
+import ClassSelectField from "../tableComponent/ReusableField/ClassSelectField";
 
 const days = [
   { label: "شنبه", value: "SATURDAY" },
@@ -63,12 +63,6 @@ const AddLessonsForm = ({ onCancel }: AddLessonsFormProps) => {
     data: subjectData,
     refetch: subjectRefetch,
   } = useGetSubjects(userData);
-  const {
-    data: ClassData,
-    refetch: classRefetch,
-    isError: isClassError,
-    isPending: isClassPending,
-  } = useGetClassDetails(userData);
 
   const [teacherValue, setTeacherValue] = useState("");
   const [openDayList, setOpenDayList] = useState(false);
@@ -85,9 +79,7 @@ const AddLessonsForm = ({ onCancel }: AddLessonsFormProps) => {
       toast.error(data.message || "خطا");
     },
   });
-
-  const [openGradeList, setOpenGradeList] = useState(false);
-  const [gradeValue, setGradeValue] = useState("");
+  const [classValue, setClassValue] = useState<string | undefined>("");
   const [openSubjectList, setOpenSubjectList] = useState(false);
   const [subjectValue, setSubjectValue] = useState("");
 
@@ -476,106 +468,13 @@ const AddLessonsForm = ({ onCancel }: AddLessonsFormProps) => {
             setTeacherValue={setTeacherValue}
             teacherValue={teacherValue}
           />
-
-          <FormField
-            control={form.control}
-            name="className"
-            render={({ field }) => (
-              <FormItem>
-                <div className="flex justify-between items-center">
-                  <FormLabel>انتخاب کلاس</FormLabel>
-                  <FormControl>
-                    <>
-                      <Popover
-                        modal
-                        open={openGradeList}
-                        onOpenChange={setOpenGradeList}
-                      >
-                        <PopoverTrigger asChild>
-                          <Button
-                            variant="outline"
-                            role="combobox"
-                            aria-expanded={openGradeList}
-                            className="w-[250px] justify-between "
-                          >
-                            {gradeValue
-                              ? ClassData?.find(
-                                  (Class) => Class.name === gradeValue
-                                )?.name
-                              : "کلاس را از لیست انتخاب کنید"}
-                            <ChevronsUpDown className="opacity-50" />
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-[250px] p-0 ">
-                          <Command>
-                            <CommandList>
-                              <CommandEmpty>
-                                <div className="flex items-center justify-center h-full w-full">
-                                  {isClassPending ? (
-                                    <div className="flex gap-2 items-center">
-                                      <Loader2 className="size-4 animate-spin" />
-                                      <p>در حال دریافت اطلاعات</p>
-                                    </div>
-                                  ) : isClassError ? (
-                                    <div className="flex flex-col gap-4 items-center">
-                                      <div className="flex gap-2">
-                                        <TriangleAlert className="size-4" />
-                                        <p className="text-xs font-semibold">
-                                          اینترنت خود را ببرسی کنید
-                                        </p>
-                                      </div>
-                                      <Button
-                                        variant="outline"
-                                        onClick={() => classRefetch()}
-                                      >
-                                        تلاش مجدد
-                                      </Button>
-                                    </div>
-                                  ) : (
-                                    "نتیجه‌ای یافت نشد"
-                                  )}
-                                </div>
-                              </CommandEmpty>
-                              <CommandGroup>
-                                {ClassData?.map((Class) => (
-                                  <CommandItem
-                                    key={Class.name}
-                                    className="z-[60] pointer-events-auto overflow-auto"
-                                    value={String(Class.name)}
-                                    onSelect={(currentValue) => {
-                                      const selectedValue =
-                                        currentValue === String(gradeValue)
-                                          ? ""
-                                          : currentValue;
-                                      setGradeValue(selectedValue);
-                                      field.onChange(selectedValue);
-                                      setOpenGradeList(false);
-                                    }}
-                                  >
-                                    {Class.name}
-                                    <Check
-                                      className={cn(
-                                        "ml-auto",
-                                        gradeValue === Class.name
-                                          ? "opacity-100"
-                                          : "opacity-0"
-                                      )}
-                                    />
-                                  </CommandItem>
-                                ))}
-                              </CommandGroup>
-                            </CommandList>
-                          </Command>
-                        </PopoverContent>
-                      </Popover>
-                    </>
-                  </FormControl>
-                </div>
-                <FormDescription>سال تحصیلی انتخاب کنید</FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
+          <ClassSelectField
+            form={form}
+            classValue={classValue}
+            setClassValue={setClassValue}
+            fieldName="className"
           />
+
           <div className="flex gap-2">
             <Button
               className="w-full bg-orange-400 hover:bg-orange-300"

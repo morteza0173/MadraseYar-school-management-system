@@ -3,7 +3,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -16,30 +15,15 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
-  Check,
-  ChevronsUpDown,
-  Loader2,
   Loader2Icon,
-  TriangleAlert,
 } from "lucide-react";
 import { announcementFormSchemas } from "@/lib/schemas";
 import { Textarea } from "../ui/textarea";
-
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandItem,
-  CommandList,
-} from "../ui/command";
-import { useUserAuth } from "@/hooks/useUserAuth";
-import { cn } from "@/lib/utils";
 import { EditAnnouncementData } from "@/actions/announcementAction";
-import { useGetClassDetails } from "@/hooks/useGetClassDetails";
+import ClassSelectField from "../tableComponent/ReusableField/ClassSelectField";
 
 type Row<T> = {
   original: T;
@@ -59,19 +43,10 @@ interface EditStudentFormProps {
 }
 
 const EditAnnouncementForm = ({ onCancel, row }: EditStudentFormProps) => {
-  const { userData } = useUserAuth(["admin", "teacher", "student", "parent"]);
-  const {
-    data: ClassData,
-    refetch: classRefetch,
-    isError: isClassError,
-    isPending: isClassPending,
-  } = useGetClassDetails(userData);
 
-  const [openClassList, setOpenClassList] = useState(false);
   const [classValue, setClassValue] = useState<string | undefined>(
     row.original.className
   );
-
   const queryClient = useQueryClient();
 
   const { mutate, isPending } = useMutation({
@@ -147,117 +122,14 @@ const EditAnnouncementForm = ({ onCancel, row }: EditStudentFormProps) => {
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="className"
-            render={({ field }) => (
-              <FormItem>
-                <div className="flex justify-between items-center">
-                  <FormLabel>انتخاب کلاس</FormLabel>
-                  <FormControl>
-                    <div className="flex gap-2">
-                      <Popover
-                        modal
-                        open={openClassList}
-                        onOpenChange={setOpenClassList}
-                      >
-                        <PopoverTrigger asChild>
-                          <Button
-                            variant="outline"
-                            role="combobox"
-                            aria-expanded={openClassList}
-                            className="w-[250px] justify-between "
-                          >
-                            {classValue
-                              ? ClassData?.find(
-                                  (Class) => Class.name === classValue
-                                )?.name
-                              : "کلاس را از لیست انتخاب کنید"}
-                            <ChevronsUpDown className="opacity-50" />
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-[250px] p-0 ">
-                          <Command>
-                            <CommandList>
-                              <CommandEmpty>
-                                <div className="flex items-center justify-center h-full w-full">
-                                  {isClassPending ? (
-                                    <div className="flex gap-2 items-center">
-                                      <Loader2 className="size-4 animate-spin" />
-                                      <p>در حال دریافت اطلاعات</p>
-                                    </div>
-                                  ) : isClassError ? (
-                                    <div className="flex flex-col gap-4 items-center">
-                                      <div className="flex gap-2">
-                                        <TriangleAlert className="size-4" />
-                                        <p className="text-xs font-semibold">
-                                          اینترنت خود را ببرسی کنید
-                                        </p>
-                                      </div>
-                                      <Button
-                                        variant="outline"
-                                        onClick={() => classRefetch()}
-                                      >
-                                        تلاش مجدد
-                                      </Button>
-                                    </div>
-                                  ) : (
-                                    "نتیجه‌ای یافت نشد"
-                                  )}
-                                </div>
-                              </CommandEmpty>
-                              <CommandGroup>
-                                {ClassData?.map((Class) => (
-                                  <CommandItem
-                                    key={Class.name}
-                                    className="z-[60] pointer-events-auto overflow-auto"
-                                    value={String(Class.name)}
-                                    onSelect={(currentValue) => {
-                                      const selectedValue =
-                                        currentValue === String(classValue)
-                                          ? ""
-                                          : currentValue;
-                                      setClassValue(selectedValue);
-                                      field.onChange(selectedValue);
-                                      setOpenClassList(false);
-                                    }}
-                                  >
-                                    {Class.name}
-                                    <Check
-                                      className={cn(
-                                        "ml-auto",
-                                        classValue === Class.name
-                                          ? "opacity-100"
-                                          : "opacity-0"
-                                      )}
-                                    />
-                                  </CommandItem>
-                                ))}
-                              </CommandGroup>
-                            </CommandList>
-                          </Command>
-                        </PopoverContent>
-                      </Popover>
-                      <Button
-                        variant="outline"
-                        type="button"
-                        size="icon"
-                        onClick={() => {
-                          setClassValue("");
-                          form.setValue("className", "");
-                        }}
-                      >
-                        ×
-                      </Button>
-                    </div>
-                  </FormControl>
-                </div>
-                <FormDescription>کلاس را انتخاب کنید</FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
+          <ClassSelectField
+            form={form}
+            classValue={classValue}
+            setClassValue={setClassValue}
+            fieldName="className"
+            hasClearButton
+            description="اگر کلاسی انتخاب نکنید به عنوان اعلامیه عمومی برای همه ارسال میشود"
           />
-
           <div className="flex gap-2">
             <Button
               className="w-full bg-orange-400 hover:bg-orange-300"
