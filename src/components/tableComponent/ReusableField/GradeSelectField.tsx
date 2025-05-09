@@ -1,7 +1,6 @@
 import { FormField, FormItem, FormLabel } from "@/components/ui/form";
-import { AddClassFormSchemaProps } from "@/lib/schemas";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { UseFormReturn } from "react-hook-form";
+import { FieldValues, Path, UseFormReturn } from "react-hook-form";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -26,31 +25,27 @@ import {
 import { cn } from "@/lib/utils";
 import { useGetGradeData } from "@/hooks/useGetGradeData";
 
-interface RowData {
-  name: string;
-  grade: number;
-  capacity: number;
-  studentCount: number;
-  supervisor?: string;
-}
-
 type Row<T> = {
   original: T;
 };
 
-interface TitleInputProps {
-  form: UseFormReturn<AddClassFormSchemaProps>;
-  row?: Row<RowData>;
+interface TitleInputProps<T extends FieldValues, R> {
+  form: UseFormReturn<T>;
+  row?: Row<R>;
   gradeValue: string;
   setGradeValue: Dispatch<SetStateAction<string>>;
+  fieldName: Path<T>;
+  rowKey?: keyof R;
 }
 
-const ClassListSelectGradeField = ({
+const GradeSelectField = <T extends FieldValues, R>({
   form,
   row,
   gradeValue,
   setGradeValue,
-}: TitleInputProps) => {
+  fieldName,
+  rowKey,
+}: TitleInputProps<T, R>) => {
   const [openGradeList, setOpenGradeList] = useState(false);
   const {
     data: gradeData,
@@ -60,26 +55,20 @@ const ClassListSelectGradeField = ({
   } = useGetGradeData();
 
   useEffect(() => {
-    if (row?.original?.grade) {
+    if (row && rowKey && row.original[rowKey]) {
       if (!isGradePending && !isGradeError) {
-        const grade = gradeData?.find((g) => g.level === row.original.grade);
+        const grade = gradeData?.find((g) => g.level === row.original[rowKey]);
         if (grade) {
           setGradeValue(grade.id.toString());
         }
       }
     }
-  }, [
-    isGradePending,
-    row?.original.grade,
-    isGradeError,
-    gradeData,
-    setGradeValue,
-  ]);
+  }, [isGradePending, row, isGradeError, gradeData, setGradeValue, rowKey]);
 
   return (
     <FormField
       control={form.control}
-      name="grade"
+      name={fieldName}
       render={({ field }) => (
         <FormItem>
           <div className="flex justify-between items-center">
@@ -178,4 +167,4 @@ const ClassListSelectGradeField = ({
     />
   );
 };
-export default ClassListSelectGradeField;
+export default GradeSelectField;

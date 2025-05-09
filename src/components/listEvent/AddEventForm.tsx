@@ -7,23 +7,22 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Loader2Icon } from "lucide-react";
 import { eventFormSchemas } from "@/lib/schemas";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { useState } from "react";
-import { Textarea } from "../ui/textarea";
 import { Calendar } from "../ui/calendar";
 import { AddEventData } from "@/actions/eventAction";
 import ClassSelectField from "../tableComponent/ReusableField/ClassSelectField";
+import SimpleField from "../tableComponent/ReusableField/SimpleField";
+import SubmitButton from "../SubmitButton";
 
 const AddEventForm = ({ onCancel }: { onCancel: () => void }) => {
   const [classValue, setClassValue] = useState<string | undefined>(undefined);
@@ -68,41 +67,18 @@ const AddEventForm = ({ onCancel }: { onCancel: () => void }) => {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <div className="flex flex-row gap-4 ">
-            <FormField
-              control={form.control}
+            <SimpleField
+              form={form}
               name="title"
-              render={({ field }) => (
-                <FormItem className="flex-1">
-                  <FormLabel>عنوان</FormLabel>
-                  <FormControl>
-                    <Input
-                      className="focus-visible:ring-orange-300 "
-                      type="text"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormDescription>حداکثر 20 حرف</FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
+              label="عنوان"
+              description="حداکثر 20 حرف"
             />
           </div>
-          <FormField
-            control={form.control}
+          <SimpleField
+            form={form}
             name="description"
-            render={({ field }) => (
-              <FormItem className="flex-1">
-                <FormLabel>توضیحات</FormLabel>
-                <FormControl>
-                  <Textarea
-                    className="focus-visible:ring-orange-300"
-                    {...field}
-                  />
-                </FormControl>
-                {/* <FormDescription></FormDescription> */}
-                <FormMessage />
-              </FormItem>
-            )}
+            label="توضیحات"
+            type="textarea"
           />
           <FormField
             control={form.control}
@@ -160,20 +136,7 @@ const AddEventForm = ({ onCancel }: { onCancel: () => void }) => {
             description="اگر کلاسی انتخاب نکنید به عنوان رویداد عمومی برای همه ارسال میشود"
           />
           <div className="flex gap-2">
-            <Button
-              className="w-full bg-orange-400 hover:bg-orange-300"
-              disabled={isPending}
-              type="submit"
-            >
-              {isPending ? (
-                <>
-                  <Loader2Icon className="ml-2 h-4 w-4 animate-spin" />
-                  لطفا صبر کنید ...
-                </>
-              ) : (
-                "ثبت"
-              )}
-            </Button>
+            <SubmitButton isPending={isPending} />
             <Button
               className="w-full hover:bg-orange-200"
               variant="outline"

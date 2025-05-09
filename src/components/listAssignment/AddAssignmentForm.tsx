@@ -18,7 +18,6 @@ import {
   Check,
   ChevronsUpDown,
   Loader2,
-  Loader2Icon,
   TriangleAlert,
 } from "lucide-react";
 import { assignmentFormSchemas } from "@/lib/schemas";
@@ -39,6 +38,8 @@ import { Calendar } from "../ui/calendar";
 import { AddAssignmentData } from "@/actions/assignmentAction";
 import { useGetClassDetails } from "@/hooks/useGetClassDetails";
 import { useGetLessonsData } from "@/hooks/useGetLessonsData";
+import SimpleField from "../tableComponent/ReusableField/SimpleField";
+import SubmitButton from "../SubmitButton";
 
 const AddAssignmentForm = ({ onCancel }: { onCancel: () => void }) => {
   const { userData } = useUserAuth(["admin", "teacher", "student", "parent"]);
@@ -93,24 +94,7 @@ const AddAssignmentForm = ({ onCancel }: { onCancel: () => void }) => {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <div className="flex flex-row gap-4 ">
-            <FormField
-              control={form.control}
-              name="title"
-              render={({ field }) => (
-                <FormItem className="flex-1">
-                  <FormLabel>عنوان</FormLabel>
-                  <FormControl>
-                    <Input
-                      className="focus-visible:ring-orange-300 "
-                      type="text"
-                      {...field}
-                    />
-                  </FormControl>
-                  {/* <FormDescription>  </FormDescription> */}
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <SimpleField form={form} name="title" label="عنوان" />
           </div>
           <FormField
             control={form.control}
@@ -284,20 +268,7 @@ const AddAssignmentForm = ({ onCancel }: { onCancel: () => void }) => {
           />
 
           <div className="flex gap-2">
-            <Button
-              className="w-full bg-orange-400 hover:bg-orange-300"
-              disabled={isPending}
-              type="submit"
-            >
-              {isPending ? (
-                <>
-                  <Loader2Icon className="ml-2 h-4 w-4 animate-spin" />
-                  لطفا صبر کنید ...
-                </>
-              ) : (
-                "ثبت"
-              )}
-            </Button>
+            <SubmitButton isPending={isPending} />
             <Button
               className="w-full hover:bg-orange-200"
               variant="outline"

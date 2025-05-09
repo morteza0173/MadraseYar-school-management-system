@@ -12,26 +12,10 @@ import { EditClass } from "@/actions/classAction";
 import { AddClassFormSchema } from "@/lib/schemas";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { gradeListProps } from "@/db/queries/getGrade";
-import ClassListSimpleField, {
-  FieldConfig,
-} from "./form-fields/classListSimpleField";
-import ClassListSelectGradeField from "./form-fields/ClassListSelectGradeField";
+import SimpleField from "../tableComponent/ReusableField/SimpleField";
 import SubmitButton from "../SubmitButton";
 import TeacherSelectField from "../tableComponent/ReusableField/TeacherSelectField";
-
-const classNameField: FieldConfig = {
-  name: "className",
-  label: "نام کلاس",
-  defaultValue: "10B",
-  description: "حداکثر شامل 20 حرف",
-};
-const capacityField: FieldConfig = {
-  name: "capacity",
-  label: "ظرفیت کلاس",
-  defaultValue: "15",
-  type: "number",
-  description: "حداقل باید 1 نفر باشد",
-};
+import GradeSelectField from "../tableComponent/ReusableField/GradeSelectField";
 
 interface RowData {
   name: string;
@@ -92,8 +76,21 @@ const EditClassForm = ({ onCancel, row }: EditeClassFormProps) => {
     <div className="p-4">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-          <ClassListSimpleField form={form} field={classNameField} />
-          <ClassListSimpleField form={form} field={capacityField} />
+          <SimpleField
+            form={form}
+            label="ظرفیت کلاس"
+            name="className"
+            defaultValue="10B"
+            description="حداکثر شامل 20 حرف"
+          />
+          <SimpleField
+            form={form}
+            name="capacity"
+            label="ظرفیت"
+            defaultValue="15"
+            type="number"
+            description="حداقل باید 1 نفر باشد"
+          />
           <TeacherSelectField
             form={form}
             row={row}
@@ -102,11 +99,13 @@ const EditClassForm = ({ onCancel, row }: EditeClassFormProps) => {
             fieldName="supervisorId"
             rowKey="supervisor"
           />
-          <ClassListSelectGradeField
+          <GradeSelectField
             form={form}
             gradeValue={gradeValue}
             setGradeValue={setGradeValue}
             row={row}
+            rowKey="grade"
+            fieldName="grade"
           />
           <div className="flex gap-2">
             <SubmitButton text="ویرایش" isPending={isPending} />

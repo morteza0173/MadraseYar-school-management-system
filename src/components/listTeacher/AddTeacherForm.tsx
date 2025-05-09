@@ -3,28 +3,26 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-
 import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { ImageIcon, Loader2Icon } from "lucide-react";
+import { ImageIcon } from "lucide-react";
 import { TeacherFormSchemas } from "@/lib/schemas";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
-import { Textarea } from "../ui/textarea";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import Image from "next/image";
 import { useRef } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AddTeacherData } from "@/actions/teacherAction";
 import { toast } from "sonner";
+import SimpleField from "../tableComponent/ReusableField/SimpleField";
+import SubmitButton from "../SubmitButton";
 const AddTeacherForm = ({ onCancel }: { onCancel: () => void }) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
@@ -34,7 +32,7 @@ const AddTeacherForm = ({ onCancel }: { onCancel: () => void }) => {
     onSuccess: (data) => {
       toast.success(data.message || "معلم با موفقیت اضافه شد");
       queryClient.invalidateQueries({ queryKey: ["teacherData"] });
-      onCancel()
+      onCancel();
     },
     onError: (error) => {
       toast.error(error.message || "خطا در اضافه کردن معلم");
@@ -82,116 +80,25 @@ const AddTeacherForm = ({ onCancel }: { onCancel: () => void }) => {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <div className="flex flex-row gap-4 ">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem className="flex-1">
-                  <FormLabel>نام</FormLabel>
-                  <FormControl>
-                    <Input
-                      className="focus-visible:ring-orange-300 "
-                      type="text"
-                      {...field}
-                    />
-                  </FormControl>
-                  {/* <FormDescription></FormDescription> */}
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="surname"
-              render={({ field }) => (
-                <FormItem className="flex-1">
-                  <FormLabel>نام خانوادگی</FormLabel>
-                  <FormControl>
-                    <Input
-                      className="focus-visible:ring-orange-300"
-                      type="text"
-                      {...field}
-                    />
-                  </FormControl>
-                  {/* <FormDescription></FormDescription> */}
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <SimpleField form={form} name="name" label="نام" />
+            <SimpleField form={form} name="surname" label="نام خانوادگی" />
           </div>
           <div className="flex flex-row gap-4">
-            <FormField
-              control={form.control}
-              name="username"
-              render={({ field }) => (
-                <FormItem className="flex-1">
-                  <FormLabel>نام کاربری</FormLabel>
-                  <FormControl>
-                    <Input
-                      className="focus-visible:ring-orange-300"
-                      type="text"
-                      {...field}
-                    />
-                  </FormControl>
-                  {/* <FormDescription></FormDescription> */}
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
+            <SimpleField form={form} name="username" label="نام کاربری" />
+            <SimpleField
+              form={form}
               name="password"
-              render={({ field }) => (
-                <FormItem className="flex-1">
-                  <FormLabel>رمز عبور</FormLabel>
-                  <FormControl>
-                    <Input
-                      className="focus-visible:ring-orange-300"
-                      type="password"
-                      {...field}
-                    />
-                  </FormControl>
-                  {/* <FormDescription></FormDescription> */}
-                  <FormMessage />
-                </FormItem>
-              )}
+              label="رمز عبور"
+              type="password"
             />
           </div>
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem className="flex-1">
-                <FormLabel>ایمیل</FormLabel>
-                <FormControl>
-                  <Input
-                    className="focus-visible:ring-orange-300"
-                    type="email"
-                    {...field}
-                  />
-                </FormControl>
-                {/* <FormDescription></FormDescription> */}
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
+          <SimpleField form={form} name="email" label="ایمیل" type="email" />
+          <SimpleField
+            form={form}
             name="address"
-            render={({ field }) => (
-              <FormItem className="flex-1">
-                <FormLabel>ادرس</FormLabel>
-                <FormControl>
-                  <Textarea
-                    className="focus-visible:ring-orange-300"
-                    placeholder="ادرس خود را وارد کنید ..."
-                    {...field}
-                  />
-                </FormControl>
-                {/* <FormDescription></FormDescription> */}
-                <FormMessage />
-              </FormItem>
-            )}
+            label="آدرس"
+            type="textarea"
+            defaultValue="ادرس خود را وارد کنید ..."
           />
           <div className="flex flex-row gap-4">
             <FormField
@@ -226,23 +133,13 @@ const AddTeacherForm = ({ onCancel }: { onCancel: () => void }) => {
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
+            <SimpleField
+              form={form}
               name="phone"
-              render={({ field }) => (
-                <FormItem className="flex-1">
-                  <FormLabel>شماره تماس</FormLabel>
-                  <FormControl>
-                    <Input
-                      className="focus-visible:ring-orange-300"
-                      type="text"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormDescription>با 09 شروع میشود</FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
+              label="شماره تماس"
+              description="با 09 شروع میشود"
+              type="number"
+              defaultValue="09123456789"
             />
           </div>
           <FormField
@@ -319,20 +216,7 @@ const AddTeacherForm = ({ onCancel }: { onCancel: () => void }) => {
             )}
           />
           <div className="flex gap-2">
-            <Button
-              className="w-full bg-orange-400 hover:bg-orange-300"
-              disabled={isPending}
-              type="submit"
-            >
-              {isPending ? (
-                <>
-                  <Loader2Icon className="ml-2 h-4 w-4 animate-spin" />
-                  لطفا صبر کنید ...
-                </>
-              ) : (
-                "ثبت"
-              )}
-            </Button>
+            <SubmitButton isPending={isPending} />
             <Button
               className="w-full hover:bg-orange-200"
               variant="outline"

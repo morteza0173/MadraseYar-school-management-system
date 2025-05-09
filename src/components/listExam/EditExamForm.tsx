@@ -3,12 +3,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-
 import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -19,11 +17,9 @@ import {
   Check,
   ChevronsUpDown,
   Loader2,
-  Loader2Icon,
   TriangleAlert,
 } from "lucide-react";
 import { examEditFormSchemas } from "@/lib/schemas";
-
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -42,11 +38,12 @@ import { EditExamData } from "@/actions/examAction";
 import { useGetClassDetails } from "@/hooks/useGetClassDetails";
 import { useGetLessonsData } from "@/hooks/useGetLessonsData";
 import { ExamsProps } from "@/db/queries/getExams";
+import SimpleField from "../tableComponent/ReusableField/SimpleField";
+import SubmitButton from "../SubmitButton";
 
 type Row<T> = {
   original: T;
 };
-
 
 interface EditStudentFormProps {
   onCancel: () => void;
@@ -108,23 +105,11 @@ const EditExamForm = ({ onCancel, row }: EditStudentFormProps) => {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <div className="flex flex-row gap-4 ">
-            <FormField
-              control={form.control}
+            <SimpleField
+              form={form}
               name="title"
-              render={({ field }) => (
-                <FormItem className="flex-1">
-                  <FormLabel>عنوان</FormLabel>
-                  <FormControl>
-                    <Input
-                      className="focus-visible:ring-orange-300 "
-                      type="text"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormDescription>حداکثر 20 حرف</FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
+              label="عنوان"
+              description="حداکثر 20 حرف"
             />
           </div>
 
@@ -300,20 +285,7 @@ const EditExamForm = ({ onCancel, row }: EditStudentFormProps) => {
           />
 
           <div className="flex gap-2">
-            <Button
-              className="w-full bg-orange-400 hover:bg-orange-300"
-              disabled={isPending}
-              type="submit"
-            >
-              {isPending ? (
-                <>
-                  <Loader2Icon className="ml-2 h-4 w-4 animate-spin" />
-                  لطفا صبر کنید ...
-                </>
-              ) : (
-                "ثبت"
-              )}
-            </Button>
+            <SubmitButton isPending={isPending} />
             <Button
               className="w-full hover:bg-orange-200"
               variant="outline"

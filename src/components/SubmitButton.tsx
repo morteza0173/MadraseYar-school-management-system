@@ -4,10 +4,10 @@ import { Button } from "./ui/button";
 import { Loader2Icon } from "lucide-react";
 
 const SubmitButton = ({
-  text,
+  text = "ثبت",
   isPending,
 }: {
-  text: string;
+  text?: string;
   isPending?: boolean;
 }) => {
   const { pending } = useFormStatus();

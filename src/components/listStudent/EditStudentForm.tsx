@@ -13,19 +13,15 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import {
   Check,
   ChevronsUpDown,
   ImageIcon,
   Loader2,
-  Loader2Icon,
   TriangleAlert,
 } from "lucide-react";
 import { StudentDataListSchema, StudentEditFormSchemas } from "@/lib/schemas";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
-import { Textarea } from "../ui/textarea";
-import { Avatar, AvatarFallback } from "../ui/avatar";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -42,6 +38,9 @@ import { cn } from "@/lib/utils";
 import { EditStudentData, getStudentInfo } from "@/actions/studentAction";
 import { useGetParentData } from "@/hooks/useGetParentData";
 import ClassSelectField from "../tableComponent/ReusableField/ClassSelectField";
+import SimpleField from "../tableComponent/ReusableField/SimpleField";
+import SubmitButton from "../SubmitButton";
+import { Avatar, AvatarFallback } from "../ui/avatar";
 
 type Row<T> = {
   original: T;
@@ -169,102 +168,26 @@ const EditStudentForm = ({ onCancel, row }: EditStudentFormProps) => {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <div className="flex flex-row gap-4 ">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem className="flex-1">
-                  <FormLabel>نام</FormLabel>
-                  <FormControl>
-                    <Input
-                      className="focus-visible:ring-orange-300 "
-                      disabled={studentInfoPending}
-                      type="text"
-                      {...field}
-                    />
-                  </FormControl>
-                  {/* <FormDescription></FormDescription> */}
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="surname"
-              render={({ field }) => (
-                <FormItem className="flex-1">
-                  <FormLabel>نام خانوادگی</FormLabel>
-                  <FormControl>
-                    <Input
-                      className="focus-visible:ring-orange-300"
-                      disabled={studentInfoPending}
-                      type="text"
-                      {...field}
-                    />
-                  </FormControl>
-                  {/* <FormDescription></FormDescription> */}
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <SimpleField form={form} name="name" label="نام" />
+            <SimpleField form={form} name="surname" label="نام خانوادگی" />
           </div>
           <div className="flex flex-row gap-4">
-            <FormField
-              control={form.control}
-              name="username"
-              render={({ field }) => (
-                <FormItem className="flex-1">
-                  <FormLabel>نام کاربری</FormLabel>
-                  <FormControl>
-                    <Input
-                      className="focus-visible:ring-orange-300"
-                      disabled={studentInfoPending}
-                      type="text"
-                      {...field}
-                    />
-                  </FormControl>
-                  {/* <FormDescription></FormDescription> */}
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
+            <SimpleField form={form} name="username" label="نام کاربری" />
+            <SimpleField
+              form={form}
               name="phone"
-              render={({ field }) => (
-                <FormItem className="flex-1">
-                  <FormLabel>شماره تماس</FormLabel>
-                  <FormControl>
-                    <Input
-                      className="focus-visible:ring-orange-300"
-                      type="text"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormDescription>با 09 شروع میشود</FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
+              label="شماره تماس"
+              type="number"
+              defaultValue="09123456789"
+              description="با 09 شروع میشودد"
             />
           </div>
-          <FormField
-            control={form.control}
+          <SimpleField
+            form={form}
             name="address"
-            render={({ field }) => (
-              <FormItem className="flex-1">
-                <FormLabel>ادرس</FormLabel>
-                <FormControl>
-                  <Textarea
-                    className="focus-visible:ring-orange-300"
-                    placeholder="ادرس خود را وارد کنید ..."
-                    disabled={studentInfoPending}
-                    {...field}
-                  />
-                </FormControl>
-                {/* <FormDescription></FormDescription> */}
-                <FormMessage />
-              </FormItem>
-            )}
+            label="آدرس"
+            type="textarea"
+            defaultValue="ادرس خود را وارد کنید ..."
           />
           <div className="flex flex-row gap-4">
             <FormField
@@ -484,20 +407,7 @@ const EditStudentForm = ({ onCancel, row }: EditStudentFormProps) => {
             )}
           />
           <div className="flex gap-2">
-            <Button
-              className="w-full bg-orange-400 hover:bg-orange-300"
-              disabled={isPending}
-              type="submit"
-            >
-              {isPending ? (
-                <>
-                  <Loader2Icon className="ml-2 h-4 w-4 animate-spin" />
-                  لطفا صبر کنید ...
-                </>
-              ) : (
-                "ثبت"
-              )}
-            </Button>
+            <SubmitButton isPending={isPending} />
             <Button
               className="w-full hover:bg-orange-200"
               variant="outline"

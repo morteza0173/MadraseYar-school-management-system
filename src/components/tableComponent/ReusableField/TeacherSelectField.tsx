@@ -69,19 +69,22 @@ const TeacherSelectField = <T extends FieldValues, R>({
   );
 
   useEffect(() => {
-    if (
-      row &&
-      rowKey &&
-      row.original[rowKey] &&
-      typeof row.original[rowKey] === "string"
-    ) {
+    if (row && rowKey && row.original[rowKey]) {
+      const value = row.original[rowKey];
       if (!isTeacherPending && !isTeacherError) {
-        const fullName = row.original[rowKey] as string;
-        const teacher = teacherData?.find(
-          (t) => `${t.name} ${t.surname}` === fullName
-        );
-        if (teacher) {
-          setTeacherValue(teacher.id);
+        if (typeof value === "object" && value !== null && "id" in value) {
+          const teacherId = (value as { id: string }).id;
+          const teacher = teacherData?.find((t) => t.id === teacherId);
+          if (teacher) {
+            setTeacherValue(teacher.id);
+          }
+        } else if (typeof value === "string") {
+          const teacher = teacherData?.find(
+            (t) => `${t.name} ${t.surname}` === value
+          );
+          if (teacher) {
+            setTeacherValue(teacher.id);
+          }
         }
       }
     }

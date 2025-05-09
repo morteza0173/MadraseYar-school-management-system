@@ -7,19 +7,13 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import {
   Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { EditGrade } from "@/actions/gradeActions";
 import { toast } from "sonner";
-import { Loader2Icon } from "lucide-react";
 import { GradeFormSchema } from "@/lib/schemas";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import SimpleField from "../tableComponent/ReusableField/SimpleField";
+import SubmitButton from "../SubmitButton";
 
 interface RowData {
   id: number;
@@ -70,40 +64,16 @@ const EditGradeForm = ({ onCancel, row }: DataTableRowActionsProps) => {
     <div className="p-4">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-          <FormField
-            control={form.control}
+          <SimpleField
+            form={form}
             name="grade"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>سال تحصیلی</FormLabel>
-                <FormControl>
-                  <Input
-                    className="focus-visible:ring-orange-300"
-                    type="number"
-                    placeholder="12"
-                    {...field}
-                  />
-                </FormControl>
-                <FormDescription>به صورت عدد وارد کنید </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
+            label="سال تحصیلی"
+            type="number"
+            defaultValue="12"
+            description="به صورت عدد وارد کنید"
           />
           <div className="flex gap-2">
-            <Button
-              className="w-full bg-orange-400 hover:bg-orange-300"
-              disabled={isPending}
-              type="submit"
-            >
-              {isPending ? (
-                <>
-                  <Loader2Icon className="ml-2 h-4 w-4 animate-spin" />
-                  لطفا صبر کنید ...
-                </>
-              ) : (
-                "ویرایش"
-              )}
-            </Button>
+            <SubmitButton isPending={isPending} />
             <Button
               className="w-full hover:bg-orange-200"
               variant="outline"
