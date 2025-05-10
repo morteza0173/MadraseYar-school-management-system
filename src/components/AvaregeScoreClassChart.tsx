@@ -64,8 +64,6 @@ export function AvaregeScoreClassChart() {
     (a, b) => b.averageScore - a.averageScore
   ); // نزولی
 
-  console.log("میانگین نمرات هر کلاس:", classAverages);
-
   const barHeight = 20;
   const gap = 6;
   const chartHeight = classAverages.length * (barHeight + gap);

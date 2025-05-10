@@ -58,7 +58,7 @@ export function LineChartLable() {
     tenDaysAgo.setDate(today.getDate() - 10);
 
     const firstValidDate = new Date(sortedResults[0].createdAt);
-    const startDate = firstValidDate > tenDaysAgo ? firstValidDate : tenDaysAgo;
+    const startDate = firstValidDate;
 
     const dates: string[] = [];
     for (let d = new Date(startDate); d <= today; d.setDate(d.getDate() + 1)) {
@@ -101,21 +101,15 @@ export function LineChartLable() {
           cumulativeScore += score;
           totalScores++;
         });
-        const average = (cumulativeScore / totalScores).toFixed(2);
+        const average =
+          totalScores > 0 ? (cumulativeScore / totalScores).toFixed(2) : 0;
         computedChartData.push({ date, result: Number(average) });
       } else {
-        const previousResult = (() => {
-          for (let j = i - 1; j >= 0; j--) {
-            if (computedChartData[j]?.result !== undefined) {
-              return computedChartData[j].result;
-            }
-          }
-          return undefined;
-        })();
-
-        if (previousResult !== undefined) {
-          computedChartData.push({ date, result: previousResult });
-        }
+        const lastResult =
+          computedChartData.length > 0
+            ? computedChartData[computedChartData.length - 1].result
+            : 0;
+        computedChartData.push({ date, result: lastResult });
       }
     }
 
@@ -128,7 +122,9 @@ export function LineChartLable() {
     const maxScore = Math.max(...allScores);
     const yDomain = [Math.floor(minScore), Math.ceil(maxScore)];
 
-    return { chartData: computedChartData, yDomain };
+    const lastTenChartData = computedChartData.slice(-10);
+
+    return { chartData: lastTenChartData, yDomain };
   }, [resultsData, isResultsPending]);
 
   const isMobile = useIsMobile();

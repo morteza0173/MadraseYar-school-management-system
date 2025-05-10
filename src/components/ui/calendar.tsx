@@ -187,11 +187,11 @@ function Calendar({
           buttonVariants({ variant: "outline" }),
           "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100"
         ),
-        nav: "flex flex-row-reverse gap-x-1 absolute left-0.5 top-1 fill-foreground",
+        nav: "flex flex-row gap-x-1 absolute left-0.5 top-1 fill-foreground",
       }}
       components={{
         Chevron: ({ orientation }) => {
-          if (orientation === "left") {
+          if (orientation === "right") {
             return <ChevronLeft />;
           } else {
             return <ChevronRight />;
