@@ -208,7 +208,7 @@ export const StudentListColumns: ColumnDef<StudentDataListSchema>[] = [
             )}
           >
             {row.getValue("averageScore")
-              ? row.getValue("averageScore")
+              ? (row.getValue("averageScore") as number).toFixed(2)
               : "ندارد"}
           </span>
         </div>

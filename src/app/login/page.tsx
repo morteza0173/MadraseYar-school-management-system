@@ -3,6 +3,7 @@
 import { getUserInfo } from "@/actions/dashboardAction";
 import { Adminlogin, Teacherlogin } from "@/actions/loginAction";
 import SubmitButton from "@/components/SubmitButton";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alart";
 import {
   Card,
   CardDescription,
@@ -15,7 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Tab from "@/components/ui/tabMotion";
 import { useQuery } from "@tanstack/react-query";
-import { GraduationCap } from "lucide-react";
+import { AlertCircle, GraduationCap } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -31,60 +32,8 @@ const initialValue = {
   message: "",
 };
 
-function CardContentUsers({
-  title,
-  description,
-  loginAction,
-}: {
-  title: string;
-  description: string;
-  loginAction: LoginAction;
-}) {
-  const [state, formAction] = useFormState(loginAction, initialValue);
-
-  useEffect(() => {
-    if (state.message) {
-      toast.error(state.message);
-    }
-  }, [state]);
-
-  return (
-    <Card dir="rtl">
-      <CardHeader className="space-y-4">
-        <CardTitle>{title}</CardTitle>
-        <CardDescription>{description}</CardDescription>
-      </CardHeader>
-      <form action={formAction}>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="user">نام کاربری یا شماره موبایل و یا کدملی</Label>
-            <Input
-              id="user"
-              name="user"
-              className="h-12"
-              defaultValue="morteza0173"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="password">پسورد</Label>
-            <Input
-              id="password"
-              name="password"
-              className="h-12"
-              defaultValue="morteza"
-            />
-          </div>
-        </CardContent>
-        <CardFooter>
-          <SubmitButton text="ورود" />
-        </CardFooter>
-      </form>
-    </Card>
-  );
-}
-
 export default function LoginPage() {
-  const [value, setValue] = useState("parent");
+  const [value, setValue] = useState("admin");
   const router = useRouter();
 
   const { data } = useQuery({
@@ -142,6 +91,8 @@ export default function LoginPage() {
                     به سیستم، می‌توانید از آخرین اخبار و گزارش‌های پیشرفت
                     فرزندتان مطلع شوید."
                 loginAction={Teacherlogin}
+                disabled={true}
+                warningText="ورود اولیا به زودی فعال می‌شود."
               />
             </Tab.content>
             <Tab.content value="student">
@@ -151,6 +102,8 @@ export default function LoginPage() {
                     تکالیف و نمرات خود مطلع شوید و مسیر پیشرفت خود را بهتر
                     برنامه‌ریزی کنید."
                 loginAction={Teacherlogin}
+                disabled={true}
+                warningText="ورود دانش آموزان به زودی فعال می‌شود."
               />
             </Tab.content>
             <Tab.content value="teacher">
@@ -160,6 +113,8 @@ export default function LoginPage() {
                     دانش‌آموزان را پیگیری کرده و از آخرین فعالیت‌ها و تکالیف
                     آن‌ها مطلع شوید."
                 loginAction={Teacherlogin}
+                defaultUsername="morteza0173"
+                defultPassword="123456789"
               />
             </Tab.content>
             <Tab.content value="admin">
@@ -169,6 +124,8 @@ export default function LoginPage() {
                     عملکرد معلمان و وضعیت دانش‌آموزان نظارت داشته باشید و
                     تصمیمات مؤثری برای بهبود کیفیت آموزشی اتخاذ کنید."
                 loginAction={Adminlogin}
+                defaultUsername="morteza0173"
+                defultPassword="morteza"
               />
             </Tab.content>
           </Tab>
@@ -197,5 +154,75 @@ export default function LoginPage() {
         />
       </div>
     </div>
+  );
+}
+
+function CardContentUsers({
+  title,
+  description,
+  loginAction,
+  disabled,
+  defaultUsername,
+  defultPassword,
+  warningText,
+}: {
+  title: string;
+  description: string;
+  loginAction: LoginAction;
+  disabled?: boolean;
+  defaultUsername?: string;
+  defultPassword?: string;
+  warningText?: string;
+}) {
+  const [state, formAction] = useFormState(loginAction, initialValue);
+
+  useEffect(() => {
+    if (state.message) {
+      toast.error(state.message);
+    }
+  }, [state]);
+
+  return (
+    <Card dir="rtl">
+      <CardHeader className="space-y-4">
+        <CardTitle>{title}</CardTitle>
+        <CardDescription>{description}</CardDescription>
+      </CardHeader>
+      <form action={formAction}>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="user">نام کاربری یا شماره موبایل و یا کدملی</Label>
+            <Input
+              id="user"
+              name="user"
+              className="h-12"
+              defaultValue={defaultUsername}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="password">پسورد</Label>
+            <Input
+              id="password"
+              name="password"
+              type="password"
+              className="h-12"
+              defaultValue={defultPassword}
+            />
+          </div>
+          {warningText && (
+            <div className="space-y-2">
+              <Alert dir="rtl" variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle>هشدار</AlertTitle>
+                <AlertDescription>{warningText}</AlertDescription>
+              </Alert>
+            </div>
+          )}
+        </CardContent>
+        <CardFooter>
+          <SubmitButton disabled={disabled} text="ورود" />
+        </CardFooter>
+      </form>
+    </Card>
   );
 }
