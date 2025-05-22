@@ -6,23 +6,16 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import {
   Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { eventFormSchemas } from "@/lib/schemas";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { useState } from "react";
-import { Calendar } from "../ui/calendar";
 import { AddEventData } from "@/actions/eventAction";
 import ClassSelectField from "../tableComponent/ReusableField/ClassSelectField";
 import SimpleField from "../tableComponent/ReusableField/SimpleField";
 import SubmitButton from "../SubmitButton";
+import DatepickerField from "../tableComponent/ReusableField/DatepickerField";
 
 const AddEventForm = ({ onCancel }: { onCancel: () => void }) => {
   const [classValue, setClassValue] = useState<string | undefined>(undefined);
@@ -80,52 +73,10 @@ const AddEventForm = ({ onCancel }: { onCancel: () => void }) => {
             label="توضیحات"
             type="textarea"
           />
-          <FormField
-            control={form.control}
-            name="startTime"
-            render={({ field }) => (
-              <FormItem className="flex-1">
-                <FormLabel>تاریخ رویداد</FormLabel>
-                <FormControl>
-                  <Popover modal={true}>
-                    <PopoverTrigger asChild>
-                      <Input
-                        readOnly
-                        value={
-                          field.value
-                            ? new Date(field.value).toLocaleDateString(
-                                "fa-IR",
-                                {
-                                  year: "numeric",
-                                  month: "2-digit",
-                                  day: "2-digit",
-                                  timeZone: "Asia/Tehran",
-                                }
-                              )
-                            : "تاریخ را انتخاب کنید"
-                        }
-                        placeholder="تاریخ را انتخاب کنید"
-                        className="cursor-pointer"
-                      />
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0">
-                      <Calendar
-                        mode="single"
-                        disabled={{ before: new Date() }}
-                        selected={
-                          field.value ? new Date(field.value) : undefined
-                        }
-                        onSelect={(date) => {
-                          field.onChange(date?.toISOString()); // ذخیره تاریخ در فرم
-                        }}
-                      />
-                    </PopoverContent>
-                  </Popover>
-                </FormControl>
-                {/* <FormDescription></FormDescription> */}
-                <FormMessage />
-              </FormItem>
-            )}
+          <DatepickerField
+            form={form}
+            fieldName="startTime"
+            formLabel="تاریخ رویداد"
           />
           <ClassSelectField
             form={form}
