@@ -4,20 +4,16 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
-import { Form, FormField, FormMessage } from "@/components/ui/form";
-import { ImageIcon } from "lucide-react";
+import { Form } from "@/components/ui/form";
 import { TeacherFormSchemas } from "@/lib/schemas";
-import { Avatar, AvatarFallback } from "../ui/avatar";
-import Image from "next/image";
-import { useRef } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AddTeacherData } from "@/actions/teacherAction";
 import { toast } from "sonner";
 import SimpleField from "../tableComponent/ReusableField/SimpleField";
 import SubmitButton from "../SubmitButton";
 import RadioGroupField from "../tableComponent/ReusableField/RadioGroupField";
+import UploadImageField from "../tableComponent/ReusableField/UploadImageField";
 const AddTeacherForm = ({ onCancel }: { onCancel: () => void }) => {
-  const inputRef = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
 
   const { mutate, isPending } = useMutation({
@@ -61,13 +57,6 @@ const AddTeacherForm = ({ onCancel }: { onCancel: () => void }) => {
     mutate(formData);
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      form.setValue("image", file);
-    }
-  };
-
   return (
     <div className="p-4">
       <Form {...form}>
@@ -107,78 +96,12 @@ const AddTeacherForm = ({ onCancel }: { onCancel: () => void }) => {
               defaultValue="09123456789"
             />
           </div>
-          <FormField
-            control={form.control}
-            name="image"
-            render={({ field }) => (
-              <div className="flex flex-col gap-y-2">
-                <div className="flex items-center gap-x-5">
-                  {field.value ? (
-                    <div className="size-[72px] relative rounded-md overflow-hidden">
-                      <Image
-                        src={
-                          field.value instanceof File
-                            ? URL.createObjectURL(field.value)
-                            : field.value
-                        }
-                        alt="teacher avatar"
-                        fill
-                        className="object-cover"
-                      />
-                    </div>
-                  ) : (
-                    <Avatar className="size-[72px]">
-                      <AvatarFallback>
-                        <ImageIcon className="size-[36px] text-neutral-400" />
-                      </AvatarFallback>
-                    </Avatar>
-                  )}
-                  <div className="flex flex-col gap-y-1">
-                    <p>عکس معلم</p>
-                    <p className="text-xs text-muted-foreground">
-                      JPG,PNG,SVG یا JPEG و حداکثر 1 مگابایت
-                    </p>
-                    <input
-                      className="hidden"
-                      accept=".jpg , .png , .jpeg , .svg"
-                      type="file"
-                      ref={inputRef}
-                      onChange={handleImageChange}
-                      disabled={isPending}
-                    />
-                    {field.value ? (
-                      <Button
-                        size="sm"
-                        type="button"
-                        disabled={isPending}
-                        variant="destructive"
-                        className="w-fit mt-2"
-                        onClick={() => {
-                          field.onChange(null);
-                          if (inputRef.current) {
-                            inputRef.current.value = "";
-                          }
-                        }}
-                      >
-                        حذف تصویر
-                      </Button>
-                    ) : (
-                      <Button
-                        size="sm"
-                        type="button"
-                        disabled={isPending}
-                        variant="secondary"
-                        className="w-fit mt-2 bg-sky-400 hover:bg-sky-300 "
-                        onClick={() => inputRef.current?.click()}
-                      >
-                        آپلود تصویر
-                      </Button>
-                    )}
-                    <FormMessage />
-                  </div>
-                </div>
-              </div>
-            )}
+          <UploadImageField
+            form={form}
+            fieldName="image"
+            labelName="تصویر معلم"
+            description="JPG,PNG,SVG یا JPEG و حداکثر 1 مگابایت"
+            disabledField={isPending}
           />
           <div className="flex gap-2">
             <SubmitButton isPending={isPending} />

@@ -206,7 +206,6 @@ export async function EditStudentData(formData: FormData) {
   const sex = formData.get("sex") as UserSex;
   const surname = formData.get("surname") as string;
   const username = formData.get("username") as string;
-  const parentId = formData.get("parent") as string;
   const className = formData.get("classValue") as string;
 
   let imageUrl: string | null = typeof image === "string" ? image : null;
@@ -264,7 +263,6 @@ export async function EditStudentData(formData: FormData) {
         sex,
         surname,
         username,
-        parentId,
         classId,
         gradeId,
       },

@@ -399,7 +399,6 @@ export const StudentEditFormSchemas = z.object({
       }),
     z.string(),
   ]),
-  parent: z.string().nonempty("باید یک والد انتخاب کنید"),
   classValue: z.string().nonempty("باید یک کلاس انتخاب کنید"),
 });
 
