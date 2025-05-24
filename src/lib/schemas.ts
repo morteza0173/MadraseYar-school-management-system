@@ -253,6 +253,7 @@ export const TeacherFormSchemas = z.object({
   username: z.string().min(1, "نام کاربری نمی‌تواند خالی باشد"),
   password: z.string().min(1, "پسورد حساب کاربری نمی‌تواند خالی باشد"),
   address: z.string().min(1, "آدرس نمی‌تواند خالی باشد"),
+  subject: z.string().nonempty("باید حوزه تدریس را انتخاب کنید"),
   sex: z.enum(["MALE", "FEMALE"], {
     message: "جنسیت معلم را انتخاب کنید",
   }),
@@ -280,6 +281,7 @@ export const TeacherEditFormSchemas = z.object({
   surname: z.string().min(1, "نام خانوادگی نمی‌تواند خالی باشد"),
   username: z.string().min(1, "نام کاربری نمی‌تواند خالی باشد"),
   address: z.string().min(1, "آدرس نمی‌تواند خالی باشد"),
+  subject: z.string().nonempty("باید حوزه تدریس را انتخاب کنید"),
   sex: z.enum(["MALE", "FEMALE"], {
     message: "جنسیت معلم را انتخاب کنید",
   }),

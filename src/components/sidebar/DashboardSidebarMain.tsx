@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronRight, LayoutDashboard, type LucideIcon } from "lucide-react";
+import { ChevronLeft, LayoutDashboard, type LucideIcon } from "lucide-react";
 
 import {
   Collapsible,
@@ -96,13 +96,13 @@ export function DashboardSidebarMain({
                         tooltip={item.title}
                         className="data-[active=true]:bg-orange-100 hover:bg-orange-50 data-[state=open]:hover:bg-orange-50 active:bg-orange-100"
                       >
-                        {item.icon && <item.icon />}
+                        <ChevronLeft className="transition-transform duration-200 group-data-[state=open]/collapsible:-rotate-90" />
                         <span>{item.title}</span>
-                        <ChevronRight className="mr-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                        {item.icon && <item.icon className="mr-auto" />}
                       </SidebarMenuButton>
                     </CollapsibleTrigger>
                     <CollapsibleContent>
-                      <SidebarMenuSub className="border-l-0 border-r border-orange-200">
+                      <SidebarMenuSub className="border-l-0 border-r border-orange-200 shadow-[inset_-1px_0_0_0_#fed7aa]">
                         {item.items?.map((subItem) => {
                           if (userInfo?.role) {
                             if (subItem.visible.includes(userInfo.role)) {

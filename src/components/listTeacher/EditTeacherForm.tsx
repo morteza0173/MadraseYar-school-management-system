@@ -6,7 +6,7 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { TeacherDataListSchema, TeacherEditFormSchemas } from "@/lib/schemas";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { EditTeacherData, getTeacherInfo } from "@/actions/teacherAction";
 import { toast } from "sonner";
@@ -14,6 +14,7 @@ import SimpleField from "../tableComponent/ReusableField/SimpleField";
 import SubmitButton from "../SubmitButton";
 import RadioGroupField from "../tableComponent/ReusableField/RadioGroupField";
 import UploadImageField from "../tableComponent/ReusableField/UploadImageField";
+import SubjectSelectField from "../tableComponent/ReusableField/SubjectSelectField";
 
 type Row<T> = {
   original: T;
@@ -25,6 +26,8 @@ interface EditTeacherFormProps {
 }
 
 const EditTeacherForm = ({ onCancel, row }: EditTeacherFormProps) => {
+  const [subjectValue, setSubjectValue] = useState("");
+
   const { data: teacherInfo, isPending: teacherInfoPending } = useQuery({
     queryKey: ["teacherInfo", row.original.id],
     queryFn: async () => getTeacherInfo(row.original.id),
@@ -52,6 +55,7 @@ const EditTeacherForm = ({ onCancel, row }: EditTeacherFormProps) => {
       phone: row.original.phone,
       address: "در حال دریافت ...",
       image: row.original.label.img,
+      subject: row.original.subject,
     },
   });
 
@@ -65,6 +69,7 @@ const EditTeacherForm = ({ onCancel, row }: EditTeacherFormProps) => {
         address: teacherInfo.address,
         image: row.original.label.img,
         sex: teacherInfo.sex,
+        subject: row.original.subject,
       });
     }
   }, [teacherInfo, form, row]);
@@ -82,6 +87,7 @@ const EditTeacherForm = ({ onCancel, row }: EditTeacherFormProps) => {
     formData.append("address", data.address);
     formData.append("image", data.image);
     formData.append("sex", data.sex);
+    formData.append("subject", subjectValue);
 
     mutate(formData);
   };
@@ -135,6 +141,16 @@ const EditTeacherForm = ({ onCancel, row }: EditTeacherFormProps) => {
               <RadioGroupField.Option label="زن" value="FEMALE" />
             </RadioGroupField>
           </div>
+          <SubjectSelectField
+            form={form}
+            fieldName="subject"
+            subjectValue={subjectValue}
+            setSubjectValue={setSubjectValue}
+            formLable="حوزه تدریس معلم"
+            description="تخصص معلم در تدریس کدام درس است ؟"
+            row={row}
+            rowKey="subject"
+          />
           <UploadImageField
             form={form}
             fieldName="image"

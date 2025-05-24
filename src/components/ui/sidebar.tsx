@@ -691,7 +691,7 @@ const SidebarMenuSub = React.forwardRef<
       ref={ref}
       data-sidebar="menu-sub"
       className={cn(
-        "mx-3.5 flex min-w-0 w-full translate-x-px flex-col gap-1 border-l border-sidebar-border px-2.5 py-0.5 relative",
+        "mx-[16px] flex min-w-0 w-full translate-x-px flex-col gap-1 border-l border-sidebar-border px-2.5 py-0.5 relative",
         "group-data-[collapsible=icon]:hidden",
         className
       )}
@@ -708,7 +708,7 @@ const SidebarMenuSub = React.forwardRef<
             <span
               ref={ref}
               className={cn(
-                "absolute top-1/2-translate-y-1/2 h-1 w-1 bg-orange-200 rounded-full",
+                "absolute top-1/2-translate-y-1/2 h-[6px] w-[6px] bg-orange-200 rounded-full",
                 isActive ? "bg-orange-400" : "bg-orange-200"
               )}
               style={{

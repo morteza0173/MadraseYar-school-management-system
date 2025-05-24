@@ -109,11 +109,11 @@ export function DashboardSidebarUser({
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem className="focus:bg-orange-50">
+              <DropdownMenuItem className="focus:bg-orange-50" disabled>
                 <BadgeCheck />
                 تنظیمات حساب
               </DropdownMenuItem>
-              <DropdownMenuItem className="focus:bg-orange-50">
+              <DropdownMenuItem className="focus:bg-orange-50" disabled>
                 <Bell />
                 پیام ها
               </DropdownMenuItem>

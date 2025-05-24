@@ -13,7 +13,10 @@ import SimpleField from "../tableComponent/ReusableField/SimpleField";
 import SubmitButton from "../SubmitButton";
 import RadioGroupField from "../tableComponent/ReusableField/RadioGroupField";
 import UploadImageField from "../tableComponent/ReusableField/UploadImageField";
+import SubjectSelectField from "../tableComponent/ReusableField/SubjectSelectField";
+import { useState } from "react";
 const AddTeacherForm = ({ onCancel }: { onCancel: () => void }) => {
+  const [subjectValue, setSubjectValue] = useState("");
   const queryClient = useQueryClient();
 
   const { mutate, isPending } = useMutation({
@@ -53,6 +56,7 @@ const AddTeacherForm = ({ onCancel }: { onCancel: () => void }) => {
     formData.append("address", data.address);
     formData.append("email", data.email);
     formData.append("sex", data.sex);
+    formData.append("subject", subjectValue);
 
     mutate(formData);
   };
@@ -96,6 +100,14 @@ const AddTeacherForm = ({ onCancel }: { onCancel: () => void }) => {
               defaultValue="09123456789"
             />
           </div>
+          <SubjectSelectField
+            form={form}
+            fieldName="subject"
+            subjectValue={subjectValue}
+            setSubjectValue={setSubjectValue}
+            formLable="حوزه تدریس معلم"
+            description="تخصص معلم در تدریس کدام درس است ؟"
+          />
           <UploadImageField
             form={form}
             fieldName="image"

@@ -17,7 +17,7 @@ export interface FormattedTeacher {
   phone?: string | undefined;
   subject?: string | undefined;
   classes: string;
-eventOnGoing: number;
+  eventOnGoing: number;
 }
 
 export async function getTeacherData(userId: string) {
@@ -202,6 +202,7 @@ export async function AddTeacherData(formData: FormData) {
   const surname = formData.get("surname") as string;
   const username = formData.get("username") as string;
   const email = formData.get("email") as string;
+  const subjectName = formData.get("subject") as string;
 
   try {
     const {
@@ -234,6 +235,10 @@ export async function AddTeacherData(formData: FormData) {
       .getPublicUrl(`${userId}/${image.name}`);
 
     await prisma.$transaction(async (prisma) => {
+      const subject = await prisma.subject.findUnique({
+        where: { name: subjectName },
+      });
+
       await prisma.users.create({
         data: {
           id: userId!,
@@ -252,6 +257,9 @@ export async function AddTeacherData(formData: FormData) {
           address,
           img: publicUrl,
           sex,
+          subjects: {
+            connect: { id: subject?.id },
+          },
         },
       });
     });
@@ -291,6 +299,7 @@ export async function EditTeacherData(formData: FormData) {
   const sex = formData.get("sex") as UserSex;
   const surname = formData.get("surname") as string;
   const username = formData.get("username") as string;
+  const subjectName = formData.get("subject") as string;
 
   let imageUrl: string | null = typeof image === "string" ? image : null;
   try {
@@ -324,6 +333,10 @@ export async function EditTeacherData(formData: FormData) {
       imageUrl = publicUrl;
     }
 
+    const subject = await prisma.subject.findUnique({
+      where: { name: subjectName },
+    });
+
     await prisma.teacher.update({
       where: { id: String(id) },
       data: {
@@ -334,6 +347,9 @@ export async function EditTeacherData(formData: FormData) {
         sex,
         surname,
         username,
+        subjects: {
+          connect: { id: subject?.id },
+        },
       },
     });
 
