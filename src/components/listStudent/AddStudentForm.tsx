@@ -21,7 +21,6 @@ import {
   TriangleAlert,
 } from "lucide-react";
 import { StudentFormSchemas } from "@/lib/schemas";
-import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import Image from "next/image";
 import { useRef, useState } from "react";
@@ -41,6 +40,7 @@ import { useGetParentData } from "@/hooks/useGetParentData";
 import ClassSelectField from "../tableComponent/ReusableField/ClassSelectField";
 import SimpleField from "../tableComponent/ReusableField/SimpleField";
 import SubmitButton from "../SubmitButton";
+import RadioGroupField from "../tableComponent/ReusableField/RadioGroupField";
 
 const AddStudentForm = ({ onCancel }: { onCancel: () => void }) => {
   const {
@@ -131,38 +131,10 @@ const AddStudentForm = ({ onCancel }: { onCancel: () => void }) => {
             defaultValue="ادرس خود را وارد کنید ..."
           />
           <div className="flex flex-row gap-4">
-            <FormField
-              control={form.control}
-              name="sex"
-              render={({ field }) => (
-                <FormItem className="flex-1">
-                  <FormLabel>جنسیت</FormLabel>
-                  <FormControl>
-                    <RadioGroup
-                      dir="rtl"
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                      className="flex flex-row gap-2 h-9 justify-around"
-                    >
-                      <FormItem className="flex items-center">
-                        <FormControl>
-                          <RadioGroupItem value="MALE" />
-                        </FormControl>
-                        <FormLabel className="m-2">مرد</FormLabel>
-                      </FormItem>
-                      <FormItem className="flex items-center">
-                        <FormControl>
-                          <RadioGroupItem value="FEMALE" />
-                        </FormControl>
-                        <FormLabel className="m-2">زن</FormLabel>
-                      </FormItem>
-                    </RadioGroup>
-                  </FormControl>
-                  {/* <FormDescription></FormDescription> */}
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <RadioGroupField fieldName="sex" form={form} labelName="جنسیت">
+              <RadioGroupField.Option label="مرد" value="MALE" />
+              <RadioGroupField.Option label="زن" value="FEMALE" />
+            </RadioGroupField>
             <SimpleField
               form={form}
               name="phone"
