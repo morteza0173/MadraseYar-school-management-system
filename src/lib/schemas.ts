@@ -18,7 +18,7 @@ export const AddClassFormSchema = z.object({
   grade: z.string().nonempty("باید سال تحصیلی را انتخاب کنید"),
 });
 
-export type AddClassFormSchemaProps = z.infer<typeof AddClassFormSchema>
+export type AddClassFormSchemaProps = z.infer<typeof AddClassFormSchema>;
 
 export const AddLessonFormSchema = z
   .object({
@@ -329,21 +329,27 @@ export const ParentEditFormSchemas = z.object({
 
 export const StudentFormSchemas = z.object({
   name: z.string().min(1, "نام نمی‌تواند خالی باشد"),
+  fatherName: z.string().min(1, "نام پدر نمی‌تواند خالی باشد"),
   email: z.string().min(1, "ایمیل نمی‌تواند خالی باشد"),
   surname: z.string().min(1, "نام خانوادگی نمی‌تواند خالی باشد"),
+  fatherUsername: z.string().min(1, "نام کاربری پدر نمی‌تواند خالی باشد"),
   username: z.string().min(1, "نام کاربری نمی‌تواند خالی باشد"),
   password: z.string().min(1, "پسورد حساب کاربری نمی‌تواند خالی باشد"),
+  fatherPassword: z.string().min(1, "رمز عبور پدر نمی‌تواند خالی باشد"),
+  fatherEmail: z.string().min(1, "ایمیل پدر نمی‌تواند خالی باشد"),
   address: z.string().min(1, "آدرس نمی‌تواند خالی باشد"),
   sex: z.enum(["MALE", "FEMALE"], {
     message: "جنسیت دانش‌آموز را انتخاب کنید",
   }),
   phone: z
     .string()
-
     .regex(/^09\d{9}$/, {
       message: "شماره تلفن باید 11 رقم و با 09 شروع شود.",
     })
     .optional(),
+  fatherPhone: z.string().regex(/^09\d{9}$/, {
+    message: "شماره تلفن باید 11 رقم و با 09 شروع شود.",
+  }),
   image: z
     .instanceof(File, { message: "لطفاً یک فایل معتبر انتخاب کنید." })
     .refine(
@@ -358,7 +364,6 @@ export const StudentFormSchemas = z.object({
     .refine((file) => file.size <= 1024 * 1024, {
       message: "حجم فایل نباید بیشتر از 1 مگابایت باشد.",
     }),
-  parent: z.string().nonempty("باید یک والد انتخاب کنید"),
   classValue: z.string().nonempty("باید یک کلاس انتخاب کنید"),
 });
 

@@ -7,9 +7,8 @@ import {
 } from "@/lib/supabaseClient";
 import { UserSex } from "@prisma/client";
 
-export async function AddStudentData(formData: FormData) {
+export async function addStudentAndParent(formData: FormData) {
   const supabase = await createClientWithServiceRole();
-
   const address = formData.get("address") as string;
   const image = formData.get("image") as File;
   const name = formData.get("name") as string;
@@ -19,81 +18,113 @@ export async function AddStudentData(formData: FormData) {
   const surname = formData.get("surname") as string;
   const username = formData.get("username") as string;
   const email = formData.get("email") as string;
-  const parentId = formData.get("parent") as string;
   const className = formData.get("classValue") as string;
 
-  try {
-    const classData = await prisma.class.findUnique({
-      where: { name: className },
-      include: { grade: true },
+  const fatherName = formData.get("fatherName") as string;
+  const fatherUsername = formData.get("fatherUsername") as string;
+  const fatherPassword = formData.get("fatherPassword") as string;
+  const fatherEmail = formData.get("fatherEmail") as string;
+  const fatherPhone = formData.get("fatherPhone") as string;
+
+  const classData = await prisma.class.findUnique({
+    where: { name: className },
+    include: { grade: true },
+  });
+
+  if (!classData) {
+    throw new Error(`کلاس با نام ${className} یافت نشد`);
+  }
+
+  const classId = classData.id;
+  const gradeId = classData.grade.id;
+
+  const { data: fatherAuth, error: fatherAuthError } =
+    await supabase.auth.admin.createUser({
+      email: fatherEmail,
+      password: fatherPassword,
+      email_confirm: true,
     });
 
-    if (!classData) {
-      throw new Error(`کلاس با نام ${className} یافت نشد`);
-    }
+  if (fatherAuthError || !fatherAuth?.user?.id) {
+    throw new Error("خطا در ایجاد حساب پدر");
+  }
 
-    const classId = classData.id;
-    const gradeId = classData.grade.id;
+  const fatherId = fatherAuth.user.id;
 
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.admin.createUser({
+  const { data: studentAuth, error: studentAuthError } =
+    await supabase.auth.admin.createUser({
       email,
       password,
       email_confirm: true,
     });
 
-    if (authError) {
-      throw new Error(`خطا در ساخت حساب کاربری: ${authError.message}`);
-    }
+  if (studentAuthError || !studentAuth?.user?.id) {
+    throw new Error("خطا در ایجاد حساب دانش‌آموز");
+  }
 
-    const userId = user?.id;
+  const studentId = studentAuth.user.id;
 
-    const { error: uploadError } = await supabase.storage
-      .from("profile-images")
-      .upload(`${userId}/${image?.name}`, image);
+  const { error: uploadError } = await supabase.storage
+    .from("profile-images")
+    .upload(`${studentId}/${image?.name}`, image);
 
-    if (uploadError) {
-      throw new Error(`خطا در آپلود عکس: ${uploadError.message}`);
-    }
+  if (uploadError) {
+    throw new Error("خطا در آپلود عکس");
+  }
 
-    const {
-      data: { publicUrl },
-    } = supabase.storage
-      .from("profile-images")
-      .getPublicUrl(`${userId}/${image.name}`);
+  const { data: publicImage } = supabase.storage
+    .from("profile-images")
+    .getPublicUrl(`${studentId}/${image.name}`);
 
+  try {
     await prisma.$transaction(async (prisma) => {
       await prisma.users.create({
         data: {
-          id: userId!,
+          id: fatherId,
+          role: "parent",
+        },
+      });
+      await prisma.users.create({
+        data: {
+          id: studentId!,
           role: "student",
+        },
+      });
+
+      await prisma.parent.create({
+        data: {
+          id: fatherId!,
+          username: fatherUsername,
+          name: fatherName,
+          surname,
+          email: fatherEmail,
+          phone: fatherPhone,
+          address,
         },
       });
 
       await prisma.student.create({
         data: {
-          id: userId!,
+          id: studentId!,
           username,
           name,
           surname,
           email,
           phone,
           address,
-          img: publicUrl,
+          img: publicImage.publicUrl,
           sex,
-          parentId,
+          parentId: fatherId,
           classId,
           gradeId,
         },
       });
     });
-
-    return { message: "دانش‌آموز با موفقیت ثبت شد" };
   } catch {
-    throw new Error(`خطا در ثبت دانش‌آموز`);
+    throw new Error("خطای در حین ثبت اطلاعات رخ داد");
   }
+
+  return { message: "دانش‌آموز و پدر با موفقیت ثبت شدند" };
 }
 
 export async function getStudentInfo(id: string) {
