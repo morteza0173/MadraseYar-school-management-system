@@ -204,70 +204,66 @@ export async function AddTeacherData(formData: FormData) {
   const email = formData.get("email") as string;
   const subjectName = formData.get("subject") as string;
 
-  try {
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.admin.createUser({
-      email,
-      password,
-      email_confirm: true,
-    });
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.admin.createUser({
+    email,
+    password,
+    email_confirm: true,
+  });
 
-    if (authError) {
-      throw new Error(`خطا در ساخت حساب کاربری: ${authError.message}`);
-    }
-
-    const userId = user?.id;
-
-    const { error: uploadError } = await supabase.storage
-      .from("profile-images")
-      .upload(`${userId}/${image?.name}`, image);
-
-    if (uploadError) {
-      throw new Error(`خطا در آپلود عکس: ${uploadError.message}`);
-    }
-
-    const {
-      data: { publicUrl },
-    } = supabase.storage
-      .from("profile-images")
-      .getPublicUrl(`${userId}/${image.name}`);
-
-    await prisma.$transaction(async (prisma) => {
-      const subject = await prisma.subject.findUnique({
-        where: { name: subjectName },
-      });
-
-      await prisma.users.create({
-        data: {
-          id: userId!,
-          role: "teacher",
-        },
-      });
-
-      await prisma.teacher.create({
-        data: {
-          id: userId!,
-          username,
-          name,
-          surname,
-          email,
-          phone,
-          address,
-          img: publicUrl,
-          sex,
-          subjects: {
-            connect: { id: subject?.id },
-          },
-        },
-      });
-    });
-
-    return { message: "معلم با موفقیت ثبت شد" };
-  } catch {
-    throw new Error(`خطا در ثبت معلم`);
+  if (authError) {
+    throw new Error(`خطا در ساخت حساب کاربری: ${authError.message}`);
   }
+
+  const userId = user?.id;
+
+  const { error: uploadError } = await supabase.storage
+    .from("profile-images")
+    .upload(`${userId}/${image?.name}`, image);
+
+  if (uploadError) {
+    throw new Error(`خطا در آپلود عکس: ${uploadError.message}`);
+  }
+
+  const {
+    data: { publicUrl },
+  } = supabase.storage
+    .from("profile-images")
+    .getPublicUrl(`${userId}/${image.name}`);
+
+  await prisma.$transaction(async (prisma) => {
+    const subject = await prisma.subject.findUnique({
+      where: { name: subjectName },
+    });
+
+    await prisma.users.create({
+      data: {
+        id: userId!,
+        role: "teacher",
+      },
+    });
+
+    await prisma.teacher.create({
+      data: {
+        id: userId!,
+        username,
+        name,
+        surname,
+        email,
+        phone,
+        address,
+        img: publicUrl,
+        sex,
+        subjects: {
+          connect: { id: subject?.id },
+        },
+      },
+    });
+  });
+
+  return { message: "معلم با موفقیت ثبت شد" };
 }
 
 export async function getTeacherInfo(id: string) {
