@@ -24,7 +24,7 @@ import { useUserAuth } from "@/hooks/useUserAuth";
 import { cn } from "@/lib/utils";
 import { Check, ChevronsUpDown, Loader2, TriangleAlert } from "lucide-react";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { FieldValues, Path, UseFormReturn } from "react-hook-form";
+import { FieldValues, Path, PathValue, UseFormReturn } from "react-hook-form";
 
 interface Row<T> {
   original: T;
@@ -176,8 +176,7 @@ const ClassSelectField = <T extends FieldValues, R>({
                     size="icon"
                     onClick={() => {
                       setClassValue("");
-                      const defaultValue = form.getValues(fieldName);
-                      form.setValue(fieldName, defaultValue);
+                      form.setValue(fieldName, "" as PathValue<T, Path<T>>);
                     }}
                   >
                     ×
