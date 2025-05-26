@@ -58,6 +58,17 @@ const LessonSelectField = <T extends FieldValues, R>({
   const { data: ClassData } = useGetClassDetails(userData);
   const [openLessonList, setOpenLessonList] = useState(false);
 
+  const uniqueLessons = lessonsData
+    ? Array.from(
+        new Map(
+          lessonsData.map((lesson) => [
+            `${lesson.lessonName}-${lesson.className}`,
+            lesson,
+          ])
+        ).values()
+      )
+    : [];
+
   return (
     <FormField
       control={form.control}
@@ -131,7 +142,7 @@ const LessonSelectField = <T extends FieldValues, R>({
                           </div>
                         </CommandEmpty>
                         <CommandGroup>
-                          {lessonsData?.map((lesson) => (
+                          {uniqueLessons?.map((lesson) => (
                             <CommandItem
                               key={lesson.lessonName}
                               className="z-[60] pointer-events-auto overflow-auto"

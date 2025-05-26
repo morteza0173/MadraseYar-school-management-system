@@ -68,7 +68,12 @@ export async function getStudentData(userId: string) {
 
   if (teacher) {
     const students = teacher.lessons.flatMap((l) => l.class.student);
-    return students.map((s) => mapStudent(s as StudentWithRelations, now));
+    const uniqueStudents = Array.from(
+      new Map(students.map((s) => [s.id, s])).values()
+    );
+    return uniqueStudents.map((s) =>
+      mapStudent(s as StudentWithRelations, now)
+    );
   }
 
   const student = await prisma.student.findUnique({
