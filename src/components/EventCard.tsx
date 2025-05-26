@@ -21,6 +21,10 @@ type CombinedDataItem = {
   className?: string;
 };
 
+const normalizeDate = (date: Date) => {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+};
+
 export const EventCard = ({
   daypickerValue,
 }: {
@@ -64,9 +68,8 @@ export const EventCard = ({
 
     const groupedByDate = allData.reduce(
       (acc: Record<string, CombinedDataItem[]>, item) => {
-        const dateKey = new Date(
-          item.startTime || item.dueDate!
-        ).toDateString();
+        const rawDate = new Date(item.startTime || item.dueDate!);
+        const dateKey = normalizeDate(rawDate).toDateString();
         if (!acc[dateKey]) {
           acc[dateKey] = [];
         }
@@ -78,6 +81,38 @@ export const EventCard = ({
 
     return groupedByDate;
   }, [eventsData, examsData, assignmentsData]);
+
+  if (isAssignmentsPending || isEventsPending || isExamsPending) {
+    return (
+      <Card>
+        <CardContent className="flex gap-2 items-center justify-center h-[300px]">
+          <Loader2 className="animate-spin w-4 h-4 " />
+          <p className="text-xs text-gray-400">درحال دریافت رویداد ها</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (
+    eventsData &&
+    eventsData.length === 0 &&
+    examsData &&
+    examsData.length === 0 &&
+    assignmentsData &&
+    assignmentsData.length === 0
+  ) {
+    return (
+      <Card>
+        <CardContent className="flex items-center justify-center h-[300px]">
+          <p className="text-xs text-gray-400">هیچ رویدادی وجود ندارد</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const selectedDateKey = daypickerValue
+    ? normalizeDate(daypickerValue).toDateString()
+    : null;
 
   return (
     <Card>
@@ -97,51 +132,17 @@ export const EventCard = ({
             <p className="text-sm md:text-base font-bold">رویداد ها</p>
           )}
         </div>
-        {isAssignmentsPending || isEventsPending || isExamsPending ? (
-          <div className="flex gap-2 items-center justify-center h-[300px]">
-            <Loader2 className="animate-spin w-4 h-4 " />
-            <p className="text-xs text-gray-400">درحال دریافت رویداد ها</p>
-          </div>
-        ) : eventsData?.length === 0 ||
-          examsData?.length === 0 ||
-          assignmentsData?.length === 0 ? (
-          <div className="flex items-center justify-center h-[300px]">
-            <p className="text-xs text-gray-400">هیچ رویدادی وجود ندارد</p>
-          </div>
-        ) : daypickerValue ? (
+
+        {daypickerValue ? (
           <div className="w-full h-[300px] overflow-y-scroll custom-scrollbar mt-4">
-            {daypickerValue ? (
-              Object.keys(combinedData).includes(
-                daypickerValue.toDateString()
-              ) ? (
-                Object.entries(combinedData).map(([date, items]) => {
-                  const isSelectedDate =
-                    new Date(date).toDateString() ===
-                    daypickerValue.toDateString();
-
-                  if (isSelectedDate) {
-                    return (
-                      <div key={date}>
-                        {items.map((item) => (
-                          <EventList key={item.id} item={item} />
-                        ))}
-                      </div>
-                    );
-                  }
-
-                  return null;
-                })
-              ) : (
-                <div className="flex items-center justify-center h-[300px]">
-                  <p className="text-xs text-gray-400">
-                    در این تاریخ رویدادی وجود ندارد
-                  </p>
-                </div>
-              )
+            {selectedDateKey && combinedData[selectedDateKey] ? (
+              combinedData[selectedDateKey].map((item) => (
+                <EventList key={item.id} item={item} />
+              ))
             ) : (
               <div className="flex items-center justify-center h-[300px]">
                 <p className="text-xs text-gray-400">
-                  یک تاریخ برای نمایش رویداد ها انتخاب کنید
+                  در این تاریخ رویدادی وجود ندارد
                 </p>
               </div>
             )}
@@ -217,7 +218,7 @@ const EventList = ({ item }: { item: CombinedDataItem }) => {
         </div>
       )}
       {item.type === "assignment" && (
-        <div className="w-[94%] h-auto bg-green-200  rounded-sm mt-2 p-2 mr-2">
+        <div className="w-[94%] h-auto bg-green-200 rounded-sm mt-2 p-2 mr-2">
           <div className="flex flex-col gap-2 w-auto">
             <div className="flex justify-between items-center">
               <p className="text-xs font-semibold">تکلیف</p>
