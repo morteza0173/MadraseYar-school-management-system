@@ -60,16 +60,15 @@ async function buildAssignmentFilter(
 async function getTeacherAssignmentFilter(
   teacherId: string
 ): Promise<AssignmentFilter> {
-  const teacher = await prisma.teacher.findUnique({
-    where: { id: teacherId },
-    include: {
-      lessons: { select: { id: true } },
-    },
+  const lessons = await prisma.lesson.findMany({
+    where: { teacherId },
+    select: { id: true },
   });
 
-  if (!teacher) return {};
+  const lessonIds = lessons.map((lesson) => lesson.id);
 
-  const lessonIds = teacher.lessons.map((lesson) => lesson.id);
+  if (lessonIds.length === 0) return { lessonId: -1 }; // هیچ درسی نداشت
+
   return { lessonId: { in: lessonIds } };
 }
 
@@ -126,6 +125,5 @@ function mapAssignmentToDTO(assignment: {
     className: assignment.lesson?.class?.name ?? "نامشخص",
   };
 }
-
 
 export type AssignmentsProps = ReturnType<typeof mapAssignmentToDTO>;
