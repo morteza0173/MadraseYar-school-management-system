@@ -16,6 +16,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
+import { AlertTriangle } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "./ui/alart";
 const chartData = [
   { date: "1403-10-22", running: 2400, swimming: 100 },
   { date: "1403-10-23", running: 2480, swimming: 20 },
@@ -39,7 +41,18 @@ const chartConfig = {
 export function Barchart() {
   return (
     <Card className="border-none ring-0 h-[400px] xl:h-[450px]">
-      <CardContent className="h-full flex flex-col justify-between p-0">
+      <CardContent className="relative h-full flex flex-col justify-between p-0">
+        <div className="absolute left-0 top-0 bg-slate-100/80 w-full h-full z-50">
+          <div className="flex h-full items-center justify-center gap-2">
+            <Alert className="w-3/4">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertTitle className="font-bold">در حال توسعه</AlertTitle>
+              <AlertDescription className="text-xs">
+                این چارت بعد از توسعه حضور غیاب فعال میشود
+              </AlertDescription>
+            </Alert>
+          </div>
+        </div>
         <div className="flex items-center justify-between py-2 p-4">
           <p className="text-sm md:text-base font-bold">حضور و غیاب</p>
           <div className="flex gap-4">

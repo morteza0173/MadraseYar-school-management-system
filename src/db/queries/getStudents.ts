@@ -20,11 +20,16 @@ export interface StudentWithRelations {
     grade: {
       level: number;
     };
+    lessons: {
+      id: number;
+      exams: { id: number; startTime: Date }[];
+      assignment: { id: number; DueDate: Date }[];
+    }[];
   };
   results: {
     score: number;
-    assignment?: { DueDate: string } | null;
-    exam?: { startTime: string } | null;
+    examId?: number | null;
+    assignmentId?: number | null;
   }[];
 }
 
@@ -35,9 +40,14 @@ export async function getStudentData(userId: string) {
   if (admin) {
     const students = await prisma.student.findMany({
       include: {
-        class: { include: { grade: true } },
+        class: {
+          include: {
+            grade: true,
+            lessons: { include: { exams: true, assignment: true } },
+          },
+        },
         parent: true,
-        results: { include: { assignment: true, exam: true } },
+        results: true,
       },
     });
 
@@ -54,9 +64,19 @@ export async function getStudentData(userId: string) {
               grade: true,
               student: {
                 include: {
-                  class: { include: { grade: true } },
+                  class: {
+                    include: {
+                      grade: true,
+                      lessons: {
+                        include: {
+                          exams: true,
+                          assignment: true,
+                        },
+                      },
+                    },
+                  },
                   parent: true,
-                  results: { include: { assignment: true, exam: true } },
+                  results: true,
                 },
               },
             },
@@ -83,9 +103,19 @@ export async function getStudentData(userId: string) {
         include: {
           student: {
             include: {
-              class: { include: { grade: true } },
+              class: {
+                include: {
+                  grade: true,
+                  lessons: {
+                    include: {
+                      exams: true,
+                      assignment: true,
+                    },
+                  },
+                },
+              },
               parent: true,
-              results: { include: { assignment: true, exam: true } },
+              results: true,
             },
           },
         },
@@ -108,9 +138,19 @@ export async function getStudentData(userId: string) {
             include: {
               student: {
                 include: {
-                  class: { include: { grade: true } },
+                  class: {
+                    include: {
+                      grade: true,
+                      lessons: {
+                        include: {
+                          exams: true,
+                          assignment: true,
+                        },
+                      },
+                    },
+                  },
                   parent: true,
-                  results: { include: { assignment: true, exam: true } },
+                  results: true,
                 },
               },
             },
@@ -128,13 +168,28 @@ export async function getStudentData(userId: string) {
   return [];
 }
 
+
 export function mapStudent(s: StudentWithRelations, now: Date) {
-  const upcomingAssignments = s.results.filter(
-    (r) => r.assignment && new Date(r.assignment.DueDate) > now
+  const allLessonExams = s.class.lessons.flatMap((lesson) => lesson.exams);
+  const allLessonAssignments = s.class.lessons.flatMap(
+    (lesson) => lesson.assignment
+  );
+
+  const studentExamIds = new Set(
+    s.results.filter((r) => r.examId !== null).map((r) => r.examId)
+  );
+  const studentAssignmentIds = new Set(
+    s.results.filter((r) => r.assignmentId !== null).map((r) => r.assignmentId)
+  );
+
+  const upcomingExams = allLessonExams.filter(
+    (exam) => new Date(exam.startTime) > now && !studentExamIds.has(exam.id)
   ).length;
 
-  const upcomingExams = s.results.filter(
-    (r) => r.exam && new Date(r.exam.startTime) > now
+  const upcomingAssignments = allLessonAssignments.filter(
+    (assignment) =>
+      new Date(assignment.DueDate) > now &&
+      !studentAssignmentIds.has(assignment.id)
   ).length;
 
   const averageScore =
