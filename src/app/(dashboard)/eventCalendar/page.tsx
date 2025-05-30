@@ -20,7 +20,7 @@ const EventPage = () => {
     new Date()
   );
   return (
-    <div className="px-4 flex flex-col xl:flex-row gap-2 h-full">
+    <div className="px-1 md:px-4 flex flex-col xl:flex-row gap-2 h-full">
       {/* right */}
       <div className="w-full xl:w-8/12 h-auto">
         <div>
@@ -32,8 +32,8 @@ const EventPage = () => {
       </div>
 
       {/* left */}
-      <div className="w-full xl:w-4/12 h-full">
-        <div className="h-full">
+      <div className="w-full xl:w-4/12 h-fit md:h-full">
+        <div className="h-fit md:h-full">
           <Card className="flex flex-col overflow-hidden">
             <CardHeader>
               <CardTitle>رویداد ها</CardTitle>
@@ -133,8 +133,8 @@ function EventCardInEventPage({
 
   if (isAssignmentsPending || isEventsPending || isExamsPending) {
     return (
-      <div className="h-[700px]">
-        <div className="flex gap-2 justify-center h-full">
+      <div className="h-fit md:h-[700px]">
+        <div className="flex gap-2 justify-center h-full mb-8">
           <Loader2 className="animate-spin w-4 h-4 " />
           <p className="text-xs text-gray-400">درحال دریافت رویداد ها</p>
         </div>
@@ -151,8 +151,8 @@ function EventCardInEventPage({
     assignmentsData.length === 0
   ) {
     return (
-      <div className="h-[700px]">
-        <div className="flex justify-center h-full">
+      <div className="h-fit md:h-[700px]">
+        <div className="flex justify-center h-full mb-8">
           <p className="text-xs text-gray-400">هیچ رویدادی وجود ندارد</p>
         </div>
       </div>
@@ -164,7 +164,7 @@ function EventCardInEventPage({
     : null;
 
   return (
-    <div className="h-[700px] overflow-y-auto custom-scrollbar">
+    <div className="h-fit md:h-[700px] overflow-y-auto custom-scrollbar">
       <div className="h-full mb-40">
         {daypickerValue ? (
           <div className="w-full">
@@ -173,7 +173,7 @@ function EventCardInEventPage({
                 <EventList key={item.id} item={item} />
               ))
             ) : (
-              <div className="flex justify-center h-[700px]">
+              <div className="flex justify-center h-fit md:h-[700px]">
                 <p className="text-xs text-gray-400">
                   در این تاریخ رویدادی وجود ندارد
                 </p>
@@ -181,7 +181,7 @@ function EventCardInEventPage({
             )}
           </div>
         ) : (
-          <div className="flex justify-center h-[700px]">
+          <div className="flex justify-center h-fit md:h-[700px]">
             <p className="text-xs text-gray-400">
               یک تاریخ برای نمایش رویداد ها انتخاب کنید
             </p>

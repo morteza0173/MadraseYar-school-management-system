@@ -123,8 +123,8 @@ function EventCalendar({
 
     const maxDots = 3;
     const eventDots = events.slice(0, maxDots).map((event, index) => {
-      const leftValue = isMdUp ? 20 : 8;
-      const topValue = isMdUp ? index * 10 : index * 8;
+      const leftValue = isMdUp ? 20 : 6;
+      const topValue = isMdUp ? index * 10 : index * 6;
       const color =
         event.type === "exam"
           ? "bg-blue-500"
@@ -174,18 +174,18 @@ function EventCalendar({
         hasEvents: "relative",
       }}
       showOutsideDays={showOutsideDays}
-      className={cn("p-4 font-IranSans w-full", className)}
+      className={cn("font-IranSans w-full", className)}
       classNames={{
         hidden: "invisible",
         root: "w-full bg-card rounded-xl shadow-sm p-2 md:h-auto",
         outside:
           "day-outside text-muted-foreground opacity-50 aria-selected:bg-accent/50 aria-selected:text-muted-foreground aria-selected:opacity-30",
         weekdays: "text-muted-foreground",
-        weekday: "p-4 text-center text-[0.6rem] md:text-md font-semibold",
+        weekday: "p-1 text-center text-[0.6rem] md:text-base font-semibold",
         day_button: cn(
           buttonVariants({ variant: "ghost" }),
           "w-full p-0 hover:bg-orange-100 ",
-          "min-h-[40px] md:min-h-[80px] xl:min-h-[110px] h-auto"
+          "md:min-h-[80px] xl:min-h-[110px] aspect-square md:aspect-auto md:h-auto"
         ),
         day: "",
         selected:
