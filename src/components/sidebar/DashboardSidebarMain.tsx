@@ -1,6 +1,11 @@
 "use client";
 
-import { ChevronLeft, LayoutDashboard, type LucideIcon } from "lucide-react";
+import {
+  Calendar,
+  ChevronLeft,
+  LayoutDashboard,
+  type LucideIcon,
+} from "lucide-react";
 
 import {
   Collapsible,
@@ -63,7 +68,6 @@ export function DashboardSidebarMain({
   return (
     <SidebarGroup>
       <SidebarGroupLabel>منو</SidebarGroupLabel>
-
       <SidebarMenu>
         {userInfo?.role && (
           <SidebarMenuItem>
@@ -75,6 +79,16 @@ export function DashboardSidebarMain({
               <Link href={`/${userInfo?.role}`}>
                 <LayoutDashboard />
                 <span>داشبورد </span>
+              </Link>
+            </SidebarMenuButton>
+            <SidebarMenuButton
+              isActive={pathname.includes("eventCalendar")}
+              className="data-[active=true]:bg-orange-100 hover:bg-orange-50"
+              asChild
+            >
+              <Link href="/eventCalendar">
+                <Calendar />
+                <span>تقویم رویدادها</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

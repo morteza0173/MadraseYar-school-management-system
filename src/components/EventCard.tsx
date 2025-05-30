@@ -159,7 +159,7 @@ export const EventCard = ({
   );
 };
 
-const EventList = ({ item }: { item: CombinedDataItem }) => {
+export const EventList = ({ item }: { item: CombinedDataItem }) => {
   const router = useRouter();
 
   return (
