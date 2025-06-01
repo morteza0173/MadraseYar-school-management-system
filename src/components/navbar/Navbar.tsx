@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 
 const routeTitles: Record<string, string> = {
   "/admin": "داشبورد اصلی",
+  "/teacher": "داشبورد اصلی معلم",
   "/eventCalendar": "تقویم رویداد ها",
   "/list/grade": "لیست پایه ها",
   "/list/class": "لیست کلاس ها",
