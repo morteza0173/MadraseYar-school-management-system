@@ -1,36 +1,74 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+School Management System
+A comprehensive school management system designed to simplify educational processes, communication, and planning for schools.
 
-## Getting Started
+Features
+The system offers 4 distinct user panels, each tailored with specific dashboards and functionalities:
 
-First, run the development server:
+🟦 School Admin Panel
+Add educational grades
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Create separate classes for each grade
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Add subjects for each class
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Build weekly class schedules
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Manage teachers and students
 
-## Learn More
+Register school events and announcements
 
-To learn more about Next.js, take a look at the following resources:
+Manage attendance
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+View class performance and average grades on the dashboard
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+🟨 Teacher Panel
+View assigned classes
 
-## Deploy on Vercel
+See upcoming assignments and exams
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Create new assignments, exams, or events (visible on students’ calendars)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Record student grades
+
+View performance reports of classes
+
+🟩 Student Panel (In Progress)
+View grades
+
+Track academic performance
+
+Access academic calendar and upcoming events
+
+🟧 Parent Panel (In Progress)
+Monitor child's academic progress
+
+Access academic calendar
+
+Follow upcoming events and exams
+
+Technologies Used
+Next.js as the main framework
+
+Tailwind CSS for rapid UI design
+
+Prisma & Supabase for data storage and management
+
+shadcn/ui prebuilt components
+
+FullCalendar for weekly schedule display
+
+React Day Picker for event calendar
+
+React Query for server state management and caching
+
+TanStack React Table for dynamic, filterable tables
+
+React Hook Form & Zod for form handling and validation
+
+
+Live Demo
+Check the live version here: https://madrase-yar.vercel.app
+
+Contribution
+Contributions and feedback are welcome! Feel free to open issues or pull requests.
+
