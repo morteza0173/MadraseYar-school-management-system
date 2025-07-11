@@ -64,7 +64,7 @@ export default function WeeklyCalendarTeacher() {
           interval: 1,
           byweekday: [dayMapping[lesson.day]],
           dtstart: `2025-01-01T${lesson.startTime}:00`,
-          until: "2025-06-01",
+          until: "2100-06-01",
         },
         extendedProps: {
           description: lesson.className,
